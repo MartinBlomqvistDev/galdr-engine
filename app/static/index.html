@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GALDR – Ekokammaren</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0a0a0f;
+      color: #c8c8d0;
+      font-family: 'Georgia', 'Times New Roman', serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      max-width: 680px;
+      width: 100%;
+      padding: 2rem 1.5rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid #2a2a3a;
+      padding-bottom: 1.5rem;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      color: #7eb8da;
+      letter-spacing: 0.3em;
+      font-weight: 400;
+    }
+
+    header p {
+      color: #5a5a6a;
+      font-style: italic;
+      margin-top: 0.5rem;
+    }
+
+    #status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.6rem 1rem;
+      background: #12121a;
+      border: 1px solid #2a2a3a;
+      border-radius: 6px;
+      margin-bottom: 1.5rem;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+    }
+
+    .hp-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .hp-visual {
+      width: 100px;
+      height: 8px;
+      background: #1a1a2a;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .hp-fill {
+      height: 100%;
+      background: #4a9;
+      transition: width 0.5s ease;
+      border-radius: 4px;
+    }
+
+    .hp-fill.low { background: #d84; }
+    .hp-fill.critical { background: #c44; }
+
+    #story-log {
+      min-height: 300px;
+      margin-bottom: 1.5rem;
+    }
+
+    .story-entry {
+      margin-bottom: 1.2rem;
+      animation: fadeIn 0.6s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .narrator-text {
+      color: #8bb8d0;
+      font-style: italic;
+      line-height: 1.7;
+      font-size: 1.05rem;
+    }
+
+    .player-text {
+      color: #d0c878;
+      padding-left: 1rem;
+      border-left: 2px solid #3a3a2a;
+      font-size: 0.95rem;
+    }
+
+    .system-text {
+      color: #5a6a5a;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      text-align: center;
+      padding: 0.5rem 0;
+    }
+
+    .dice-text {
+      color: #b080d0;
+      font-family: 'Courier New', monospace;
+      text-align: center;
+      padding: 0.5rem 0;
+      font-size: 0.95rem;
+    }
+
+    .state-change {
+      color: #6ab06a;
+      font-size: 0.85rem;
+      padding-left: 1rem;
+    }
+
+    .scene-title {
+      color: #7eb8da;
+      font-size: 1.3rem;
+      text-align: center;
+      padding: 1rem 0;
+      border-top: 1px solid #2a2a3a;
+      border-bottom: 1px solid #2a2a3a;
+      margin: 1rem 0;
+      letter-spacing: 0.1em;
+    }
+
+    #actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .action-btn {
+      background: #16162a;
+      border: 1px solid #3a3a5a;
+      color: #c8c8d0;
+      padding: 0.7rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.95rem;
+      text-align: left;
+      transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+      background: #1e1e3a;
+      border-color: #7eb8da;
+      color: #fff;
+    }
+
+    .action-btn .num {
+      color: #d0c878;
+      margin-right: 0.5rem;
+      font-weight: bold;
+    }
+
+    #input-area {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    #player-input {
+      flex: 1;
+      background: #12121a;
+      border: 1px solid #2a2a3a;
+      color: #d0c878;
+      padding: 0.7rem 1rem;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    #player-input:focus { border-color: #7eb8da; }
+    #player-input::placeholder { color: #3a3a4a; }
+
+    #send-btn {
+      background: #2a3a5a;
+      border: 1px solid #3a4a6a;
+      color: #7eb8da;
+      padding: 0.7rem 1.2rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 1rem;
+    }
+
+    #send-btn:hover { background: #3a4a6a; }
+    #send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .items-list {
+      color: #5a6a5a;
+      font-size: 0.8rem;
+    }
+
+    #setup {
+      text-align: center;
+      padding: 3rem 1rem;
+    }
+
+    #setup input {
+      background: #12121a;
+      border: 1px solid #2a2a3a;
+      color: #d0c878;
+      padding: 0.7rem 1rem;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 1.1rem;
+      text-align: center;
+      width: 250px;
+      outline: none;
+      margin: 1rem 0;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    #setup input:focus { border-color: #7eb8da; }
+
+    #start-btn {
+      background: #2a3a5a;
+      border: 1px solid #7eb8da;
+      color: #7eb8da;
+      padding: 0.8rem 2rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 1.1rem;
+      letter-spacing: 0.1em;
+      margin-top: 0.5rem;
+    }
+
+    #start-btn:hover { background: #3a5a7a; color: #fff; }
+
+    #game { display: none; }
+
+    .ending {
+      text-align: center;
+      padding: 2rem 0;
+      border-top: 1px solid #2a2a3a;
+      margin-top: 1rem;
+    }
+
+    .ending h2 { color: #7eb8da; margin-bottom: 1rem; }
+    .ending .light { color: #6ab06a; }
+    .ending .dark { color: #c44; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>G A L D R</h1>
+      <p>Ekokammaren – Malmös Osynliga Röster</p>
+    </header>
+
+    <!-- Setup -->
+    <div id="setup">
+      <p style="color: #5a5a6a; margin-bottom: 1rem;">Vad heter du, vandrare?</p>
+      <input type="text" id="name-input" placeholder="Äventyrare" autofocus>
+      <br>
+      <button id="start-btn">Börja</button>
+    </div>
+
+    <!-- Game -->
+    <div id="game">
+      <div id="status-bar">
+        <div class="hp-bar">
+          <span>HP</span>
+          <div class="hp-visual"><div class="hp-fill" id="hp-fill"></div></div>
+          <span id="hp-text">20/20</span>
+        </div>
+        <span id="location-text" style="color: #5a5a6a;"></span>
+        <span class="items-list" id="items-text"></span>
+      </div>
+
+      <div id="story-log"></div>
+      <div id="actions"></div>
+
+      <div id="input-area">
+        <input type="text" id="player-input" placeholder="Skriv något eller välj en handling..." disabled>
+        <button id="send-btn" disabled>Sänd</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = window.location.origin + '/api/v1';
+    let sessionId = null;
+    let currentActions = [];
+
+    const log = document.getElementById('story-log');
+    const actionsDiv = document.getElementById('actions');
+    const input = document.getElementById('player-input');
+    const sendBtn = document.getElementById('send-btn');
+
+    // Setup
+    document.getElementById('start-btn').addEventListener('click', startGame);
+    document.getElementById('name-input').addEventListener('keydown', e => {
+      if (e.key === 'Enter') startGame();
+    });
+
+    async function startGame() {
+      const name = document.getElementById('name-input').value.trim() || 'Äventyrare';
+
+      try {
+        const res = await fetch(`${API}/sessions`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ character_name: name }),
+        });
+        const data = await res.json();
+        sessionId = data.session_id;
+
+        document.getElementById('setup').style.display = 'none';
+        document.getElementById('game').style.display = 'block';
+        input.disabled = false;
+        sendBtn.disabled = false;
+        input.focus();
+
+        // Enter first node
+        const enterRes = await fetch(`${API}/sessions/${sessionId}/enter`, { method: 'POST' });
+        const enterData = await enterRes.json();
+        handleResponse(enterData, true);
+      } catch (err) {
+        addSystem('Kunde inte ansluta till servern. Kör: uvicorn galdr.main:app');
+      }
+    }
+
+    // Send input
+    sendBtn.addEventListener('click', sendInput);
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') sendInput();
+    });
+
+    async function sendInput() {
+      const text = input.value.trim();
+      if (!text || !sessionId) return;
+
+      input.value = '';
+      input.disabled = true;
+      sendBtn.disabled = true;
+
+      addPlayer(text);
+
+      try {
+        const prevNode = document.getElementById('location-text').dataset.nodeId || '';
+
+        const res = await fetch(`${API}/sessions/${sessionId}/input`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text }),
+        });
+        const data = await res.json();
+
+        // Check for node change
+        if (data.node_id !== prevNode && prevNode !== '') {
+          // Get the new node's opening
+          const enterRes = await fetch(`${API}/sessions/${sessionId}/enter`, { method: 'POST' });
+          const enterData = await enterRes.json();
+
+          // Show dice from original response
+          if (data.dice_result) showDice(data.dice_result);
+          data.state_changes.forEach(c => { if (c) addStateChange(c); });
+
+          // Show scene transition + opening text
+          handleResponse(enterData, true);
+        } else {
+          handleResponse(data, false);
+        }
+
+        // Update status
+        await updateStatus();
+
+        // Check for ending
+        const stateRes = await fetch(`${API}/sessions/${sessionId}/state`);
+        const state = await stateRes.json();
+        const ending = state.flags?.ending;
+        if (ending) {
+          showEnding(ending, state);
+          return;
+        }
+      } catch (err) {
+        addSystem('Något gick fel: ' + err.message);
+      }
+
+      input.disabled = false;
+      sendBtn.disabled = false;
+      input.focus();
+    }
+
+    function handleResponse(data, isNewScene) {
+      if (isNewScene) {
+        // Find node title from the response
+        addSceneTitle(data.node_id);
+      }
+
+      if (data.dice_result) showDice(data.dice_result);
+      if (data.text) addNarrator(data.text);
+      data.state_changes?.forEach(c => { if (c) addStateChange(c); });
+
+      // Update location
+      const locEl = document.getElementById('location-text');
+      locEl.textContent = data.node_id;
+      locEl.dataset.nodeId = data.node_id;
+
+      // Actions
+      currentActions = data.available_actions || [];
+      showActions(currentActions);
+    }
+
+    function showActions(actions) {
+      actionsDiv.innerHTML = '';
+      actions.forEach((a, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'action-btn';
+        btn.innerHTML = `<span class="num">${i + 1}</span>${a.label}`;
+        btn.addEventListener('click', () => {
+          input.value = String(i + 1);
+          sendInput();
+        });
+        actionsDiv.appendChild(btn);
+      });
+    }
+
+    function showDice(result) {
+      let text = '';
+      if (result.quality === 'spectacular') {
+        text = result.roll === 20
+          ? `⚄ KRITISK FRAMGÅNG! [d20: 20 = ${result.roll} mot DC ${result.dc}]`
+          : `⚃ Spektakulärt! [${result.ability}: ${result.roll} mot DC ${result.dc}]`;
+      } else if (result.quality === 'disaster') {
+        text = result.roll === 1
+          ? `⚀ KRITISKT MISSLYCKANDE! [d20: 1 mot DC ${result.dc}]`
+          : `⚁ Katastrof [${result.ability}: ${result.roll} mot DC ${result.dc}]`;
+      } else if (result.success) {
+        text = `⚃ Lyckat! [${result.ability}: ${result.roll} mot DC ${result.dc}]`;
+      } else {
+        text = `⚁ Misslyckat [${result.ability}: ${result.roll} mot DC ${result.dc}]`;
+      }
+      addDice(text);
+    }
+
+    async function updateStatus() {
+      try {
+        const res = await fetch(`${API}/sessions/${sessionId}/state`);
+        const state = await res.json();
+
+        const hp = state.hp;
+        const maxHp = state.max_hp;
+        const ratio = hp / maxHp;
+
+        document.getElementById('hp-text').textContent = `${hp}/${maxHp}`;
+        const fill = document.getElementById('hp-fill');
+        fill.style.width = `${ratio * 100}%`;
+        fill.className = 'hp-fill' + (ratio <= 0.25 ? ' critical' : ratio <= 0.5 ? ' low' : '');
+
+        const items = state.inventory.length > 0 ? state.inventory.join(', ') : '';
+        document.getElementById('items-text').textContent = items;
+      } catch {}
+    }
+
+    function showEnding(ending, state) {
+      actionsDiv.innerHTML = '';
+      input.disabled = true;
+      sendBtn.disabled = true;
+
+      const div = document.createElement('div');
+      div.className = 'ending';
+      if (ending === 'ljus') {
+        div.innerHTML = `<h2 class="light">Ljuset återvänder</h2>
+          <p style="color:#5a6a5a">Platser: ${Object.keys(state.flags).filter(k=>k.startsWith('visited')).length} |
+          Föremål: ${state.inventory.length} | Turer: ${state.turn_count || '?'}</p>
+          <p style="margin-top:1rem;color:#5a5a6a;font-style:italic">Tack för att du spelade Ekokammaren.</p>`;
+      } else {
+        div.innerHTML = `<h2 class="dark">Skuggorna stannar</h2>
+          <p style="color:#5a6a5a">Föremål: ${state.inventory.length}</p>
+          <p style="margin-top:1rem;color:#5a5a6a;font-style:italic">Tack för att du spelade Ekokammaren.</p>`;
+      }
+      log.appendChild(div);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    // DOM helpers
+    function addNarrator(text) {
+      const div = document.createElement('div');
+      div.className = 'story-entry narrator-text';
+      div.textContent = text;
+      log.appendChild(div);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    function addPlayer(text) {
+      const div = document.createElement('div');
+      div.className = 'story-entry player-text';
+      div.textContent = `> ${text}`;
+      log.appendChild(div);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    function addSystem(text) {
+      const div = document.createElement('div');
+      div.className = 'story-entry system-text';
+      div.textContent = text;
+      log.appendChild(div);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    function addDice(text) {
+      const div = document.createElement('div');
+      div.className = 'story-entry dice-text';
+      div.textContent = text;
+      log.appendChild(div);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    function addStateChange(text) {
+      const div = document.createElement('div');
+      div.className = 'story-entry state-change';
+      div.textContent = `> ${text}`;
+      log.appendChild(div);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    function addSceneTitle(nodeId) {
+      const div = document.createElement('div');
+      div.className = 'story-entry scene-title';
+      // Formatera node-id till titel
+      const title = nodeId.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+      div.textContent = title;
+      log.appendChild(div);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    // Keyboard: siffror triggar actions
+    document.addEventListener('keydown', e => {
+      if (input.disabled) return;
+      if (document.activeElement === input) return;
+      const num = parseInt(e.key);
+      if (num >= 1 && num <= currentActions.length) {
+        input.value = String(num);
+        sendInput();
+      }
+    });
+  </script>
+</body>
+</html>

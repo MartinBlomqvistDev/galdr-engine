@@ -1,13 +1,15 @@
 # GALDR Engine
-**Asynchronous Voice-First AI Orchestration.**
+**High-performance Asynchronous AI Orchestration.**
 
-GALDR is an event-driven engine for real-time voice-AI interaction, optimized for p95 <500ms latency via asynchronous flow control and strict state persistence.
+GALDR is a specialized engine for voice-first interactive fiction, designed for sub-500ms p95 latency. It implements a strict separation between narrative structure (directed graphs) and generative improvisation.
 
-## Architecture
-1. **Voice Layer:** Audio stream processing (STT/TTS).
-2. **Logic Layer:** Asynchronous FastAPI orchestration.
-3. **Content Layer:** Context management and RAG logic.
-4. **Persistence Layer:** Pydantic-driven state management.
+### Core Architectural Pillars
+- **Strict State Management:** Pydantic-validated atomic state transitions.
+- **Service Orchestration:** Dependency-injected AI backends (STT/LLM/TTS) via async protocols.
+- **Latency Monitoring:** Integrated telemetry for every step of the 8-stage processing loop.
+- **Offline-First Resilience:** Deterministic mechanical resolution (dice, flags, nodes) with optional AI enhancement.
 
-## Stack
-Python 3.11+, FastAPI, Asyncio, Pydantic v2, NumPy.
+### Tech Stack
+Python 3.11+, FastAPI, Asyncio, Pydantic v2.
+
+See `app/README.md` and `app/ARCHITECTURE.md` for technical deep-dives.
