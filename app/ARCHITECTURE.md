@@ -15,9 +15,9 @@ GALDR's answer is a strict separation of concerns: the dramatist controls *struc
 
 ---
 
-## Senior Engineering: Design Patterns & Observability
+## Technical Design Patterns & Observability
 
-To meet the **p95 < 500ms** latency target while maintaining a clean, testable codebase, GALDR employs several advanced architectural patterns:
+To meet the **p95 < 500ms** latency target while maintaining a clean, testable codebase, GALDR employs several key architectural patterns:
 
 ### 1. Inversion of Control (IoC) & Dependency Injection
 The `GaldrEngine` does not depend on concrete implementations of AI services (OpenAI, local models, etc.). Instead, it depends on **Protocols** (`LLMService`, `TTSService`).

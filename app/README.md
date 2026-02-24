@@ -1,51 +1,26 @@
 # GALDR Engine
 
-An agentic AI engine for voice-first interactive storytelling — no screen, no GUI, just conversation and sound.
+Voice-first orchestration for interactive fiction — headless, event-driven, and designed for low-latency narrative delivery.
 
-The core idea: a dramatist designs a story as a graph of narrative nodes. An AI character lives inside those nodes and improvises dialogue freely. The two never overlap — structure is the dramatist's job, language is the AI's. We call this split *nod-regi* (graph control) and *prompt-regi* (character direction).
+### Core Principle: Separation of Concerns
+GALDR implements a strict boundary between dramaturgical structure and generative language:
+- **Nod-regi (Graph Control):** The dramatist defines the scene structure, mechanics, and branching via a directed graph.
+- **Prompt-regi (Creative Direction):** The AI improvises dialogue within the specific constraints of the current node.
 
----
-
-## What problem this solves
-
-Current voice AI either gives you a chatbot (unconstrained, wanders off-story) or an audio book (scripted, static). GALDR sits between: the story has bones the AI can't break, but within each scene the AI is genuinely responsive. Player says something unexpected — the character rolls with it, within the scene's intent.
-
-Every player action also goes through a proper RPG skill check (D&D 5e-flavoured) before the AI generates a response. The dice result shapes what the AI says — not the other way around.
+This architecture ensures narrative consistency (the AI cannot break the story graph) while maintaining conversational fluidity.
 
 ---
 
-## Architecture sketch
+## Processing Pipeline
 
-```
-Player input (text or voice)
-         │
-         ▼
-    Intent matching
-    (LLM constrained to available node actions, with offline keyword fallback)
-         │
-         ▼
-    Skill check  ←── if the action requires one (Pydantic-validated)
-         │
-         ▼
-    State mutation  ←── consequences applied atomically
-         │
-         ▼
-    Prompt builder  ←── nod-regi + state + dice result → system prompt
-         │
-         ▼
-       LLM
-         │
-         ▼
-    Content filter  ←── global + per-node forbidden topics
-         │
-         ▼
-    TTS  ←── voice morphing params from node definition
-         │
-         ▼
-    Response (text + audio + updated state)
-```
+1. **Intent Matching**: Maps player input to node actions (LLM-based with heuristic fallback).
+2. **Mechanical Resolution**: RPG-style skill checks (D&D 5e-inspired) validated via Pydantic.
+3. **State Mutation**: Atomic updates to GameState (inventory, flags, HP).
+4. **Context Construction**: Dynamic system prompt generation from node metadata and world state.
+5. **Inference**: LLM generation and deterministic content filtering.
+6. **Synthesis**: TTS generation with per-node voice parameters (pitch, reverb, style).
 
-This order matters — see [ARCHITECTURE.md](ARCHITECTURE.md) for why each step sits where it does.
+See [ARCHITECTURE.md](ARCHITECTURE.md) for a technical deep-dive into the 8-step orchestration loop and p95 latency targets.
 
 ---
 

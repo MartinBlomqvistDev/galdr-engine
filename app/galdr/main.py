@@ -74,7 +74,7 @@ def _create_minimal_scenario() -> Scenario:
                 system_prompt=(
                     "Spelaren står vid kanten av en urgammal skog. "
                     "Det är skymning. Dimma kryper mellan stammarna. "
-                    "Beskriv scenen atmosphäriskt och bjud in spelaren."
+                    "Beskriv scenen atmosfäriskt och bjud in spelaren."
                 ),
                 opening_text=(
                     "Du står vid skogens gräns. Gamla tallar reser sig som "
@@ -117,8 +117,7 @@ async def lifespan(app: FastAPI):
     global engine
     logger.info("=== GALDR Engine starting ===")
 
-    # Initialize Services (Dependency Injection)
-    # This allows us to easily swap OpenAI for local models or mock services in tests
+    # Service initialization (Dependency Injection)
     ai_service = OpenAIService(
         api_key=settings.openai_api_key, 
         model=settings.openai_model

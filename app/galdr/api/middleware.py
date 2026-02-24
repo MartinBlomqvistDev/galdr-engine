@@ -14,11 +14,11 @@ class TelemetryMiddleware(BaseHTTPMiddleware):
         process_time = (time.perf_counter() - start_time) * 1000
         response.headers["X-Process-Time-Ms"] = f"{process_time:.2f}"
         
-        # Log slow requests to help tune for p95 < 500ms
+        # Latency monitoring for p95 < 500ms targets
         if process_time > 500:
             logger.warning(
-                f"Slow Request: {request.method} {request.url.path} "
-                f"took {process_time:.2f}ms"
+                f"Latency Target Exceeded: {request.method} {request.url.path} "
+                f"({process_time:.2f}ms)"
             )
         else:
             logger.debug(
