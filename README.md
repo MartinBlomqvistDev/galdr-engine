@@ -1,7 +1,7 @@
 # GALDR Engine
 **High-performance Asynchronous AI Orchestration.**
 
-GALDR is a specialized engine for voice-first interactive fiction, designed for sub-500ms p95 latency. It implements a strict separation between narrative structure (directed graphs) and generative improvisation.
+GALDR is an AI orchestration engine built on a single premise: most agent failures come from letting the LLM control its own execution flow. GALDR separates state machine logic from LLM calls entirely. The directed graph defines what can happen. The model decides content within each node. Deterministic, testable, auditable.
 
 ### Core Architectural Pillars
 - **Strict State Management:** Pydantic-validated atomic state transitions.
