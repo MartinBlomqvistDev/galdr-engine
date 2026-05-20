@@ -4,8 +4,9 @@ Voice-first orchestration for interactive fiction — headless, event-driven, an
 
 ### Core Principle: Separation of Concerns
 GALDR implements a strict boundary between dramaturgical structure and generative language:
-- **Nod-regi (Graph Control):** The dramatist defines the scene structure, mechanics, and branching via a directed graph.
-- **Prompt-regi (Creative Direction):** The AI improvises dialogue within the specific constraints of the current node.
+
+- **Graph (Graph Control):** The dramatist defines the scene structure, mechanics, and branching via a directed graph.
+- **Director (Creative Layer):** The AI improvises dialogue within the specific constraints of the current node.
 
 This architecture ensures narrative consistency (the AI cannot break the story graph) while maintaining conversational fluidity.
 
@@ -31,7 +32,7 @@ galdr/
 ├── core/
 │   ├── engine.py        # The 8-step orchestration loop
 │   ├── nodes.py         # NarrativeNode, Condition, Consequence, Scenario
-│   ├── prompt_regi.py   # Builds LLM system prompts from node + game state
+│   ├── prompt_director.py # Builds LLM system prompts from node + game state
 │   ├── state.py         # GameState, Character, World — all Pydantic
 │   └── dice.py          # Skill checks, DC, nat 20/1, narrative quality tiers
 ├── voice/
@@ -48,7 +49,8 @@ galdr/
     └── repository.py    # In-memory for now, Postgres-shaped for later
 
 scenarios/
-└── ekokammaren.json     # 8-node GPS story set in Malmö city centre
+├── calloused.json           # Full arc — 22 nodes, Acts 1–2
+└── calloused_prologue.json  # 5-node Kern crossing — reference scenario
 
 tests/                   # 46 tests including two full end-to-end playthroughs
 play.py                  # Terminal client — playable offline, no API key needed
@@ -114,7 +116,7 @@ Runs fine locally without GPS. Use number keys or free text to navigate.
 |--------|-----|
 | Pydantic for all state | Mutations fail loudly, not silently |
 | Skill checks before LLM generation | Mechanics drive the story — AI narrates the outcome |
-| Nod-regi as a directed graph | AI can improvise within scenes, can't skip between them |
+| Graph as a directed graph | AI can improvise within scenes, can't skip between them |
 | Dual-layer content filtering | Global hard blocks + per-scene soft blocks for narrative context |
 | Offline-first fallback | The engine should be demonstrable without credentials |
 

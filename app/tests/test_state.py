@@ -22,7 +22,7 @@ def test_ability_modifier_ten():
 
 def test_character_defaults():
     char = Character()
-    assert char.name == "Äventyrare"
+    assert char.name == "Traveler"
     assert char.hp == 20
     assert char.level == 1
     assert len(char.inventory) == 0

@@ -239,7 +239,7 @@ async def voice_loop(scenario_path: Path) -> None:
     engine = GaldrEngine(scenario=scenario, llm=llm, tts=_NullTTS())
 
     print("\n" + "=" * 50)
-    print("      GALDR – VOICE-ONLY RPG (Azure PoC)")
+    print("         G.A.L.D.R. // CALLOUSED")
     print("=" * 50)
 
     # 3. Resume from checkpoint or start fresh
@@ -265,24 +265,13 @@ async def voice_loop(scenario_path: Path) -> None:
         state = engine.create_session()
 
     if not resuming:
-        # Name capture
-        await speak(tts, "Welcome to GALDR. What is your name, traveller?", _NARRATOR_VOICE)
-        print("\n[Listening for name...]")
-        raw_name = await stt.listen_from_mic()
-        name = raw_name.strip(" .,!?") or "Traveller"
-        state.character.name = name
-        logger.info("[NAME CAPTURED]: %s", name)
-        await speak(tts, f"Welcome, {name}.", _NARRATOR_VOICE)
-
-        # Tribal Service calibration — only for scenarios that opt in
+        # Diegetic calibration — fires mid-game at calibration_node, not at startup
         if scenario.calibration_enabled:
-            await speak(tts, "Now the smart-dust calibrates you. Answer the Registry's questions truthfully.", _NARRATOR_VOICE)
             state.character.stats = await run_calibration(
                 llm=llm,
                 speak=lambda text: speak(tts, text, _NARRATOR_VOICE),
                 listen=stt.listen_from_mic,
             )
-            await speak(tts, "Registry entry sealed. Operational profile locked.", _NARRATOR_VOICE)
             logger.info("[CALIBRATION DONE] stats=%s", state.character.stats.model_dump())
 
     # calibration_done tracks whether diegetic mid-game calibration has fired this session

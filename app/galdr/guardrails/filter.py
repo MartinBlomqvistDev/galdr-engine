@@ -20,9 +20,9 @@ GLOBAL_BLOCKED_PATTERNS: list[re.Pattern] = [
 
 # In-world fallback lines used when content is blocked
 FALLBACK_RESPONSES = [
-    "Berättaren tystnar ett ögonblick och hittar en annan tråd i historien...",
-    "Vindarna vänder och tar med sig dina ord. Låt oss utforska en annan väg.",
-    "Den frågan hör inte hemma i denna berättelse. Vad vill du göra istället?",
+    "The narrator pauses for a moment and finds another thread in the story...",
+    "The wind shifts and carries your words away. Let's explore a different path.",
+    "That question doesn't belong in this story. What do you want to do instead?",
 ]
 
 

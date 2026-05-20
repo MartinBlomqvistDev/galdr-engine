@@ -82,11 +82,11 @@ class TTSEngine:
         This is the integration point for the custom neural model in production.
         For the PoC, OpenAI voices are close enough to validate the flow.
         """
-        if params.style == "whisper" or params.emotion == "viskande":
+        if params.style == "whisper" or params.emotion == "whisper":
             return "shimmer"
-        elif params.emotion in ("auktoritär", "hotfull"):
+        elif params.emotion in ("authoritative", "threatening"):
             return "onyx"
-        elif params.emotion == "varm":
+        elif params.emotion == "warm":
             return "nova"
         elif params.pitch_shift > 0.3:
             return "alloy"

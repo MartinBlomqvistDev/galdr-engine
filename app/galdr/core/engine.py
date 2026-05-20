@@ -18,7 +18,7 @@ from pydantic import BaseModel, Field
 from galdr.config import settings
 from galdr.core.dice import skill_check, SkillCheckResult
 from galdr.core.nodes import NarrativeNode, NodeAction, Scenario
-from galdr.core.prompt_regi import (
+from galdr.core.prompt_director import (
     build_context_messages,
     build_dice_narrative,
     build_system_prompt,
@@ -74,7 +74,7 @@ class GaldrEngine:
 
     # ----- Session management -----
 
-    def create_session(self, character_name: str = "Äventyrare") -> GameState:
+    def create_session(self, character_name: str = "Traveler") -> GameState:
         state = GameState()
         state.character.name = character_name
         state.current_node_id = self.scenario.start_node
@@ -220,6 +220,165 @@ class GaldrEngine:
             step_latencies=step_times
         )
 
+    # ----- Streaming input processing -----
+
+    async def process_input_stream(
+        self,
+        session_id: str,
+        player_input: str,
+        player_lat: float | None = None,
+        player_lon: float | None = None,
+    ):
+        """Run steps 1-4 (GPS, intent, mechanics, transition) and return immediately.
+
+        Returns (EngineResponse, async_token_generator).
+        The token generator is LAZY — no LLM call happens until the caller
+        iterates it. If the caller discards the generator (e.g. because the
+        new node has scripted opening_text), no LLM call is made at all.
+
+        TTFA improvement: callers pipe the token generator through
+        galdr.utils.sentence_splitter.split_sentences and speak each
+        sentence as it completes, instead of waiting for the full response.
+        """
+        start_time = time.perf_counter()
+        step_times: dict[str, float] = {}
+
+        state = self.get_session(session_id)
+        if not state:
+            async def _err():
+                yield "Session not found."
+            return EngineResponse(text="Session not found.", latency_ms=0), _err()
+
+        if player_lat is not None:
+            state.player_lat = player_lat
+            state.player_lon = player_lon
+
+        node = self.scenario.get_node(state.current_node_id)
+        if not node:
+            async def _err2():
+                yield f"Node '{state.current_node_id}' not found."
+            return EngineResponse(latency_ms=0), _err2()
+
+        state.record_dialog("player", player_input, node_id=node.id)
+
+        t0 = time.perf_counter()
+        geo_context = await self._check_geofence(state, node)
+        ambient_context = await build_ambient_context(state.player_lat, state.player_lon)
+        step_times["gps_ambient"] = (time.perf_counter() - t0) * 1000
+
+        t0 = time.perf_counter()
+        matched_action = await self._match_action(player_input, node, state)
+        step_times["intent_match"] = (time.perf_counter() - t0) * 1000
+
+        t0 = time.perf_counter()
+        dice_result = None
+        state_changes: list[str] = []
+        next_node_id = state.current_node_id
+
+        if matched_action:
+            if matched_action.skill_check:
+                dice_result = skill_check(state, matched_action.skill_check, matched_action.dc)
+                if dice_result.success:
+                    next_node_id = matched_action.target_node or state.current_node_id
+                    for c in matched_action.consequences:
+                        state_changes.append(c.apply(state))
+                else:
+                    next_node_id = matched_action.failure_node or state.current_node_id
+                    for c in matched_action.failure_consequences:
+                        state_changes.append(c.apply(state))
+            else:
+                next_node_id = matched_action.target_node or state.current_node_id
+                for c in matched_action.consequences:
+                    state_changes.append(c.apply(state))
+        step_times["mechanics"] = (time.perf_counter() - t0) * 1000
+
+        t0 = time.perf_counter()
+        if next_node_id != state.current_node_id:
+            new_node = self.scenario.get_node(next_node_id)
+            if new_node and new_node.can_enter(state):
+                state.current_node_id = next_node_id
+                node = new_node
+                for c in node.on_enter:
+                    state_changes.append(c.apply(state))
+                state.visit_location(node.id, node.title)
+        step_times["transition"] = (time.perf_counter() - t0) * 1000
+
+        combined_context = "\n".join(filter(None, [geo_context, ambient_context]))
+        available = node.get_available_actions(state)
+        pre_latency = int((time.perf_counter() - start_time) * 1000)
+        logger.info("[STREAM] steps 1-4 done in %dms — LLM stream is lazy", pre_latency)
+
+        partial = EngineResponse(
+            text="",
+            audio=b"",
+            node_id=node.id,
+            available_actions=[{"id": a.id, "label": a.label} for a in available],
+            dice_result=dice_result,
+            state_changes=[s for s in state_changes if s],
+            latency_ms=pre_latency,
+            step_latencies=step_times,
+        )
+
+        return partial, self._generate_response_stream(
+            state, node, player_input, dice_result, combined_context
+        )
+
+    async def _generate_response_stream(
+        self,
+        state: GameState,
+        node: NarrativeNode,
+        player_input: str,
+        dice_result,
+        context: str,
+    ):
+        """Async generator — yields LLM tokens as they arrive.
+
+        Records dialog to state once the stream is complete or abandoned.
+        Falls back to full generation if the LLM service has no streaming support.
+        """
+        system_prompt = build_system_prompt(self.scenario, node, state)
+        messages: list[dict[str, str]] = [{"role": "system", "content": system_prompt}]
+        messages.extend(build_context_messages(state, max_history=8))
+
+        extra: list[str] = []
+        if dice_result:
+            extra.append(build_dice_narrative(dice_result))
+        if context:
+            extra.append(context)
+
+        user_content = player_input
+        if extra:
+            user_content = player_input + "\n\n" + "\n".join(extra)
+        messages.append({"role": "user", "content": user_content})
+
+        max_tokens = max(80, int(node.max_response_length * 1.5))
+        collected: list[str] = []
+
+        try:
+            if not hasattr(self.llm, "generate_text_stream"):
+                # LLM service has no streaming support — full generation, single yield
+                text = await self._generate_response(state, node, player_input, dice_result, context)
+                collected.append(text)
+                yield text
+                return
+
+            async for chunk in self.llm.generate_text_stream(messages=messages, max_tokens=max_tokens):
+                collected.append(chunk)
+                yield chunk
+
+        except Exception as e:
+            logger.error("LLM stream error: %s", e)
+            fallback = self._generate_fallback(node, player_input, dice_result)
+            collected.append(fallback)
+            yield fallback
+        finally:
+            if collected:
+                full_text = "".join(collected)
+                state.record_dialog(
+                    node.voice.character_name, full_text,
+                    node_id=node.id, emotion=node.voice.emotion,
+                )
+
     # ----- Node entry -----
 
     async def enter_node(self, session_id: str) -> EngineResponse:
@@ -301,7 +460,7 @@ class GaldrEngine:
         if not available:
             return None
 
-        if not settings.openai_api_key:
+        if not settings.openai_api_key and not settings.use_azure:
             return self._match_action_offline(player_input, available)
 
         # Try LLM first, fall back to offline matching
@@ -425,8 +584,9 @@ class GaldrEngine:
 
         messages.append({"role": "user", "content": user_content})
 
+        max_tokens = max(80, int(node.max_response_length * 1.5))
         try:
-            return await self.llm.generate_text(messages=messages)
+            return await self.llm.generate_text(messages=messages, max_tokens=max_tokens)
         except Exception as e:
             logger.error(f"LLM error: {e}")
             return self._generate_fallback(node, player_input, dice_result)

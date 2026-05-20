@@ -31,7 +31,7 @@ class OpenAIService(LLMService, TTSService, STTService):
         try:
             voice_map = {
                 "narrator": "onyx",
-                "mystisk": "shimmer",
+                "mystic": "shimmer",
                 "aggressive": "fable",
                 "friendly": "nova",
             }

@@ -25,6 +25,7 @@ from galdr.config import settings
 from galdr.core.engine import GaldrEngine
 from galdr.core.nodes import Scenario
 from galdr.services.openai_service import OpenAIService
+from galdr.services.azure_service import AzureOpenAIService, AzureSpeechTTSService
 
 logging.basicConfig(
     level=logging.DEBUG if settings.debug else logging.INFO,
@@ -60,44 +61,42 @@ def _create_minimal_scenario() -> Scenario:
     return Scenario(
         id="demo",
         title="GALDR Demo",
-        description="Minimalt demo-scenario",
+        description="Minimal demo scenario — forest edge at dusk.",
         global_system_prompt=(
-            "Du är en mystisk berättare i en nordisk fantasivärld. "
-            "Tala poetiskt men tydligt. Driv berättelsen framåt."
+            "You are a narrator in a northern wilderness setting. "
+            "Speak with atmosphere and economy. Drive the story forward."
         ),
         start_node="start",
         nodes={
             "start": NarrativeNode(
                 id="start",
-                title="Skogens kant",
-                description="Spelaren börjar vid kanten av en mörk skog",
+                title="The Forest Edge",
+                description="Player begins at the edge of a dark forest at dusk.",
                 system_prompt=(
-                    "Spelaren står vid kanten av en urgammal skog. "
-                    "Det är skymning. Dimma kryper mellan stammarna. "
-                    "Beskriv scenen atmosfäriskt och bjud in spelaren."
+                    "Player stands at the edge of an ancient forest at dusk. "
+                    "Fog moves between the trunks. Describe atmospherically and invite the player in."
                 ),
                 opening_text=(
-                    "Du står vid skogens gräns. Gamla tallar reser sig som "
-                    "mörka pelare mot den bleknade himlen. Dimman kryper långsamt "
-                    "runt dina fötter, och någonstans djupt bland träden hör du "
-                    "ett svagt ljud... som en viskning."
+                    "You stand at the tree line. Old pines rise like dark pillars "
+                    "against the fading sky. Fog creeps around your feet, and somewhere "
+                    "deep among the trees you hear something faint — like a whisper."
                 ),
                 voice=VoiceParams(
-                    character_name="Berättaren",
-                    emotion="mystisk",
+                    character_name="Narrator",
+                    emotion="mysterious",
                     style="narrator",
                 ),
                 actions=[
                     NodeAction(
                         id="enter_forest",
-                        label="Gå in i skogen",
-                        description="Följ viskningarna in bland träden",
+                        label="Walk into the forest",
+                        description="Follow the whispers in among the trees.",
                         target_node="forest",
                     ),
                     NodeAction(
                         id="listen",
-                        label="Lyssna på viskningarna",
-                        description="Stanna och försök urskilja vad viskningarna säger",
+                        label="Listen to the whispers",
+                        description="Stay still and try to make out what the whispers are saying.",
                         skill_check=Ability.WISDOM,
                         dc=12,
                         target_node="forest_aware",
@@ -118,16 +117,32 @@ async def lifespan(app: FastAPI):
     logger.info("=== GALDR Engine starting ===")
 
     # Service initialization (Dependency Injection)
-    ai_service = OpenAIService(
-        api_key=settings.openai_api_key, 
-        model=settings.openai_model
-    )
+    if settings.use_azure:
+        logger.info("Azure mode: using AzureOpenAIService + AzureSpeechTTSService")
+        llm_service = AzureOpenAIService(
+            api_key=settings.azure_openai_api_key,
+            endpoint=settings.azure_openai_endpoint,
+            deployment=settings.azure_openai_deployment,
+            api_version=settings.azure_openai_api_version,
+        )
+        tts_service = AzureSpeechTTSService(
+            key=settings.azure_speech_key,
+            region=settings.azure_speech_region,
+        )
+    else:
+        logger.info("OpenAI mode: using OpenAIService")
+        ai_service = OpenAIService(
+            api_key=settings.openai_api_key,
+            model=settings.openai_model,
+        )
+        llm_service = ai_service
+        tts_service = ai_service
 
     scenario = load_scenario()
     engine = GaldrEngine(
         scenario=scenario,
-        llm=ai_service,
-        tts=ai_service
+        llm=llm_service,
+        tts=tts_service,
     )
     set_engine(engine)
 
@@ -135,8 +150,8 @@ async def lifespan(app: FastAPI):
     logger.info(f"API: http://{settings.host}:{settings.port}")
     logger.info(f"Docs: http://{settings.host}:{settings.port}/docs")
 
-    if not settings.openai_api_key:
-        logger.warning("No OPENAI_API_KEY — running in offline mode (scripted responses, no TTS)")
+    if not settings.use_azure and not settings.openai_api_key:
+        logger.warning("No API keys found — running in offline mode (scripted responses, no TTS)")
 
     yield
 

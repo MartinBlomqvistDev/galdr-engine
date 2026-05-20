@@ -74,7 +74,7 @@ This matters because:
 - Tests can construct any state precisely without mocking
 - The agentic loop can be replayed deterministically for debugging
 
-The tradeoff: Pydantic adds overhead on every mutation. At GALDR's scale (single-player sessions, <2s response budget) this is irrelevant.
+The tradeoff: Pydantic adds overhead on every mutation. At GALDR's scale (single-player sessions, <500ms response budget) this is irrelevant.
 
 ---
 

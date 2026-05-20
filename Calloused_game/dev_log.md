@@ -901,12 +901,29 @@ This was the last remaining scripted text in the prologue that contradicted reac
 
 ---
 
+## 2026-05-20 -- Remove Name Capture and Meta-Welcome
+
+**Problem:** voice_play.py opened with "Welcome to GALDR... Traveler." and asked "What is your name?" before entering the scenario. Both violate the design document:
+
+- No system narrator voice (Ven was removed; the world does not welcome anyone)
+- Name capture is character-creation-screen energy -- the world does not ask your name
+- `crater_investigation` already has an opening_text that plunges the player into the scene: "Three days since the Eternal Breath stopped..."
+- The meta-welcome would play immediately before that line, doubling the introduction
+
+**Fix:** Removed name capture entirely. Removed welcome speaks. Default character name is "Traveler" (was "Aventyrare" -- broken encoding on Windows console). The startup calibration block now only fires if `calibration_enabled: true`; the surrounding meta-speaks ("Answer the Registry's questions truthfully") removed. The diegetic v2.1 calibration design fires mid-game at `facility_scan` and needs no startup framing.
+
+**Result:** Game starts on first audio line of `crater_investigation`. No meta-layer between player and world.
+
+**Also fixed:** Console banner em dash caused `?` encoding on Windows. Changed to ASCII-safe `G.A.L.D.R. // CALLOUSED`. Default character name changed from Swedish "Aventyrare" to "Traveler" -- fixes broken `?` in session log lines. Voice reverted from en-US-DavisNeural (rejected) to en-GB-SoniaNeural.
+
+---
+
 ## Pending / Next
 
 - [ ] Run benchmarks 06+ with new 17-node prologue and flag-based narration. Target 20+ TTFA measurements total.
 - [ ] Thesis deadline 2026-05-22 -- 2 days. Write RQ1 (TTFA) section with collected data.
 - [ ] Reframe TTFA in thesis: "LLM-to-first-sentence latency" not "input-to-first-audio." True TTFA = TTFA value + TTS synthesis (~200-650ms). Current p50 approximately 1600-1700ms LLM-first-sentence; approximately 2-3s true TTFA.
-- [ ] Voice decision: currently en-US-DavisNeural (darker register). Still considering en-GB male voices -- Ryan, Thomas, Oliver.
+- [ ] Voice decision: en-GB-SoniaNeural current. Continue auditioning male voices post-thesis.
 - [ ] Calibration long-term: replace question-based intake with choice-driven stat emergence from prologue play. Post-thesis.
 - [ ] Barge-in (post-thesis): requires headphones or echo cancellation. Windows WASAPI concurrent stream conflict on speakers.
 - [ ] Act 1 opening: overland travel from crater to The Cleft. Lo delivers world-knowledge during the walk.

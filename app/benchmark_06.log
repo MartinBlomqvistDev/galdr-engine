@@ -1,0 +1,11 @@
+2026-05-20 15:21:49,614 [INFO] __main__: Initializing Azure Speech TTS (Standard)
+2026-05-20 15:21:49,615 [INFO] __main__: [TTS] Pre-warming synthesizer connections...
+2026-05-20 15:21:49,716 [INFO] galdr.services.azure_service: [TTS WARMUP] synthesizers ready in 96ms
+
+==================================================
+      GALDR � VOICE-ONLY RPG (Azure PoC)
+==================================================
+2026-05-20 15:21:49,717 [INFO] galdr.core.engine: New session: 79565e56-6b93-4ce1-9219-5c1ebf84df8c (�ventyrare)
+
+2026-05-20 15:21:56,196 [INFO] galdr.services.azure_service: [TTS\u2192speaker] voice=en-GB-SoniaNeural chars=47 latency_ms=6478
+[Listening for name...]

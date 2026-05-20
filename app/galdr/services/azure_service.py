@@ -124,7 +124,7 @@ class AzureSpeechTTSService:
     #   en-IE-EmilyNeural             — Irish, quiet authority
     #   en-AU-NatashaNeural           — Australian, dry and grounded
     #   en-NZ-MollyNeural             — New Zealand, understated
-    _NARRATOR = "en-US-DavisNeural"
+    _NARRATOR = "en-GB-SoniaNeural"
 
     _VOICE_MAP = {
         "narrator":    _NARRATOR,

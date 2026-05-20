@@ -35,7 +35,7 @@ def build_system_prompt(
 
     # Layer 1: global identity
     parts.append(
-        "You are GALDR — an AI narrator for interactive storytelling. "
+        "You are the narrator of Calloused, a voice-first interactive story. "
         "You voice characters with presence, tempo, and subtext. "
         "You are NOT a chatbot. You are a game master who drives the story forward."
     )

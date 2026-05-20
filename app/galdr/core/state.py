@@ -53,7 +53,7 @@ class InventoryItem(BaseModel):
 class Character(BaseModel):
     """Player character: stats, inventory, backstory."""
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    name: str = "Äventyrare"
+    name: str = "Traveler"
     stats: CharacterStats = Field(default_factory=CharacterStats)
     hp: int = Field(default=20, ge=0)
     max_hp: int = 20
@@ -61,6 +61,14 @@ class Character(BaseModel):
     inventory: list[InventoryItem] = Field(default_factory=list)
     personality_traits: list[str] = Field(default_factory=list)
     backstory: str = ""
+    # Physiological stress — tracks cumulative heat, noise, fatigue, injury shock.
+    # Range 0–10. Injected into the system prompt to shift narrator register.
+    # 0-3: normal. 4-6: narrator harsher, shorter. 7-9: disorientation.
+    # 10: forced node (blackout / collapse) — engine enforces this.
+    pressure: int = Field(default=0, ge=0, le=10)
+    # Lo companion trust — 0 = Lo has left or is hostile, 5 = full bond.
+    # Default 3 (neutral). Falls to 0 triggers Lo's silent departure.
+    lo_trust: int = Field(default=3, ge=0, le=5)
 
 
 # ---------------------------------------------------------------------------

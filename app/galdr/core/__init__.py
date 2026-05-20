@@ -9,7 +9,7 @@ from galdr.core.nodes import (
 )
 from galdr.core.state import GameState, Character, CharacterStats, NarrativeFlags
 from galdr.core.dice import skill_check, roll_dice, SkillCheckResult, DiceRoll
-from galdr.core.prompt_regi import build_system_prompt, build_dice_narrative
+from galdr.core.prompt_director import build_system_prompt, build_dice_narrative
 
 __all__ = [
     "GaldrEngine",

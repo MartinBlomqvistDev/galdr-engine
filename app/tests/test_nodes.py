@@ -1,4 +1,4 @@
-"""Tester för nod-regi systemet."""
+"""Tests for the narrative node system."""
 
 import json
 
