@@ -23,6 +23,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
+# Force UTF-8 on Windows so em dashes and other Unicode in authored content
+# don't appear as ? in the console. Must run before logging.basicConfig.
+if sys.platform == "win32" and hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 from galdr.config import settings
 from galdr.core.calibration import run_calibration
 from galdr.core.engine import GaldrEngine

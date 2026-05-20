@@ -918,11 +918,140 @@ This was the last remaining scripted text in the prologue that contradicted reac
 
 ---
 
+## 2026-05-20 -- Benchmark 06: 8 TTFA Measurements, 24 Total
+
+### n=24 distribution across benchmarks 01-06
+
+Benchmark 06 was the first run with the full set of fixes (UTF-8 logging, markdown stripping, flag-based narration). 8 TTFA data points collected, bringing the total to 24 across all 6 benchmark runs.
+
+**Distribution (n=24 total):**
+
+| Metric | n | min | mean | p50 | p95 | max |
+| --- | --- | --- | --- | --- | --- | --- |
+| TTFA (LLM first sentence) | 24 | 817ms | 1986ms | 1894ms | 3672ms | 4405ms |
+
+**Interpretation for thesis:**
+
+The 500ms target is not met and was not expected to be met for cloud LLM. `[STREAM TTFA]` measures time from player input received to first complete sentence extracted from the LLM token stream. True time-to-first-audio = TTFA + TTS synthesis for sentence 1 (Azure TTS warm: p50~196ms, p95~450ms). True TTFA p50 therefore approximately 2.1s.
+
+Bottleneck: Azure OpenAI first-token latency (~1.5-2.5s). This is network + model inference, not the GALDR pipeline. The pipeline overhead (steps 1-4: GPS, intent match, mechanics, transition) is 300-1100ms at p95, contributing roughly 10-15% of total TTFA.
+
+**Thesis framing:** Reframe RQ1 from "meets 500ms target" to "characterizes achievable TTFA for cloud-LLM voice-first interactive narrative" -- a descriptive result, not a pass/fail.
+
+---
+
+## 2026-05-20 -- LLM Intent Matcher Prompt Rewritten to English
+
+**Problem:** `_match_action_llm` in `engine.py` sent the intent matching prompt in Swedish. When a player said "headbutt it," the LLM received a Swedish prompt asking for an action match. The semantic bridge between English player speech and English action IDs was broken.
+
+**Fix:** Rewrote prompt to English, with explicit synonym hint:
+
+```text
+The player said: "headbutt it"
+
+Available actions:
+- ID: charge_at_it | Label: Charge at it | Description: ...
+
+Which action best matches the player's intent?
+Consider synonyms and creative phrasings (e.g. 'headbutt' matches 'charge at it').
+Reply with ONLY the action ID, or 'none' if nothing matches.
+```
+
+**Also fixed:** Offline fallback yes/no heuristics -- removed Swedish words ("ja", "okej", "visst", "nej", "vägra", "lämna") and replaced with English equivalents.
+
+---
+
+## 2026-05-20 -- Swedish Purge
+
+**Problem:** Systematic Swedish found across: `ambient/weather.py` (all WMO code descriptions), `ambient/daylight.py` (phase names), `ambient/context.py` (docstrings), `galdr/__init__.py` (module docstring), `api/routes.py` (default character name "Aventyrare"), `core/engine.py` (default character name), `core/state.py` (default character name), `tests/test_state.py` (all test data).
+
+**Files fully rewritten to English:**
+
+- `weather.py`: WMO codes 0-99 mapped to English descriptions. "klar himmel" -> "clear sky", "blåsigt" -> "strong wind".
+- `daylight.py`: phase names "night", "dawn", "morning", "midday", "afternoon", "dusk".
+- `context.py`: docstrings.
+- Default character name: "Aventyrare" -> "Traveler" across all three files.
+- `test_state.py`: complete rewrite, all test data in English.
+
+**Files deleted:**
+
+- `app/play.py` -- Ekokammaren terminal PoC, scenario deleted.
+- `app/tests/test_playthrough.py` -- tested the deleted Ekokammaren scenario.
+
+---
+
+## 2026-05-20 -- Markdown Stripping in TTS Pipeline
+
+**Problem:** LLM sometimes returns markdown formatting -- asterisks for bold/italic (`**word**`, `*word*`), backticks, heading markers. Azure TTS reads these literally: "asterisk word asterisk."
+
+**Fix:** Added `_MD_NOISE` regex to `galdr/utils/sentence_splitter.py`:
+
+```python
+_MD_NOISE = re.compile(r'\*{1,3}|_{1,2}|`|^#{1,6}\s*', re.MULTILINE)
+```
+
+Applied at all TTS entry points: `split_sentences()` strips before yielding each sentence. `voice_play.py` `speak()` and `_split_text_sentences()` call `_clean_text()` using the same pattern. Triple asterisks, double asterisks, single asterisks, underscores, backticks, and markdown headings all stripped before synthesis.
+
+---
+
+## 2026-05-20 -- Windows Console UTF-8 Encoding Fixes
+
+**Problem 1:** Logger strings in `azure_service.py` and `elevenlabs_service.py` contained Unicode arrows (`->` was `→`, `<-` was `←`) and em dash (`--` was `--`). On Windows console with cp1252 encoding, these rendered as `?`.
+
+**Fix:** `replace_all` on all three characters across both service files. Also fixed em dash in `engine.py` logger string.
+
+**Problem 2:** Windows console default encoding (cp1252) can't render em dashes in authored scenario content when printed to console.
+
+**Fix:** Added to `voice_play.py` before `logging.basicConfig`:
+
+```python
+if sys.platform == "win32" and hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+```
+
+This runs before `logging.basicConfig`, which uses `sys.stderr` as the default stream. Em dashes in action labels, descriptions, and authored content now render correctly on Windows.
+
+---
+
+## 2026-05-20 -- Automated Test Suite: 76 Tests Passing
+
+### Six test modules cover graph integrity, intent matching, sentence splitting, pressure budget, and prompt director
+
+All tests written and passing (76/76) as of this entry. Two root-cause bugs found during testing:
+
+**Bug 1 -- pressure budget key mismatch:** `test_pressure_budget.py` used `effect.get("value", 0)` but the prologue JSON uses `"amount"` key for `modify_pressure` consequences. All pressure calculations returned 0 until fixed. Key is now `effect.get("amount", effect.get("value", 0))`.
+
+**Bug 2 -- ellipsis split behavior documented:** The sentence splitter regex `(?<=[^.][.])` intentionally excludes ellipsis from sentence boundaries. `test_ellipsis_no_split` was written with wrong assertions (`len == 2`). Fixed to assert `len == 1` -- "The unit... it stops." is yielded as one sentence, split only by the remainder handler.
+
+**Test modules and coverage:**
+
+| Module | Tests | Covers |
+| --- | --- | --- |
+| `test_scenario_graph.py` | 9 | Node references, reachability, start/end validity, self-loop guard |
+| `test_intent_matcher.py` | 22 | Exact ID, digit index, keyword, adversarial inputs, yes/no heuristics |
+| `test_sentence_splitter.py` | 24 | Markdown cleaning, sentence splitting, chunked token streams |
+| `test_pressure_budget.py` | 3 | BFS over all prologue paths, Gold Zone validation, no COLLAPSE |
+| `test_prompt_director.py` | 17 | Flag injection, pressure directives, Lo trust, layer ordering, encoding |
+
+**Coverage boundary documented:** "panel" alone returns None from the offline intent matcher. `find_the_panel`'s label is "Search the wall -- there must be a shutoff" -- the word "panel" does not appear. The action ID compound token is not split. Single-word-from-ID matching requires the LLM path.
+
+**Pressure budget result:** All 154,440 paths walked. Pressure range at `lo_aftermath`: 1-5. Gold Zone (4-6) confirmed. COLLAPSE (10) unreachable.
+
+---
+
+## 2026-05-20 -- the_ascent Flag-Based Narration Confirmed Working
+
+**Confirmed in playthrough:** After `destroyed_the_unit` flag was set (player charged the cleaning unit and stopped it), a second pass through `the_ascent` produced narrator text that correctly noted the corridor was quiet and nothing was on circuit. The cleaning unit was not mentioned as active.
+
+This is the intended behavior: all state-dependent narration in the prologue is now driven by `## Narrative State` flag injection into the system prompt, not hardcoded `opening_text`.
+
+---
+
 ## Pending / Next
 
-- [ ] Run benchmarks 06+ with new 17-node prologue and flag-based narration. Target 20+ TTFA measurements total.
 - [ ] Thesis deadline 2026-05-22 -- 2 days. Write RQ1 (TTFA) section with collected data.
-- [ ] Reframe TTFA in thesis: "LLM-to-first-sentence latency" not "input-to-first-audio." True TTFA = TTFA value + TTS synthesis (~200-650ms). Current p50 approximately 1600-1700ms LLM-first-sentence; approximately 2-3s true TTFA.
+- [ ] Reframe TTFA in thesis: "LLM-to-first-sentence latency" not "input-to-first-audio." True TTFA = TTFA value + TTS synthesis (~200-650ms). Current p50 approximately 1894ms LLM-first-sentence; approximately 2.1s true TTFA.
 - [ ] Voice decision: en-GB-SoniaNeural current. Continue auditioning male voices post-thesis.
 - [ ] Calibration long-term: replace question-based intake with choice-driven stat emergence from prologue play. Post-thesis.
 - [ ] Barge-in (post-thesis): requires headphones or echo cancellation. Windows WASAPI concurrent stream conflict on speakers.
