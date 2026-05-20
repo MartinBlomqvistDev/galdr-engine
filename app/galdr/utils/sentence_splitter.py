@@ -9,16 +9,22 @@ from __future__ import annotations
 import re
 from collections.abc import AsyncIterator
 
-# Match sentence-ending punctuation followed by whitespace.
-# Negative lookbehind for '.' prevents splitting on ellipsis mid-word.
 _SENT_END = re.compile(r'(?<=[!?])\s+|(?<=[^.][.])\s+')
+
+# Strip markdown that TTS reads literally: **bold**, *italic*, __under__, `code`, # headings
+_MD_NOISE = re.compile(r'\*{1,3}|_{1,2}|`|^#{1,6}\s*', re.MULTILINE)
+
+
+def _clean(text: str) -> str:
+    return _MD_NOISE.sub('', text).strip()
 
 
 async def split_sentences(tokens: AsyncIterator[str]) -> AsyncIterator[str]:
     """Buffer async token stream and yield complete sentences.
 
-    Splits on [.!?] followed by whitespace. Handles ellipsis correctly —
+    Splits on [.!?] followed by whitespace. Handles ellipsis correctly --
     '...' mid-sentence does not trigger a split.
+    Strips markdown formatting before yielding so TTS never reads asterisks.
     """
     buf = ""
     async for chunk in tokens:
@@ -27,10 +33,10 @@ async def split_sentences(tokens: AsyncIterator[str]) -> AsyncIterator[str]:
             m = _SENT_END.search(buf)
             if not m:
                 break
-            sentence = buf[: m.start() + 1].strip()
+            sentence = _clean(buf[: m.start() + 1])
             buf = buf[m.end() :]
             if sentence:
                 yield sentence
-    remainder = buf.strip()
+    remainder = _clean(buf)
     if remainder:
         yield remainder

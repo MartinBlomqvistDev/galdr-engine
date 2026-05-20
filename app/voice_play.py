@@ -66,7 +66,8 @@ class _NullTTS:
 
 
 async def speak(tts, text: str, voice: VoiceParams) -> None:
-    """Plain playback — no barge-in. Use only for system prompts where interruption is meaningless."""
+    """Plain playback -- no barge-in. Use only for system prompts where interruption is meaningless."""
+    text = _clean_text(text)
     if not text:
         return
     if hasattr(tts, "speak"):
@@ -160,11 +161,16 @@ async def narrate_stream(tts, token_stream, voice: VoiceParams) -> str:
 
 
 _SENT_SPLIT = re.compile(r'(?<=[.!?])\s+')
+_MD_NOISE = re.compile(r'\*{1,3}|_{1,2}|`|^#{1,6}\s*', re.MULTILINE)
+
+
+def _clean_text(text: str) -> str:
+    return _MD_NOISE.sub('', text).strip()
 
 
 def _split_text_sentences(text: str) -> list[str]:
     """Split a scripted string into sentences for per-sentence TTS."""
-    parts = _SENT_SPLIT.split(text.strip())
+    parts = _SENT_SPLIT.split(_clean_text(text))
     return [p.strip() for p in parts if p.strip()]
 
 
