@@ -116,7 +116,7 @@ class AzureSpeechTTSService:
     #   en-US-DavisNeural             — expressive, darker register
     #   en-US-ChristopherNeural       — steady, reliable narration
     # US English (female)
-    #   en-US-JaneNeural              — calm authority  ← current
+    #   en-US-JaneNeural              — calm authority  <- current
     #   en-US-SaraNeural              — clear, measured
     # British English (female)
     #   en-GB-SoniaNeural             — warm but measured, strong narrator quality
@@ -231,7 +231,7 @@ class AzureSpeechTTSService:
         else:
             ssml = self._build_ssml(text, voice)
             await loop.run_in_executor(None, self._synth_to_speaker, ssml)
-        logger.info("[TTS→speaker] voice=%s chars=%d latency_ms=%.0f", voice, len(text), (time.perf_counter() - t0) * 1000)
+        logger.info("[TTS->speaker] voice=%s chars=%d latency_ms=%.0f", voice, len(text), (time.perf_counter() - t0) * 1000)
 
     def _synth_to_speaker(self, ssml: str) -> None:
         import azure.cognitiveservices.speech as speechsdk
@@ -255,9 +255,9 @@ class AzureSpeechTTSService:
         result = await loop.run_in_executor(None, self._speak_barge_in_sync, ssml, stt, params.reverb)
         latency_ms = (time.perf_counter() - t0) * 1000
         if result:
-            logger.info("[TTS→barge-in] chars=%d latency_ms=%.0f text=%r", len(text), latency_ms, result[:40])
+            logger.info("[TTS->barge-in] chars=%d latency_ms=%.0f text=%r", len(text), latency_ms, result[:40])
         else:
-            logger.info("[TTS→speaker] voice=%s chars=%d latency_ms=%.0f", voice, len(text), latency_ms)
+            logger.info("[TTS->speaker] voice=%s chars=%d latency_ms=%.0f", voice, len(text), latency_ms)
         return result
 
     def _speak_barge_in_sync(self, ssml: str, stt: "AzureSpeechSTTService", reverb: float = 0.0) -> str:
@@ -305,7 +305,7 @@ class AzureSpeechTTSService:
 
         t0 = time.perf_counter()
         text = stt._transcribe_pcm_sync(pcm)
-        logger.info("[BARGE-IN] interrupt→transcribe=%.0fms text=%r", (time.perf_counter() - t0) * 1000, text[:40])
+        logger.info("[BARGE-IN] interrupt->transcribe=%.0fms text=%r", (time.perf_counter() - t0) * 1000, text[:40])
         return text
 
 
@@ -339,7 +339,7 @@ class AzureSpeechSTTService:
         t0 = time.perf_counter()
         loop = asyncio.get_event_loop()
         text = await loop.run_in_executor(None, self._from_mic_sync)
-        logger.info("[STT←mic] chars=%d latency_ms=%.0f", len(text), (time.perf_counter() - t0) * 1000)
+        logger.info("[STT<-mic] chars=%d latency_ms=%.0f", len(text), (time.perf_counter() - t0) * 1000)
         return text
 
     def _from_bytes_sync(self, audio_data: bytes) -> str:
@@ -378,7 +378,7 @@ class AzureSpeechSTTService:
             speech_config=self._make_speech_config(), audio_config=audio_cfg
         )
         text = self._get_result(recognizer)
-        logger.info("[STT←vad] bytes=%d chars=%d latency_ms=%.0f", len(pcm_bytes), len(text), (time.perf_counter() - t0) * 1000)
+        logger.info("[STT<-vad] bytes=%d chars=%d latency_ms=%.0f", len(pcm_bytes), len(text), (time.perf_counter() - t0) * 1000)
         return text
 
     @staticmethod

@@ -20,7 +20,7 @@ _DEFAULT_VOICE_ID = "21m00Tcm4TlvDq8ikWAM"
 
 
 def _samplerate_from_format(fmt: str) -> int:
-    """Parse samplerate from ElevenLabs output format string, e.g. 'pcm_16000' → 16000."""
+    """Parse samplerate from ElevenLabs output format string, e.g. 'pcm_16000' -> 16000."""
     for part in fmt.split("_"):
         if part.isdigit():
             return int(part)
@@ -70,7 +70,7 @@ class ElevenLabsTTSService:
             from galdr.utils.audio import apply_reverb
             audio_array = apply_reverb(audio_array, params.reverb, sr)
         await loop.run_in_executor(None, lambda: (sd.play(audio_array, samplerate=sr), sd.wait()))
-        logger.info("[EL TTS→speaker] chars=%d latency_ms=%.0f", len(text), (time.perf_counter() - t0) * 1000)
+        logger.info("[EL TTS->speaker] chars=%d latency_ms=%.0f", len(text), (time.perf_counter() - t0) * 1000)
 
     async def speak_with_barge_in(
         self,
@@ -85,9 +85,9 @@ class ElevenLabsTTSService:
         result = await loop.run_in_executor(None, self._play_barge_in_sync, pcm, stt, params.reverb)
         latency_ms = (time.perf_counter() - t0) * 1000
         if result:
-            logger.info("[EL TTS→barge-in] chars=%d latency_ms=%.0f text=%r", len(text), latency_ms, result[:40])
+            logger.info("[EL TTS->barge-in] chars=%d latency_ms=%.0f text=%r", len(text), latency_ms, result[:40])
         else:
-            logger.info("[EL TTS→speaker] chars=%d latency_ms=%.0f", len(text), latency_ms)
+            logger.info("[EL TTS->speaker] chars=%d latency_ms=%.0f", len(text), latency_ms)
         return result
 
     def _play_barge_in_sync(self, pcm: bytes, stt: "AzureSpeechSTTService", reverb: float = 0.0) -> str:
@@ -138,5 +138,5 @@ class ElevenLabsTTSService:
 
         t0 = time.perf_counter()
         text = stt._transcribe_pcm_sync(captured)
-        logger.info("[BARGE-IN] interrupt→transcribe=%.0fms text=%r", (time.perf_counter() - t0) * 1000, text[:40])
+        logger.info("[BARGE-IN] interrupt->transcribe=%.0fms text=%r", (time.perf_counter() - t0) * 1000, text[:40])
         return text
