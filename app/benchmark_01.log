@@ -1,0 +1,210 @@
+2026-05-19 14:03:10,958 [INFO] __main__: Initializing Azure Speech TTS (Standard)
+
+==================================================
+      GALDR � VOICE-ONLY RPG (Azure PoC)
+==================================================
+2026-05-19 14:03:10,959 [INFO] galdr.core.engine: New session: ac06103c-004c-45d0-8dbf-3bd0df18fef6 (�ventyrare)
+2026-05-19 14:03:16,228 [INFO] galdr.services.azure_service: [TTS\u2192speaker] voice=en-US-RyanMultilingualNeural chars=47 latency_ms=5270
+
+[Listening for name...]
+2026-05-19 14:03:19,340 [INFO] galdr.services.azure_service: [STT\u2190mic] chars=7 latency_ms=3112
+2026-05-19 14:03:19,341 [INFO] __main__: [NAME CAPTURED]: Martin
+2026-05-19 14:03:21,238 [INFO] galdr.services.azure_service: [TTS\u2192speaker] voice=en-US-RyanMultilingualNeural chars=16 latency_ms=1898
+2026-05-19 14:03:21,732 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=44 latency_ms=342
+2026-05-19 14:03:21,822 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=24 latency_ms=90
+2026-05-19 14:03:24,716 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=106 latency_ms=167
+2026-05-19 14:03:26,528 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=65 latency_ms=152
+2026-05-19 14:03:33,446 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=38 latency_ms=146
+2026-05-19 14:03:37,031 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=69 latency_ms=159
+2026-05-19 14:03:39,604 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=18 latency_ms=135
+2026-05-19 14:03:44,586 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=39 latency_ms=145
+
+[Listening � node: crater_investigation]
+2026-05-19 14:03:49,706 [INFO] galdr.services.azure_service: [TTS\u2192speaker] voice=en-US-RyanMultilingualNeural chars=15 latency_ms=1375
+2026-05-19 14:03:57,293 [INFO] galdr.services.azure_service: [STT\u2190mic] chars=48 latency_ms=7586
+2026-05-19 14:03:57,293 [INFO] __main__: [USER INPUT]: I go to low and ask what the hell are you doing?
+2026-05-19 14:03:58,381 [INFO] httpx: HTTP Request: POST https://swedencentral.api.cognitive.microsoft.com/openai/deployments/gpt-4o/chat/completions?api-version=2025-01-01-preview "HTTP/1.1 200 OK"
+2026-05-19 14:03:58,386 [INFO] galdr.services.azure_service: [LLM CALL] tokens_in=144 tokens_out=4 latency_ms=1092
+2026-05-19 14:03:58,386 [INFO] galdr.core.engine: [STREAM] steps 1-4 done in 1092ms � LLM stream is lazy
+2026-05-19 14:03:58,515 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=38 latency_ms=128
+2026-05-19 14:03:58,623 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=56 latency_ms=108
+2026-05-19 14:04:01,465 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=13 latency_ms=140
+2026-05-19 14:04:05,385 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=36 latency_ms=133
+2026-05-19 14:04:07,019 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=64 latency_ms=145
+2026-05-19 14:04:09,287 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=22 latency_ms=126
+2026-05-19 14:04:13,467 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=18 latency_ms=122
+2026-05-19 14:04:15,261 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=22 latency_ms=137
+2026-05-19 14:04:16,792 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=26 latency_ms=119
+2026-05-19 14:04:20,425 [INFO] __main__: [AUTO_NEXT] the_fall -> the_dark (delay=4.0s)
+
+[AUTO] the_fall -> the_dark in 4s
+2026-05-19 14:04:24,560 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=21 latency_ms=126
+2026-05-19 14:04:24,653 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=17 latency_ms=93
+2026-05-19 14:04:26,611 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=18 latency_ms=137
+2026-05-19 14:04:28,137 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=53 latency_ms=150
+2026-05-19 14:04:29,777 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=11 latency_ms=128
+2026-05-19 14:04:34,325 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=20 latency_ms=214
+2026-05-19 14:04:35,575 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=6 latency_ms=183
+2026-05-19 14:04:37,591 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=13 latency_ms=242
+2026-05-19 14:04:38,732 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=40 latency_ms=325
+2026-05-19 14:04:40,092 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=79 latency_ms=385
+2026-05-19 14:04:42,700 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=10 latency_ms=133
+2026-05-19 14:04:47,324 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=8 latency_ms=135
+2026-05-19 14:04:48,737 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=27 latency_ms=129
+
+[Listening � node: the_dark]
+2026-05-19 14:04:53,192 [INFO] galdr.services.azure_service: [TTS\u2192speaker] voice=en-US-RyanMultilingualNeural chars=15 latency_ms=1332
+2026-05-19 14:04:59,088 [INFO] galdr.services.azure_service: [STT\u2190mic] chars=29 latency_ms=5896
+2026-05-19 14:04:59,088 [INFO] __main__: [USER INPUT]: I smashed it with two pieces.
+2026-05-19 14:04:59,807 [INFO] httpx: HTTP Request: POST https://swedencentral.api.cognitive.microsoft.com/openai/deployments/gpt-4o/chat/completions?api-version=2025-01-01-preview "HTTP/1.1 200 OK"
+2026-05-19 14:04:59,808 [INFO] galdr.services.azure_service: [LLM CALL] tokens_in=203 tokens_out=4 latency_ms=720
+2026-05-19 14:04:59,809 [INFO] galdr.core.engine: [STREAM] steps 1-4 done in 720ms � LLM stream is lazy
+2026-05-19 14:05:00,098 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=53 latency_ms=289
+2026-05-19 14:05:00,309 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=5 latency_ms=212
+2026-05-19 14:05:04,279 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=128 latency_ms=480
+2026-05-19 14:05:05,004 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=37 latency_ms=237
+2026-05-19 14:05:13,028 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=21 latency_ms=121
+2026-05-19 14:05:15,545 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=22 latency_ms=182
+2026-05-19 14:05:17,405 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=75 latency_ms=419
+2026-05-19 14:05:18,848 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=11 latency_ms=171
+2026-05-19 14:05:24,796 [INFO] __main__: [AUTO_NEXT] dark_wounded -> cryo_room (delay=3.0s)
+
+[AUTO] dark_wounded -> cryo_room in 3s
+2026-05-19 14:05:27,952 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=15 latency_ms=142
+2026-05-19 14:05:28,105 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=12 latency_ms=153
+2026-05-19 14:05:29,654 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=16 latency_ms=193
+2026-05-19 14:05:30,991 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=21 latency_ms=136
+2026-05-19 14:05:32,512 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=66 latency_ms=156
+2026-05-19 14:05:34,170 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=11 latency_ms=94
+2026-05-19 14:05:38,479 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=11 latency_ms=104
+2026-05-19 14:05:39,762 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=28 latency_ms=134
+2026-05-19 14:05:41,120 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=13 latency_ms=124
+2026-05-19 14:05:43,529 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=49 latency_ms=155
+2026-05-19 14:05:45,097 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=48 latency_ms=182
+2026-05-19 14:05:48,977 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=21 latency_ms=132
+2026-05-19 14:05:51,948 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=21 latency_ms=134
+
+[Listening � node: cryo_room]
+2026-05-19 14:05:56,730 [INFO] galdr.services.azure_service: [TTS\u2192speaker] voice=en-US-RyanMultilingualNeural chars=15 latency_ms=1367
+2026-05-19 14:06:03,450 [INFO] galdr.services.azure_service: [STT\u2190mic] chars=31 latency_ms=6719
+2026-05-19 14:06:03,450 [INFO] __main__: [USER INPUT]: I smashed a window open on one.
+2026-05-19 14:06:04,191 [INFO] httpx: HTTP Request: POST https://swedencentral.api.cognitive.microsoft.com/openai/deployments/gpt-4o/chat/completions?api-version=2025-01-01-preview "HTTP/1.1 200 OK"
+2026-05-19 14:06:04,193 [INFO] galdr.services.azure_service: [LLM CALL] tokens_in=192 tokens_out=6 latency_ms=743
+2026-05-19 14:06:04,193 [INFO] galdr.core.engine: [STREAM] steps 1-4 done in 743ms � LLM stream is lazy
+2026-05-19 14:06:04,451 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=31 latency_ms=258
+2026-05-19 14:06:04,685 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=30 latency_ms=233
+2026-05-19 14:06:07,184 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=51 latency_ms=270
+2026-05-19 14:06:09,604 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=29 latency_ms=212
+2026-05-19 14:06:13,528 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=33 latency_ms=262
+2026-05-19 14:06:16,024 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=47 latency_ms=613
+2026-05-19 14:06:18,403 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=32 latency_ms=277
+2026-05-19 14:06:24,414 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=26 latency_ms=250
+2026-05-19 14:06:26,989 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=36 latency_ms=275
+2026-05-19 14:06:29,113 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=4 latency_ms=149
+2026-05-19 14:06:32,043 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=18 latency_ms=188
+
+[Listening � node: console_chamber]
+2026-05-19 14:06:35,899 [INFO] galdr.services.azure_service: [TTS\u2192speaker] voice=en-US-RyanMultilingualNeural chars=15 latency_ms=1335
+2026-05-19 14:06:46,073 [INFO] galdr.services.azure_service: [STT\u2190mic] chars=79 latency_ms=10174
+2026-05-19 14:06:46,073 [INFO] __main__: [USER INPUT]: What does this mean? What is this globe crap? I bend it with my enormous hands.
+2026-05-19 14:06:46,765 [INFO] httpx: HTTP Request: POST https://swedencentral.api.cognitive.microsoft.com/openai/deployments/gpt-4o/chat/completions?api-version=2025-01-01-preview "HTTP/1.1 200 OK"
+2026-05-19 14:06:46,766 [INFO] galdr.services.azure_service: [LLM CALL] tokens_in=181 tokens_out=4 latency_ms=692
+2026-05-19 14:06:46,766 [INFO] galdr.core.engine: [STREAM] steps 1-4 done in 692ms � LLM stream is lazy
+2026-05-19 14:06:47,013 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=50 latency_ms=247
+2026-05-19 14:06:47,247 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=31 latency_ms=233
+2026-05-19 14:06:50,295 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=23 latency_ms=211
+2026-05-19 14:06:53,080 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=28 latency_ms=347
+2026-05-19 14:06:54,831 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=32 latency_ms=148
+2026-05-19 14:06:59,184 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=21 latency_ms=213
+2026-05-19 14:07:01,763 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=45 latency_ms=244
+2026-05-19 14:07:03,467 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=15 latency_ms=183
+2026-05-19 14:07:06,716 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=41 latency_ms=254
+2026-05-19 14:07:08,248 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=37 latency_ms=231
+2026-05-19 14:07:10,729 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=8 latency_ms=155
+
+[Listening � node: proximity_auth]
+2026-05-19 14:07:15,458 [INFO] galdr.services.azure_service: [TTS\u2192speaker] voice=en-US-RyanMultilingualNeural chars=15 latency_ms=1365
+2026-05-19 14:07:24,917 [INFO] galdr.services.azure_service: [STT\u2190mic] chars=40 latency_ms=9459
+2026-05-19 14:07:24,917 [INFO] __main__: [USER INPUT]: I smashed the screen again with my fist.
+2026-05-19 14:07:25,448 [INFO] httpx: HTTP Request: POST https://swedencentral.api.cognitive.microsoft.com/openai/deployments/gpt-4o/chat/completions?api-version=2025-01-01-preview "HTTP/1.1 200 OK"
+2026-05-19 14:07:25,449 [INFO] galdr.services.azure_service: [LLM CALL] tokens_in=80 tokens_out=2 latency_ms=532
+2026-05-19 14:07:25,449 [INFO] galdr.core.engine: [STREAM] steps 1-4 done in 532ms � LLM stream is lazy
+2026-05-19 14:07:27,127 [INFO] galdr.services.azure_service: [TTS\u2192speaker] voice=en-US-RyanMultilingualNeural chars=15 latency_ms=1677
+
+[Listening � node: proximity_auth]
+2026-05-19 14:07:28,475 [INFO] galdr.services.azure_service: [TTS\u2192speaker] voice=en-US-RyanMultilingualNeural chars=15 latency_ms=1348
+2026-05-19 14:07:32,367 [INFO] galdr.services.azure_service: [STT\u2190mic] chars=11 latency_ms=3891
+2026-05-19 14:07:32,367 [INFO] __main__: [USER INPUT]: I smash it.
+2026-05-19 14:07:33,716 [INFO] httpx: HTTP Request: POST https://swedencentral.api.cognitive.microsoft.com/openai/deployments/gpt-4o/chat/completions?api-version=2025-01-01-preview "HTTP/1.1 200 OK"
+2026-05-19 14:07:33,717 [INFO] galdr.services.azure_service: [LLM CALL] tokens_in=75 tokens_out=2 latency_ms=1350
+2026-05-19 14:07:33,717 [INFO] galdr.core.engine: [STREAM] steps 1-4 done in 1350ms � LLM stream is lazy
+2026-05-19 14:07:35,387 [INFO] galdr.services.azure_service: [TTS\u2192speaker] voice=en-US-RyanMultilingualNeural chars=15 latency_ms=1670
+
+[Listening � node: proximity_auth]
+2026-05-19 14:07:36,746 [INFO] galdr.services.azure_service: [TTS\u2192speaker] voice=en-US-RyanMultilingualNeural chars=15 latency_ms=1359
+2026-05-19 14:07:41,043 [INFO] galdr.services.azure_service: [STT\u2190mic] chars=32 latency_ms=4296
+2026-05-19 14:07:41,043 [INFO] __main__: [USER INPUT]: I say, what do you do 100 times?
+2026-05-19 14:07:41,658 [INFO] httpx: HTTP Request: POST https://swedencentral.api.cognitive.microsoft.com/openai/deployments/gpt-4o/chat/completions?api-version=2025-01-01-preview "HTTP/1.1 200 OK"
+2026-05-19 14:07:41,659 [INFO] galdr.services.azure_service: [LLM CALL] tokens_in=82 tokens_out=2 latency_ms=616
+2026-05-19 14:07:41,659 [INFO] galdr.core.engine: [STREAM] steps 1-4 done in 616ms � LLM stream is lazy
+2026-05-19 14:07:41,781 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=27 latency_ms=122
+2026-05-19 14:07:42,247 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=84 latency_ms=466
+2026-05-19 14:07:44,310 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=20 latency_ms=214
+2026-05-19 14:07:49,214 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=37 latency_ms=282
+2026-05-19 14:07:50,814 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=40 latency_ms=252
+2026-05-19 14:07:53,542 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=36 latency_ms=259
+2026-05-19 14:07:56,326 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=28 latency_ms=243
+2026-05-19 14:07:58,865 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=6 latency_ms=159
+2026-05-19 14:08:01,398 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=11 latency_ms=192
+2026-05-19 14:08:02,512 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=10 latency_ms=152
+
+[Listening � node: the_ascent]
+2026-05-19 14:08:06,327 [INFO] galdr.services.azure_service: [TTS\u2192speaker] voice=en-US-RyanMultilingualNeural chars=15 latency_ms=1355
+2026-05-19 14:08:11,510 [INFO] galdr.services.azure_service: [STT\u2190mic] chars=22 latency_ms=5184
+2026-05-19 14:08:11,511 [INFO] __main__: [USER INPUT]: I sleep and fall down.
+2026-05-19 14:08:12,229 [INFO] httpx: HTTP Request: POST https://swedencentral.api.cognitive.microsoft.com/openai/deployments/gpt-4o/chat/completions?api-version=2025-01-01-preview "HTTP/1.1 200 OK"
+2026-05-19 14:08:12,230 [INFO] galdr.services.azure_service: [LLM CALL] tokens_in=81 tokens_out=2 latency_ms=719
+2026-05-19 14:08:12,230 [INFO] galdr.core.engine: [STREAM] steps 1-4 done in 719ms � LLM stream is lazy
+2026-05-19 14:08:12,435 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=16 latency_ms=204
+2026-05-19 14:08:12,600 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=9 latency_ms=165
+2026-05-19 14:08:14,527 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=10 latency_ms=165
+2026-05-19 14:08:15,887 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=13 latency_ms=215
+2026-05-19 14:08:17,370 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=94 latency_ms=390
+2026-05-19 14:08:18,622 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=19 latency_ms=181
+2026-05-19 14:08:23,854 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=32 latency_ms=272
+2026-05-19 14:08:25,622 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=20 latency_ms=321
+2026-05-19 14:08:27,915 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=10 latency_ms=148
+2026-05-19 14:08:29,681 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=53 latency_ms=279
+2026-05-19 14:08:30,809 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=12 latency_ms=166
+
+[Listening � node: crater_surface]
+2026-05-19 14:08:36,607 [INFO] galdr.services.azure_service: [TTS\u2192speaker] voice=en-US-RyanMultilingualNeural chars=15 latency_ms=1338
+2026-05-19 14:08:43,199 [INFO] galdr.services.azure_service: [STT\u2190mic] chars=52 latency_ms=6591
+2026-05-19 14:08:43,199 [INFO] __main__: [USER INPUT]: I glared at low and say what the hell are you doing?
+2026-05-19 14:08:43,945 [INFO] httpx: HTTP Request: POST https://swedencentral.api.cognitive.microsoft.com/openai/deployments/gpt-4o/chat/completions?api-version=2025-01-01-preview "HTTP/1.1 200 OK"
+2026-05-19 14:08:43,946 [INFO] galdr.services.azure_service: [LLM CALL] tokens_in=89 tokens_out=2 latency_ms=747
+2026-05-19 14:08:43,946 [INFO] galdr.core.engine: [STREAM] steps 1-4 done in 747ms � LLM stream is lazy
+2026-05-19 14:08:44,137 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=15 latency_ms=191
+2026-05-19 14:08:44,418 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=54 latency_ms=281
+2026-05-19 14:08:46,435 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=59 latency_ms=275
+2026-05-19 14:08:49,748 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=34 latency_ms=230
+2026-05-19 14:08:53,216 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=20 latency_ms=183
+2026-05-19 14:08:55,582 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=16 latency_ms=177
+2026-05-19 14:08:57,184 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=48 latency_ms=248
+2026-05-19 14:08:58,560 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=25 latency_ms=213
+2026-05-19 14:09:01,219 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=25 latency_ms=202
+2026-05-19 14:09:02,970 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=19 latency_ms=200
+
+[Listening � node: lo_aftermath]
+2026-05-19 14:09:07,531 [INFO] galdr.services.azure_service: [TTS\u2192speaker] voice=en-US-RyanMultilingualNeural chars=15 latency_ms=1343
+2026-05-19 14:09:13,810 [INFO] galdr.services.azure_service: [STT\u2190mic] chars=37 latency_ms=6279
+2026-05-19 14:09:13,810 [INFO] __main__: [USER INPUT]: A ******* monster bit me on the shin.
+2026-05-19 14:09:14,446 [INFO] httpx: HTTP Request: POST https://swedencentral.api.cognitive.microsoft.com/openai/deployments/gpt-4o/chat/completions?api-version=2025-01-01-preview "HTTP/1.1 200 OK"
+2026-05-19 14:09:14,447 [INFO] galdr.services.azure_service: [LLM CALL] tokens_in=139 tokens_out=7 latency_ms=637
+2026-05-19 14:09:14,447 [INFO] galdr.core.engine: [STREAM] steps 1-4 done in 636ms � LLM stream is lazy
+2026-05-19 14:09:14,639 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=23 latency_ms=191
+2026-05-19 14:09:14,856 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=25 latency_ms=218
+2026-05-19 14:09:17,044 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=53 latency_ms=184
+2026-05-19 14:09:19,670 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=167 latency_ms=669
+2026-05-19 14:09:22,604 [INFO] galdr.services.azure_service: [TTS] voice=en-US-RyanMultilingualNeural chars=37 latency_ms=356
+2026-05-19 14:09:36,500 [INFO] __main__: Session ended.

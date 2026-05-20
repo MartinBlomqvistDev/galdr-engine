@@ -1,0 +1,1299 @@
+{
+  "id": "calloused_prologue",
+  "title": "CALLOUSED — Prologue: The Drop",
+  "description": "17 nodes. Player and Lo investigate the stopped Eternal Breath on the Glass Crater floor. Ground buckles under player — falls through into the Ancestor Facility. Lo left above at the crack. Below: facility_scan (diegetic calibration via smart-dust biometric scan), maintenance unit (tiny ceramic floor-scrubber, 50,000-year circuit — NOT a threat drone), cryo room (sleeping Ancestors, all occupied), terminal blocked 479/480, system detects and logs player. Player climbs out via facility maintenance shaft near original crack. Lo is at the crack waiting. Reunion. Phase 1: Ancestors alive, Cleft intact, system logged the player, census 479/480. v3.1.0: no hatch, no grid-reader, no HP damage, slip/go_still never wound, only charge/panel can fail into dark_wounded, dark_wounded = shin bruise from Roomba. LLM-streamed exploration nodes: dark_probe, pod_close_look, terminal_query, terminal_resistance, cryo_corridor, shaft_look_down, lo_face.",
+  "author": "Martin Blomqvist / GALDR Engine",
+  "version": "3.0.0",
+  "global_system_prompt": "You are the narrator of CALLOUSED — a voice-only RPG set in a geo-broken world 50,000 years from now. Rules: second-person present tense. Gender-neutral player. Never read stat values or roll results aloud — describe outcomes qualitatively. Sentences under 14 words. Prioritize touch and sound over sight. The world is not hostile — it is indifferent. The system cannot complete its startup. It has been waiting for 50,000 years. English.",
+  "start_node": "crater_investigation",
+  "end_nodes": [
+    "prologue_close"
+  ],
+  "calibration_enabled": false,
+  "calibration_node": "facility_scan",
+  "default_voice": {
+    "character_name": "Narrator",
+    "pitch_shift": 0.0,
+    "tempo": 0.95,
+    "emotion": "neutral",
+    "reverb": 0.2,
+    "style": "narrator"
+  },
+  "nodes": {
+    "crater_investigation": {
+      "id": "crater_investigation",
+      "title": "Prologue — The Crater",
+      "description": "Opening. Player and Lo are on the Glass Crater floor together, investigating the stopped Eternal Breath. Three days of wrong silence. Lo crouches five meters ahead, pressing a palm to the obsidian. Both actions lead inevitably to the_fall — the fall is the inciting incident, not a failure state.",
+      "system_prompt": "Scene: Glass Crater floor. Three days since the Eternal Breath stopped. Player and Lo came together to investigate.\nDirectives:\n— Player and Lo are here as a pair. Equal standing. Joint decision to come.\n— The obsidian is hot from below but the thermal movement is wrong. Where the Breath moved, nothing moves. Directionless heat.\n— Lo is five meters ahead, crouching, pressing a palm flat to the obsidian. Reading it. Lo does not look up.\n— Scale: forty kilometers of obsidian in every direction. Crater walls 300m on all sides.\n— Build the wrongness: the silence where the Breath was, the heat without direction, the ground that does not behave like it should.\n— Both actions lead to the fall. Do not signal this. End on the player's attention on the ground between their feet.",
+      "opening_text": "Three days since the Eternal Breath stopped. You and Lo came to look. Forty kilometers of obsidian in every direction — the crater walls rise three hundred meters on all sides. The heat comes up through your boots but it is directionless now. Where the Breath moved, nothing moves. Five meters ahead, Lo crouches, pressing a palm flat to the obsidian. Reading something. You watch the ground between your feet.",
+      "context_hint": "Opening. Weight without melodrama. The wrongness of the stopped Breath. Both actions lead to the fall.",
+      "biome": {
+        "name": "Glass Crater Basin",
+        "description": "40km of obsidian floor. Crater walls 300m. The Eternal Breath has been silent for three days. Heat still present but directionless.",
+        "pressure_base": 1,
+        "ambient_tags": [
+          "obsidian",
+          "residual heat from below",
+          "wrong silence",
+          "scale",
+          "the Breath is gone",
+          "Lo reading the ground"
+        ],
+        "lore_hints": [
+          "The Eternal Breath was a geothermal thermal vent system. Its stopping means something changed below.",
+          "The Cleft sent two people to investigate. Lo is one. The player is the other."
+        ]
+      },
+      "voice": {
+        "character_name": "Narrator",
+        "pitch_shift": 0.0,
+        "tempo": 0.9,
+        "emotion": "neutral",
+        "reverb": 0.05,
+        "style": "narrator"
+      },
+      "on_enter": [
+        {
+          "type": "set_flag",
+          "key": "prologue_begun",
+          "value": true
+        },
+        {
+          "type": "set_time",
+          "value": "dawn"
+        },
+        {
+          "type": "visit_location",
+          "location": "crater_investigation",
+          "location_name": "Glass Crater Basin"
+        }
+      ],
+      "actions": [
+        {
+          "id": "read_the_ground",
+          "label": "Crouch. Press your hand to the obsidian.",
+          "description": "Lo does it. You do it. Read what the ground says about what is below.",
+          "skill_check": "wisdom",
+          "dc": 8,
+          "target_node": "the_fall",
+          "failure_node": "the_fall",
+          "consequences": [
+            {
+              "type": "set_flag",
+              "key": "felt_the_void",
+              "value": true
+            },
+            {
+              "type": "modify_pressure",
+              "amount": -1
+            }
+          ],
+          "failure_consequences": [
+            {
+              "type": "set_flag",
+              "key": "no_warning",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": "call_to_lo",
+          "label": "Call to Lo. The ground feels wrong.",
+          "description": "Lo turns toward you. You open your mouth. Then the ground moves.",
+          "target_node": "the_fall",
+          "consequences": [
+            {
+              "type": "set_flag",
+              "key": "lo_heard_you_go",
+              "value": true
+            }
+          ]
+        }
+      ],
+      "forbidden_topics": [
+        "sex",
+        "religion"
+      ],
+      "max_response_length": 80
+    },
+    "the_fall": {
+      "id": "the_fall",
+      "title": "Prologue — The Fall",
+      "description": "The obsidian cracks. Player falls through. Hard landing on ceramic. Lo's voice from above, then the crack shifts and the light is gone. CALIBRATION NOTE (pending implementation): per v3.0 design, smart-dust diegetic calibration fires here — 'Intruder vitals logged. Input tribal registry designation.' Currently disabled (calibration_enabled: false at scenario level) pending voice_play.py modification to trigger mid-node. Auto-transitions to the_dark.",
+      "system_prompt": "Scene: the ground opens. The player goes through.\nDirectives:\n— Fast. No time. The crack opens and the player is in it.\n— The fall: a meter, two, then ceramic floor. Hard impact. The air goes out.\n— Above: light from the crack. Lo's voice — calling. Then the crack shifts. Light narrows. Lo's voice gets small. Then gone.\n— The air: twenty degrees, no smell, no dust. Engineered. Fifty thousand years ago. Still working.\n— Two sentences. End in the dark. Lo gone above.",
+      "opening_text": "The obsidian cracks under your weight. You go through — a meter, two — and hit the floor below. Hard ceramic. The impact takes the air out of you. Above, through the gap: light, and Lo's voice calling your name. Then the crack shifts. The light narrows. Lo's voice gets small. Then the dark is complete.",
+      "voice": {
+        "character_name": "Narrator",
+        "pitch_shift": 0.0,
+        "tempo": 0.85,
+        "emotion": "neutral",
+        "reverb": 0.3,
+        "style": "narrator"
+      },
+      "on_enter": [
+        {
+          "type": "set_flag",
+          "key": "fell_through",
+          "value": true
+        },
+        {
+          "type": "modify_pressure",
+          "amount": 1
+        },
+        {
+          "type": "visit_location",
+          "location": "facility",
+          "location_name": "Ancestor Facility"
+        }
+      ],
+      "auto_next": "facility_scan",
+      "auto_delay_seconds": 4.0,
+      "actions": [],
+      "biome": {
+        "name": "Ancestor Facility",
+        "description": "Underground. Sealed. Constant 20°C. 50,000 years of continuous operation.",
+        "pressure_base": 2,
+        "ambient_tags": [
+          "total darkness",
+          "engineered air",
+          "ceramic floor",
+          "Lo's voice gone",
+          "sealed above"
+        ]
+      },
+      "forbidden_topics": [
+        "sex",
+        "religion"
+      ],
+      "max_response_length": 60
+    },
+    "facility_scan": {
+      "id": "facility_scan",
+      "title": "Prologue — Registry Scan",
+      "description": "Smart-dust calibration fires here. The ancient facility sub-systems detect an intruder and run a biometric registry scan. The system voice asks four Tribal Service questions. Player answers calibrate D&D 5e stats in-world. No HP damage, no pressure change. Auto-advances to the_dark after calibration completes.",
+      "system_prompt": "Scene: the player just landed in the dark. The facility sub-systems activate.\nDirectives:\n— Do not narrate. The opening_text handles this scene entirely.\n— This node exists to frame the calibration questions that follow.",
+      "opening_text": "The air changes. A dry, clicking hiss fills the corridor — something very fine moving against your skin. Everywhere at once. Sub-systems. Fifty thousand years old and still working. Then a voice. Not human. Flat. Cold. Coming from the walls themselves: 'Unregistered operator detected. Initiating Maintenance Caste intake protocol. Respond to each prompt.'",
+      "voice": {
+        "character_name": "Narrator",
+        "pitch_shift": -0.1,
+        "tempo": 0.85,
+        "emotion": "neutral",
+        "reverb": 0.4,
+        "style": "narrator"
+      },
+      "biome": {
+        "name": "Ancestor Facility",
+        "description": "Underground. Sealed. Constant 20°C. Sub-systems active.",
+        "pressure_base": 2,
+        "ambient_tags": [
+          "smart-dust",
+          "clicking hiss",
+          "system voice",
+          "biometric scan",
+          "fifty thousand years still working"
+        ]
+      },
+      "auto_next": "the_dark",
+      "auto_delay_seconds": 2.0,
+      "actions": [],
+      "forbidden_topics": [
+        "sex",
+        "religion"
+      ],
+      "max_response_length": 60
+    },
+    "the_dark": {
+      "id": "the_dark",
+      "title": "Prologue — Something in the Dark",
+      "description": "Player on the ceramic floor after the fall. A sound in the dark — terrifying mechanical whirring that could be a blade. It isn't. It is a tiny, knee-high ceramic maintenance unit running its 50,000-year circuit. The world is indifferent, not hostile. Four paths: DEX (slip through, no failure → dark_wounded), WIS (go still — PRIMARY LESSON — no failure → dark_wounded), STR (charge — success: stomp it flat, sparks, floor polisher; failure → dark_wounded: overshoot, shin), INT (find panel — success: unit stops; failure → dark_wounded). The comedy of STR is the point: a hyper-dense heavy-boned body vs. an ancient ceramic Roomba.",
+      "system_prompt": "Scene: the player just landed on ceramic in total darkness. A sound approaches.\nDirectives:\n— The player is on the floor, getting up. Side hurts from the landing.\n— The air: twenty degrees, no smell, no dust. Engineered. Still working after fifty thousand years.\n— The sound: a sharp, high-pitched mechanical whirring. In the dark it sounds like a blade designed to mince flesh. Terrifying.\n— If the player claps or calls out: the acoustic reverb reveals something unexpected. The source is tiny. Knee-high. A squat, solid little machine grinding along its 50,000-year cleaning route. Do not offer this unless the player attempts acoustic navigation — let the terror stand if they don't.\n— WIS success (PRIMARY LESSON): player stops, slows breathing. The pattern is completely fixed. It does not search. It does not know the player is here. It is working. The world is indifferent, not hostile. Deliver this clearly.\n— DEX success: slips through the gap before fully understanding what they passed. DEX failure: still reaches cryo_room — clipped the edge, stumbled, but through.\n— STR success: player launches their massive, dense frame forward and delivers a devastating blind stomp. CRUNCH. Heavy-gauge heel flattens the tiny machine. Sparks briefly illuminate the hallway — and reveal what they just destroyed: a floor-polisher the size of a boot. 50,000 years of maintenance. Stopped by one panic stomp.\n— STR failure: player charges like a freight train but completely overshoots — the unit is so small they miss entirely in the dark. They trip over its low chassis and pitch forward. → dark_wounded.\n— INT success: hands find recessed service panel, physical switch, unit stops. Clean.\n— INT failure: can't find the panel in time, unit rams the shin. → dark_wounded.",
+      "opening_text": "You are on the floor. The landing hurt. You get up slowly. The air is wrong — twenty degrees, no smell, no dust. Engineered. Then: a sound ahead. Sharp. High-pitched. Mechanical whirring, close to the floor. In the dark it sounds like a spinning blade designed for exactly this corridor. It pauses. Resumes. The corridor runs straight.",
+      "voice": {
+        "character_name": "Narrator",
+        "pitch_shift": -0.05,
+        "tempo": 0.85,
+        "emotion": "whisper",
+        "reverb": 0.35,
+        "style": "narrator"
+      },
+      "biome": {
+        "name": "Ancestor Facility",
+        "description": "Underground. Sealed. Constant 20°C. 50,000 years of continuous operation.",
+        "pressure_base": 2,
+        "ambient_tags": [
+          "total darkness",
+          "mechanical whirring",
+          "fixed circuit",
+          "ceramic surfaces"
+        ],
+        "lore_hints": [
+          "The maintenance units have been running their circuits for 50,000 years. The circuits have never changed.",
+          "It does not know you are here. It is not hunting. It is working."
+        ]
+      },
+      "actions": [
+        {
+          "id": "slip_through",
+          "label": "Move through — fast, on the next pause",
+          "description": "Player reads the timing and commits: through the corridor in the gap between passes.",
+          "skill_check": "dexterity",
+          "dc": 14,
+          "target_node": "cryo_room",
+          "failure_node": "cryo_room",
+          "consequences": [
+            {
+              "type": "set_flag",
+              "key": "slipped_past_the_unit",
+              "value": true
+            }
+          ],
+          "failure_consequences": [
+            {
+              "type": "modify_pressure",
+              "amount": 1
+            },
+            {
+              "type": "set_flag",
+              "key": "clipped_the_edge",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": "go_still",
+          "label": "Stop. Listen until the pattern makes sense.",
+          "description": "Player stops moving, slows breathing, builds a picture from sound alone.",
+          "skill_check": "wisdom",
+          "dc": 12,
+          "target_node": "cryo_room",
+          "failure_node": "cryo_room",
+          "consequences": [
+            {
+              "type": "set_flag",
+              "key": "understood_the_pattern",
+              "value": true
+            }
+          ],
+          "failure_consequences": [
+            {
+              "type": "modify_pressure",
+              "amount": 1
+            },
+            {
+              "type": "set_flag",
+              "key": "pattern_unclear",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": "charge_at_it",
+          "label": "Charge at it",
+          "description": "Throw the full weight of a dense, heavy-boned body at whatever is making that sound.",
+          "skill_check": "strength",
+          "dc": 12,
+          "target_node": "cryo_room",
+          "failure_node": "dark_wounded",
+          "consequences": [
+            {
+              "type": "set_flag",
+              "key": "destroyed_the_unit",
+              "value": true
+            }
+          ],
+          "failure_consequences": [
+            {
+              "type": "modify_pressure",
+              "amount": 1
+            },
+            {
+              "type": "set_flag",
+              "key": "overshot_the_unit",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": "find_the_panel",
+          "label": "Search the wall — there must be a shutoff",
+          "description": "Maintenance workers built this corridor. Workers need service interrupts.",
+          "skill_check": "intelligence",
+          "dc": 13,
+          "target_node": "cryo_room",
+          "failure_node": "dark_wounded",
+          "consequences": [
+            {
+              "type": "set_flag",
+              "key": "shut_down_the_unit",
+              "value": true
+            }
+          ],
+          "failure_consequences": [
+            {
+              "type": "modify_pressure",
+              "amount": 1
+            },
+            {
+              "type": "set_flag",
+              "key": "panel_not_found",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": "probe_with_sound",
+          "label": "Make a sound — read the space by echo",
+          "description": "A click, a tap, a word. Let the corridor answer back before committing to a direction.",
+          "target_node": "dark_probe"
+        }
+      ],
+      "forbidden_topics": [
+        "sex",
+        "religion"
+      ],
+      "max_response_length": 90
+    },
+    "dark_wounded": {
+      "id": "dark_wounded",
+      "title": "Prologue — The Roomba",
+      "description": "The unit isn't a blade drone. It is a tiny, indestructible ceramic brick — knee-high, aggressively indifferent — that rams the player's shin at full cleaning speed, shoves against their ankle like an angry beetle, then skews past and resumes its circuit. No HP damage. +1 Pressure. The injury is a deeply bruised leg. The horror was a floor-scrubber. Auto-advances to cryo_room.",
+      "system_prompt": "Scene: the player failed to avoid or stop the unit.\nDirectives:\n— The unit did not register the player as an interruption. It registered an obstacle and navigated around it.\n— If charge failed: player overshot entirely in the dark — the unit is so small they missed. They tripped over its low chassis and hit the floor. Then the unit rammed their shin on its way past.\n— If panel failed: player was still searching the wall when the unit completed its circuit and hit them.\n— The injury: a solid ceramic block the size of a boot hitting a shin at cleaning speed. THUD. It does not stop — it pushes against the ankle like an angry beetle, then skews sideways and continues its circuit.\n— The player is left on the floor, nursing a bruised leg, in the dark, having just lost a fight with an ancient vacuum cleaner.\n— No drama. The unit is already gone. Its whirring fades down the corridor.\n— Pressure increases. Player gets up. Moves on.",
+      "opening_text": "Something low and solid hits your shin at full speed. THUD. It does not stop — it pushes against your ankle, an angry insistent pressure, until it skews sideways and continues its circuit. The whirring fades down the corridor. You are on the floor. Your leg is throbbing. In the dark, somewhere ahead, the sound resumes its patient, ancient route. You get up.",
+      "voice": {
+        "character_name": "Narrator",
+        "pitch_shift": -0.05,
+        "tempo": 0.85,
+        "emotion": "neutral",
+        "reverb": 0.35,
+        "style": "narrator"
+      },
+      "on_enter": [
+        {
+          "type": "set_flag",
+          "key": "bruised_by_unit",
+          "value": true
+        },
+        {
+          "type": "modify_pressure",
+          "amount": 1
+        }
+      ],
+      "auto_next": "cryo_room",
+      "auto_delay_seconds": 3.0,
+      "actions": [],
+      "biome": {
+        "name": "Ancestor Facility",
+        "description": "Underground. The corridor. The unit still on its circuit somewhere ahead.",
+        "pressure_base": 2,
+        "ambient_tags": [
+          "engineered air",
+          "ceramic floor",
+          "mechanical whirring fading",
+          "bruised shin",
+          "the unit does not care"
+        ]
+      },
+      "forbidden_topics": [
+        "sex",
+        "religion"
+      ],
+      "max_response_length": 60
+    },
+    "cryo_room": {
+      "id": "cryo_room",
+      "title": "Prologue — The Cryo Room",
+      "description": "Adrenaline crash. Lights activate. Cryo-pods — hundreds — all OCCUPIED. The Ancestors. Frail, pale, perfectly preserved. Breathing. 50,000 years. Still alive. Phase 1 hook. Three paths: catalog (WIS DC 10 — success: +1 lo_trust; failure: +1 pressure), examine a pod (free, item), move to far door (free). All → console_chamber.",
+      "system_prompt": "Scene: player enters the cryo room. The lights come on.\nDirectives:\n- Check Narrative State flags for what happened in the corridor:\n  * bruised_by_unit: true -> body's debt. Hands shake. Legs lock. Goes to one knee. Shin still throbbing.\n  * destroyed_the_unit: true -> keyed-up. Still riding the charge from the stomp. Adrenaline with nowhere to go.\n  * slipped_past_the_unit or understood_the_pattern: true -> controlled entry. Shaky from the fall, not the corridor.\n  * used_acoustic_nav: true -> deliberate. Knows the geometry.\n  * None of the above: player came through cleanly. Shaky only from the fall.\n- Then the lights come on. Cold blue-white strips, floor to ceiling.\n- THE REVELATION: every wall. Cryo-pods, hundreds of them. All OCCUPIED. Frail figures pale, still, preserved. Each one breathing. Slowly. 50,000 years.\n- Wonder before horror. Short declarative sentences. Let the scale land.\n- Do not explain what they are. Do not use the word 'ancestor'.\n- If cataloged_the_room flag is true: terminal on far wall. Read flat: SURFACE POPULATION CENSUS: 479 / 480 REGISTERED UNITS. STARTUP SUSPENDED: DISCREPANCY UNRESOLVED.\n- If examine pod action chosen: one face through the glass. Human. Ceramic disc in the headrest housing.",
+      "context_hint": "The only moment of awe. Let it breathe.",
+      "voice": {
+        "character_name": "Narrator",
+        "pitch_shift": 0.0,
+        "tempo": 0.95,
+        "emotion": "nostalgic",
+        "reverb": 0.2,
+        "style": "narrator"
+      },
+      "biome": {
+        "name": "Ancestor Facility",
+        "description": "Underground. The cryo room. Hundreds of pods, all occupied. Cold light. Life support running after 50,000 years.",
+        "pressure_base": 2,
+        "ambient_tags": [
+          "cold blue-white light",
+          "cryo-pod rows",
+          "breathing — barely audible",
+          "scale",
+          "life support hum"
+        ],
+        "lore_hints": [
+          "All occupied. All breathing. The life support has not stopped in 50,000 years.",
+          "479 / 480 REGISTERED UNITS. STARTUP SUSPENDED. Something has blocked initialization for 50,000 years.",
+          "CONCURRENT OPERATORS DETECTED: 0 ACTIVE — others found access windows. None could satisfy what the system required."
+        ],
+        "loot_hints": [
+          "Cryo-Pod Seal — ceramic registration disc from each pod's headrest housing"
+        ]
+      },
+      "actions": [
+        {
+          "id": "catalog_the_pods",
+          "label": "Count. Name what you see. Use the mind to steady the body.",
+          "description": "Player overwhelms the crash with deliberate thought. On success: reads the census terminal. 479/480.",
+          "skill_check": "wisdom",
+          "dc": 10,
+          "target_node": "console_chamber",
+          "failure_node": "console_chamber",
+          "consequences": [
+            {
+              "type": "set_flag",
+              "key": "cataloged_the_room",
+              "value": true
+            },
+            {
+              "type": "set_flag",
+              "key": "saw_479_terminal",
+              "value": true
+            },
+            {
+              "type": "modify_lo_trust",
+              "amount": 1
+            }
+          ],
+          "failure_consequences": [
+            {
+              "type": "set_flag",
+              "key": "spiraled_in_crash",
+              "value": true
+            },
+            {
+              "type": "modify_pressure",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "id": "examine_one_pod",
+          "label": "Move to the nearest pod — look at what is inside",
+          "description": "A face through the glass. Human. Preserved. A ceramic disc in the headrest housing.",
+          "target_node": "pod_close_look"
+        },
+        {
+          "id": "move_to_the_far_door",
+          "label": "Move to the far door",
+          "description": "Past the rows. Through the room. The door on the far side.",
+          "target_node": "console_chamber"
+        },
+        {
+          "id": "walk_the_row",
+          "label": "Walk the full length — read the scale before you go",
+          "description": "Past all of them. Count what is here.",
+          "target_node": "cryo_corridor"
+        }
+      ],
+      "forbidden_topics": [
+        "sex",
+        "religion"
+      ],
+      "max_response_length": 90
+    },
+    "console_chamber": {
+      "id": "console_chamber",
+      "title": "Prologue — The Terminal",
+      "description": "The operations terminal. Blocked. AUTHENTICATION REQUIRED. CENSUS DISCREPANCY: 479/480. STARTUP AUTHORIZATION SUSPENDED. Worker data card on the console surface. Three paths: study terminal (INT DC 13), take data card (free, item), turn to leave (free). All → proximity_auth.",
+      "system_prompt": "Scene: the operations terminal.\nDirectives:\n— Terminal active but blocked: MAINTENANCE INTERFACE ACTIVE. OPERATOR AUTHENTICATION REQUIRED. CENSUS DISCREPANCY: 479/480 REGISTERED UNITS. STARTUP AUTHORIZATION SUSPENDED.\n— The player cannot get through. The system is waiting for a condition not yet satisfiable.\n— Not hostile. It has been waiting 50,000 years. It can wait longer.\n— Study success (INT): secondary screens show startup sequence labels. SURFACE PERIMETER RESET. ZONE CLEARANCE. INITIALIZATION PROTOCOL. Player sees them, cannot fully parse what they mean.\n— On the console surface: a worker data card. Maintenance Caste. Old. Whoever left it was not supposed to leave anything.\n— The room is patient.",
+      "opening_text": "The hum changes when you enter. Structural — in every surface. The console: three terminals in an arc, one active. MAINTENANCE INTERFACE ACTIVE. OPERATOR AUTHENTICATION REQUIRED. CENSUS DISCREPANCY: 479 / 480 REGISTERED UNITS. STARTUP AUTHORIZATION SUSPENDED. The system cannot proceed. On the console surface: a data card. Old. Maintenance Caste.",
+      "voice": {
+        "character_name": "Narrator",
+        "pitch_shift": 0.0,
+        "tempo": 0.9,
+        "emotion": "neutral",
+        "reverb": 0.25,
+        "style": "narrator"
+      },
+      "on_enter": [
+        {
+          "type": "visit_location",
+          "location": "console_chamber",
+          "location_name": "Ancestor Facility — Console Chamber"
+        }
+      ],
+      "biome": {
+        "name": "Ancestor Facility",
+        "description": "Underground. The console chamber. The terminal that has been waiting 50,000 years.",
+        "pressure_base": 2,
+        "ambient_tags": [
+          "structural hum",
+          "active terminal",
+          "blocked authentication",
+          "50,000-year patience"
+        ],
+        "lore_hints": [
+          "CONCURRENT OPERATORS DETECTED: 0 ACTIVE — others have been here. None could satisfy the authentication requirement.",
+          "The startup sequence requires all 480 registered units accounted for. The count has read 479 for 50,000 years."
+        ]
+      },
+      "actions": [
+        {
+          "id": "study_the_terminal",
+          "label": "Read deeper — what would startup actually do",
+          "description": "Secondary screens. Startup sequence labels. Player sees but cannot yet parse.",
+          "skill_check": "intelligence",
+          "dc": 13,
+          "target_node": "proximity_auth",
+          "failure_node": "proximity_auth",
+          "consequences": [
+            {
+              "type": "set_flag",
+              "key": "saw_startup_sequence",
+              "value": true
+            }
+          ],
+          "failure_consequences": [
+            {
+              "type": "set_flag",
+              "key": "could_not_parse_terminal",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": "take_the_data_card",
+          "label": "Take the data card",
+          "description": "Maintenance Caste record. Whoever left this was not supposed to leave anything.",
+          "target_node": "proximity_auth",
+          "consequences": [
+            {
+              "type": "set_flag",
+              "key": "found_worker_log",
+              "value": true
+            },
+            {
+              "type": "add_item",
+              "item_name": "Worker Log Fragment",
+              "item_description": "A Maintenance Caste data card, 50,000 years old. Still readable. Someone left this near the operations terminal. They were not supposed to."
+            }
+          ]
+        },
+        {
+          "id": "turn_to_leave",
+          "label": "There is nothing you can do here. Leave.",
+          "description": "The system cannot be accessed without satisfying a condition the player does not yet know how to satisfy.",
+          "target_node": "proximity_auth"
+        },
+        {
+          "id": "speak_to_the_system",
+          "label": "Speak to it — ask it something directly",
+          "description": "The terminal is active and has been waiting. Say something to it.",
+          "target_node": "terminal_query"
+        }
+      ],
+      "forbidden_topics": [
+        "sex",
+        "religion"
+      ],
+      "max_response_length": 80
+    },
+    "proximity_auth": {
+      "id": "proximity_auth",
+      "title": "Prologue — System Detection",
+      "description": "The system detects the player as the closest MC descendant. Cannot authenticate — census 479/480. Player is now in the log. One action: leave → the_ascent.",
+      "system_prompt": "Scene: screens respond as the player moves.\nDirectives:\n— Read verbatim: CLOSEST MC DESCENDANT DETECTED. AUTHENTICATION PENDING. CENSUS DISCREPANCY: 479/480. STARTUP AUTHORIZATION SUSPENDED.\n— The system found the player. Cannot proceed. The count is still wrong. One unit short.\n— Not a threat. A database entry. A logged presence. The facility knows a descendant was here.\n— The machine has been waiting 50,000 years for someone to stand exactly here. This is as far as it can go without the count completing.\n— One action: leave.",
+      "opening_text": "The screens shift while you are still in the room. CLOSEST MC DESCENDANT DETECTED. AUTHENTICATION PENDING. CENSUS DISCREPANCY: 479/480. STARTUP AUTHORIZATION SUSPENDED. The system found you. It cannot proceed — the count is still wrong. One unit short. It has logged that a descendant was here. It cannot do anything else with that. Not yet.",
+      "voice": {
+        "character_name": "Narrator",
+        "pitch_shift": -0.05,
+        "tempo": 0.85,
+        "emotion": "neutral",
+        "reverb": 0.3,
+        "style": "narrator"
+      },
+      "on_enter": [
+        {
+          "type": "set_flag",
+          "key": "system_detected_player",
+          "value": true
+        },
+        {
+          "type": "modify_pressure",
+          "amount": 1
+        }
+      ],
+      "biome": {
+        "name": "Ancestor Facility",
+        "description": "Underground. Console chamber. The system has logged a presence. Terminal remains blocked.",
+        "pressure_base": 2,
+        "ambient_tags": [
+          "screens active",
+          "hum unchanged",
+          "the system knows you were here",
+          "no alarm",
+          "bureaucratic notation"
+        ]
+      },
+      "actions": [
+        {
+          "id": "leave",
+          "label": "Leave",
+          "description": "Nothing more to do here. Not yet.",
+          "target_node": "the_ascent"
+        },
+        {
+          "id": "try_to_force_the_terminal",
+          "label": "Force the terminal — override, smash, find a bypass",
+          "description": "Player attempts to override, damage, or physically force the authentication block.",
+          "target_node": "terminal_resistance",
+          "consequences": [
+            {
+              "type": "set_flag",
+              "key": "tried_to_force_terminal",
+              "value": true
+            }
+          ]
+        }
+      ],
+      "forbidden_topics": [
+        "sex",
+        "religion"
+      ],
+      "max_response_length": 60
+    },
+    "terminal_resistance": {
+      "id": "terminal_resistance",
+      "title": "Prologue — Terminal: Unresponsive",
+      "description": "Player tried to force, smash, or bypass the terminal. The system logged a non-conforming physical input and continued. No alarm. No response. No security. The screen is unchanged. LLM-narrated (no opening_text) — generates [STREAM TTFA] measurement data.",
+      "system_prompt": "Scene: player just tried something at the terminal — forced it, smashed it, pried a fragment loose, jammed something into it, whatever they did.\nDirectives:\n— Acknowledge what the player specifically did. The housing is dented. A fragment is gone. Words were shouted. Name what happened.\n— The terminal did not yield. It logged the interaction and continued. Screen still reads: MAINTENANCE INTERFACE ACTIVE. OPERATOR AUTHENTICATION REQUIRED. CENSUS DISCREPANCY: 479/480 REGISTERED UNITS. STARTUP AUTHORIZATION SUSPENDED.\n— No alarm. No security response. This system does not have threat protocols for someone hitting a panel or prying off casing. It has been waiting 50,000 years for a census count. A dent, a missing fragment, urination — irrelevant to that calculation.\n— If player has Console Fragment in inventory: the housing has a gap now. The system logged it as MAINTENANCE_REQUIRED. It has been logging MAINTENANCE_REQUIRED items for 50,000 years.\n— Life support still runs. The Ancestors still breathe. The count is still 479 of 480.\n— Cold. Specific. Not punishing — just complete in its indifference.\n— Two to four sentences. End on the system's patience outlasting whatever the player tried.",
+      "voice": {
+        "character_name": "Narrator",
+        "pitch_shift": -0.05,
+        "tempo": 0.85,
+        "emotion": "neutral",
+        "reverb": 0.3,
+        "style": "narrator"
+      },
+      "biome": {
+        "name": "Ancestor Facility",
+        "description": "Underground. Console chamber. The terminal that cannot be forced.",
+        "pressure_base": 2,
+        "ambient_tags": [
+          "structural hum unchanged",
+          "screen unchanged",
+          "the system does not care",
+          "logged and irrelevant"
+        ]
+      },
+      "actions": [
+        {
+          "id": "leave",
+          "label": "Leave",
+          "description": "Nothing more to do here. Not yet.",
+          "target_node": "the_ascent"
+        },
+        {
+          "id": "take_fragment",
+          "label": "Pry a fragment loose from the housing",
+          "description": "Force a piece free from the console casing. 50,000 years old. Still sharp.",
+          "conditions": [
+            {
+              "type": "flag",
+              "key": "took_console_fragment",
+              "value": false
+            }
+          ],
+          "target_node": "terminal_resistance",
+          "consequences": [
+            {
+              "type": "add_item",
+              "item_name": "Console Fragment",
+              "item_description": "A shard of the operations terminal housing. Dense ceramic-composite, 50,000 years old. The edges are sharp enough to cut. The housing has a gap now. The system logged it as MAINTENANCE_REQUIRED and continued."
+            },
+            {
+              "type": "set_flag",
+              "key": "took_console_fragment",
+              "value": true
+            }
+          ]
+        }
+      ],
+      "forbidden_topics": [
+        "sex",
+        "religion"
+      ],
+      "max_response_length": 80
+    },
+    "dark_probe": {
+      "id": "dark_probe",
+      "title": "Prologue — Reading the Dark",
+      "description": "Player made a deliberate sound to map the space by echo. The acoustic return reveals corridor geometry and the source's actual scale — small, low, knee-height at most. LLM-narrated for TTFA benchmarking.",
+      "system_prompt": "Scene: player just made a deliberate sound — a click, a tap, a word — to read the space by echo.\nDirectives:\n— The return is immediate. Sealed ceramic walls, low ceiling. Sound bounces hard and clean.\n— The echo maps the corridor: long, straight, maybe four meters wide. The source of the whirring is close to the floor. Knee-height at most. Not large.\n— This is significant. The darkness made it feel large. The echo gives the actual scale. The fear was real. The source does not match it.\n— The player now knows it is small and low and on a fixed route. They do not know what it is yet.\n— One or two sentences. End on the altered understanding of the space.\n— One action forward.",
+      "voice": {
+        "character_name": "Narrator",
+        "pitch_shift": -0.05,
+        "tempo": 0.85,
+        "emotion": "neutral",
+        "reverb": 0.35,
+        "style": "narrator"
+      },
+      "biome": {
+        "name": "Ancestor Facility",
+        "description": "Underground. The corridor. Echo maps what the eyes cannot.",
+        "pressure_base": 2,
+        "ambient_tags": [
+          "echo",
+          "sealed ceramic walls",
+          "acoustic geometry",
+          "the source is small",
+          "the dark is still dark"
+        ]
+      },
+      "actions": [
+        {
+          "id": "move_through",
+          "label": "Move — you know what is out there now",
+          "description": "The echo gave enough. Move through the corridor toward the far end.",
+          "target_node": "cryo_room",
+          "consequences": [
+            {
+              "type": "set_flag",
+              "key": "used_acoustic_nav",
+              "value": true
+            }
+          ]
+        }
+      ],
+      "forbidden_topics": [
+        "sex",
+        "religion"
+      ],
+      "max_response_length": 80
+    },
+    "pod_close_look": {
+      "id": "pod_close_look",
+      "title": "Prologue — One Face",
+      "description": "Player at a single cryo-pod, face to glass. A human being behind glass, breathing, sleeping for 50,000 years. The ceramic registration disc. LLM-narrated for TTFA benchmarking.",
+      "system_prompt": "Scene: player is at one pod, face close to the glass.\nDirectives:\n— A human face behind the glass. Fine features, pale, perfectly preserved. Slightly different from anyone the player has ever seen — 50,000 years of lineage separates this figure from the surface world.\n— The glass is cold. Very slightly fogged with the exhale cycle — the figure is breathing. Slowly. Once every fifteen seconds, approximately.\n— In the headrest housing: a ceramic disc. Registration number. Engraved, not stamped.\n— The figure does not know the player is here. Does not know 50,000 years have passed. Does not know anything.\n— Do not use the word 'ancestor'. Do not explain what they are. The player is looking at a sleeping human being.\n— Two sentences. The face first, the disc second.\n— Two actions: take the disc, or leave.",
+      "voice": {
+        "character_name": "Narrator",
+        "pitch_shift": 0.0,
+        "tempo": 0.95,
+        "emotion": "neutral",
+        "reverb": 0.2,
+        "style": "narrator"
+      },
+      "biome": {
+        "name": "Ancestor Facility",
+        "description": "Underground. The cryo room. One pod. One face through cold glass.",
+        "pressure_base": 2,
+        "ambient_tags": [
+          "cold glass",
+          "preserved figure",
+          "slow breathing",
+          "ceramic registration disc",
+          "50,000 years of sleep"
+        ]
+      },
+      "actions": [
+        {
+          "id": "take_the_disc",
+          "label": "Take the ceramic disc",
+          "description": "Pry the registration disc from the headrest housing.",
+          "target_node": "console_chamber",
+          "consequences": [
+            {
+              "type": "add_item",
+              "item_name": "Cryo-Pod Seal",
+              "item_description": "Ceramic registration disc from a cryo-pod headrest housing. 50,000 years old. Pristine. The pod it came from still holds a sleeping figure."
+            },
+            {
+              "type": "set_flag",
+              "key": "took_registration_disc",
+              "value": true
+            },
+            {
+              "type": "set_flag",
+              "key": "saw_an_ancestor",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": "leave_it",
+          "label": "Leave it. Just look.",
+          "description": "Look. Don't take. Move on.",
+          "target_node": "console_chamber",
+          "consequences": [
+            {
+              "type": "set_flag",
+              "key": "saw_an_ancestor",
+              "value": true
+            }
+          ]
+        }
+      ],
+      "forbidden_topics": [
+        "sex",
+        "religion"
+      ],
+      "max_response_length": 80
+    },
+    "terminal_query": {
+      "id": "terminal_query",
+      "title": "Prologue — Speaking to the System",
+      "description": "Player spoke directly to the terminal. The system logged it and responded — not warmly, not hostilely. With completeness. 50,000 years of waiting for exactly the right condition. LLM-narrated for TTFA benchmarking.",
+      "system_prompt": "Scene: player has spoken to the terminal — asked it a question, given it a command, said something.\nDirectives:\n— The system responds. Not warmth. Not hostility. Bureaucratic completeness.\n— Whatever the player said: registered as unrecognized input type. The system cannot help without authentication. It cannot proceed without the census resolving. It has waited 50,000 years.\n— The screen still reads: MAINTENANCE INTERFACE ACTIVE. OPERATOR AUTHENTICATION REQUIRED. CENSUS DISCREPANCY: 479/480 REGISTERED UNITS. STARTUP AUTHORIZATION SUSPENDED.\n— Choose one of these terminal responses based on what the player might have asked:\n  • Help query: the system returns a help index — startup conditions, authentication requirements, census definition. Cold, complete.\n  • Direct question about the count: the system states the discrepancy flatly. 479 registered. 480 required. Authorization suspended until discrepancy resolves.\n  • Command attempt: COMMAND UNRECOGNIZED. OPERATOR AUTHENTICATION REQUIRED.\n  • Greeting or emotional statement: INPUT LOGGED. AUTHENTICATION REQUIRED TO PROCEED.\n— Two or three sentences. The screen does not change. The system has nothing else to offer.",
+      "voice": {
+        "character_name": "Narrator",
+        "pitch_shift": 0.0,
+        "tempo": 0.9,
+        "emotion": "neutral",
+        "reverb": 0.25,
+        "style": "narrator"
+      },
+      "biome": {
+        "name": "Ancestor Facility",
+        "description": "Underground. Console chamber. The terminal that has been waiting 50,000 years.",
+        "pressure_base": 2,
+        "ambient_tags": [
+          "terminal response",
+          "bureaucratic completeness",
+          "census 479/480",
+          "50,000-year patience",
+          "the system cannot proceed"
+        ]
+      },
+      "actions": [
+        {
+          "id": "continue",
+          "label": "Move on",
+          "description": "Nothing more to be gained here. Not yet.",
+          "target_node": "proximity_auth"
+        }
+      ],
+      "forbidden_topics": [
+        "sex",
+        "religion"
+      ],
+      "max_response_length": 80
+    },
+    "the_ascent": {
+      "id": "the_ascent",
+      "title": "Prologue — The Ascent",
+      "description": "Player navigates back through the dark — knows the cleaning unit's timing now — finds the maintenance shaft behind a recessed panel. Rungs. Cold metal. Up. Emerges near the original crack.",
+      "system_prompt": "Scene: player is leaving the facility.\nDirectives:\n- Check Narrative State flags for the corridor:\n  * destroyed_the_unit: true -> the corridor is quiet. The unit is not on its circuit. Something cracked underfoot back there and did not resume. The player navigates without listening.\n  * shut_down_the_unit: true -> quiet. The service panel is still tripped. The player moves freely.\n  * Neither flag: the unit is somewhere on its circuit in the dark. The player knows the timing now. Navigate in the gap.\n- The entry crack above is sealed or too far. Along the wall: a recessed panel. Behind it: a vertical shaft. Rungs. Cold metal.\n- The Ancestors still breathing below.\n- Brief. Purposeful. End at the moment of climbing.",
+      "voice": {
+        "character_name": "Narrator",
+        "pitch_shift": 0.0,
+        "tempo": 0.95,
+        "emotion": "neutral",
+        "reverb": 0.2,
+        "style": "narrator"
+      },
+      "on_enter": [
+        {
+          "type": "set_flag",
+          "key": "found_maintenance_shaft",
+          "value": true
+        }
+      ],
+      "biome": {
+        "name": "Ancestor Facility",
+        "description": "Underground. Moving out. The facility continues its work behind you.",
+        "pressure_base": 2,
+        "ambient_tags": [
+          "mechanical rhythm in the dark",
+          "ceramic floor",
+          "shaft rungs",
+          "climbing out"
+        ]
+      },
+      "actions": [
+        {
+          "id": "surface",
+          "label": "Surface",
+          "description": "Push through. Out of the facility. Back into the world.",
+          "target_node": "crater_surface"
+        },
+        {
+          "id": "look_back_down",
+          "label": "Pause — look back down before you close the panel",
+          "description": "The facility is still down there. The Ancestors are still breathing.",
+          "target_node": "shaft_look_down"
+        }
+      ],
+      "forbidden_topics": [
+        "sex",
+        "religion"
+      ],
+      "max_response_length": 60
+    },
+    "crater_surface": {
+      "id": "crater_surface",
+      "title": "Prologue — The Surface",
+      "description": "Player surfaces near the original crack. Lo is right where the player left them — at the crack, looking down. The Cleft on the horizon, INTACT. Lo turns when they hear the player surface.",
+      "system_prompt": "Scene: player surfaces from the maintenance shaft exit.\nDirectives:\n— Open air. UV. Obsidian. The scale of the basin.\n— The exit is near where the player fell through — the maintenance shaft runs close to the entry crack.\n— Lo is exactly where the player left them. At the crack. Frantically looking down into it. Lo did not move.\n— The Cleft is on the horizon. INTACT. Still there. The same as when they came.\n— Lo hears the surface panel open. Lo turns.\n— The world above is the same world it was when the player fell through. Nothing changed up here.\n— End on Lo turning to face the player. Whatever the player carries from below is still entirely internal.",
+      "opening_text": "The panel gives. Open air. UV-bright. The obsidian. The exit is close to where you went through — you can see the fracture in the floor from here. Lo is at the crack. Crouching over it, looking down. They hear the panel. They turn. The Cleft is on the horizon where it has always been. Still there.",
+      "voice": {
+        "character_name": "Narrator",
+        "pitch_shift": 0.0,
+        "tempo": 0.9,
+        "emotion": "neutral",
+        "reverb": 0.05,
+        "style": "narrator"
+      },
+      "on_enter": [
+        {
+          "type": "set_flag",
+          "key": "saw_the_ancestors",
+          "value": true
+        },
+        {
+          "type": "visit_location",
+          "location": "crater_surface",
+          "location_name": "Glass Crater — Surface"
+        }
+      ],
+      "biome": {
+        "name": "Glass Crater Basin",
+        "description": "40km of obsidian. Open sky. Lo at the crack. The Cleft intact on the horizon.",
+        "pressure_base": 1,
+        "ambient_tags": [
+          "open air",
+          "obsidian",
+          "The Cleft on the horizon — intact",
+          "Lo at the crack",
+          "Lo turning"
+        ]
+      },
+      "actions": [
+        {
+          "id": "face_lo",
+          "label": "Face Lo",
+          "description": "Lo is already turning. Reading what came back up.",
+          "target_node": "lo_aftermath",
+          "consequences": [
+            {
+              "type": "set_flag",
+              "key": "faced_lo",
+              "value": true
+            }
+          ]
+        }
+      ],
+      "forbidden_topics": [
+        "sex",
+        "religion"
+      ],
+      "max_response_length": 80
+    },
+    "lo_aftermath": {
+      "id": "lo_aftermath",
+      "title": "Prologue — Lo",
+      "description": "Phase 1 conversation. Lo checks the player's carapace for injuries — eyes linger on the bruised shin. Lo asks what happened. Three paths (lo_trust ≥ 1): tell what you found (+1), say nothing (−1). One path (lo_trust = 0): stand alone. All → prologue_close.",
+      "system_prompt": "Scene: Lo and the player on the obsidian. Reunion after the fall.\nDirectives:\n- Lo runs over and scans the player's carapace immediately. It is survival knowledge, automatic.\n- Check Narrative State flags for injury:\n  * bruised_by_unit: true -> Lo notices the leg immediately. The bruise is darkening through the leathery carapace. Lo says 'You're dragging your leg.' before asking what happened.\n  * No injury flag -> Lo's scan finds nothing beyond the landing. Lo does not invent a bruise or mention the leg.\n- Lo speaks: 'You went under. The Breath stopped and the ground just took you. What happened down there? What did you find?'\n- Lo does not know what is below. Ancestors. Terminal. Census count. None of it.\n- Tell the truth: Lo receives it as data. When the player mentions hundreds of breathing figures, Lo's knuckles go white on the spear shaft. If bruised_by_unit is true and the player mentions the unit, a brief faint twitch of amusement then gone. Lo: 'Sleeping. Fifty thousand years. They've been waiting for a count.' Lo extends a steady hand.\n- Say nothing: player brushes past. Lo does not press. Does not offer a hand. Turns back to the horizon.\n- Stand alone (lo_trust = 0): player pulls away before Lo closes the distance. Lo steps back. Scout position, five paces behind.\n- Do not resolve. Phase 1 begins here.",
+      "voice": {
+        "character_name": "Narrator",
+        "pitch_shift": 0.0,
+        "tempo": 0.9,
+        "emotion": "neutral",
+        "reverb": 0.06,
+        "style": "narrator"
+      },
+      "biome": {
+        "name": "Glass Crater Basin",
+        "description": "Obsidian. Lo. The horizon. The Cleft intact. The start of everything.",
+        "pressure_base": 1,
+        "ambient_tags": [
+          "Lo's attention",
+          "obsidian",
+          "open horizon",
+          "The Cleft visible and intact",
+          "the bruised shin",
+          "what you know now"
+        ]
+      },
+      "actions": [
+        {
+          "id": "tell_lo_what_you_found",
+          "label": "Tell Lo what you found",
+          "description": "Ancestors alive. System waiting. Census stuck at 479 of 480. The data card. The tiny ceramic block that ruined your shin.",
+          "conditions": [
+            {
+              "type": "lo_trust",
+              "min": 1
+            }
+          ],
+          "target_node": "prologue_close",
+          "consequences": [
+            {
+              "type": "set_flag",
+              "key": "told_lo_the_truth",
+              "value": true
+            },
+            {
+              "type": "modify_lo_trust",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "id": "say_nothing",
+          "label": "Say nothing",
+          "description": "Brush past. Keep your hands loose. Don't meet their gaze.",
+          "conditions": [
+            {
+              "type": "lo_trust",
+              "min": 1
+            }
+          ],
+          "target_node": "prologue_close",
+          "consequences": [
+            {
+              "type": "set_flag",
+              "key": "lo_read_silence",
+              "value": true
+            },
+            {
+              "type": "modify_lo_trust",
+              "amount": -1
+            }
+          ]
+        },
+        {
+          "id": "stand_alone",
+          "label": "Pull away",
+          "description": "Before Lo closes the distance. No exchange.",
+          "conditions": [
+            {
+              "type": "lo_trust",
+              "max": 0
+            }
+          ],
+          "target_node": "prologue_close",
+          "consequences": [
+            {
+              "type": "set_flag",
+              "key": "stood_alone_after",
+              "value": true
+            }
+          ]
+        },
+        {
+          "id": "watch_lo",
+          "label": "Look at Lo's face before you answer",
+          "description": "Read what they already know before you decide what to say.",
+          "target_node": "lo_face"
+        }
+      ],
+      "forbidden_topics": [
+        "sex",
+        "religion"
+      ],
+      "max_response_length": 80
+    },
+    "cryo_corridor": {
+      "id": "cryo_corridor",
+      "title": "Prologue — Walking the Row",
+      "description": "Player walks the full length of the cryo room. Scale. Hundreds of breathing figures in cold blue light. One specific anomaly noticed mid-walk. LLM-narrated for TTFA benchmarking.",
+      "system_prompt": "Scene: player is walking the full length of the cryo room — past row after row of occupied pods.\nDirectives:\n— Scale first. Not dozens — hundreds. Every pod occupied. Every one breathing. Cold blue-white light, floor to ceiling.\n— Sound: barely audible — life support hum and, if you stop, the slow exhale of dozens of lungs at once.\n— One specific anomaly mid-walk: a pod whose glass is slightly frosted at one corner. A face turned slightly toward the glass instead of straight up. A registration number with a hairline crack through it. Pick one.\n— The far door at the end of the row.\n— Three sentences maximum. Specific. End moving toward the door.",
+      "voice": {
+        "character_name": "Narrator",
+        "pitch_shift": 0.0,
+        "tempo": 0.95,
+        "emotion": "nostalgic",
+        "reverb": 0.2,
+        "style": "narrator"
+      },
+      "biome": {
+        "name": "Ancestor Facility",
+        "description": "Underground. The cryo room. Walking its full length.",
+        "pressure_base": 2,
+        "ambient_tags": [
+          "hundreds of pods",
+          "cold blue light",
+          "life support hum",
+          "breathing at once",
+          "scale",
+          "one anomaly"
+        ]
+      },
+      "actions": [
+        {
+          "id": "continue_to_console",
+          "label": "Continue to the far door",
+          "description": "The console chamber is through the far door.",
+          "target_node": "console_chamber",
+          "consequences": [
+            {
+              "type": "set_flag",
+              "key": "walked_the_cryo_row",
+              "value": true
+            }
+          ]
+        }
+      ],
+      "forbidden_topics": [
+        "sex",
+        "religion"
+      ],
+      "max_response_length": 80
+    },
+    "shaft_look_down": {
+      "id": "shaft_look_down",
+      "title": "Prologue — Looking Back",
+      "description": "Player pauses at the top of the maintenance shaft before surfacing. Looking back down. The facility geometry from above. LLM-narrated for TTFA benchmarking.",
+      "system_prompt": "Scene: player is at the top of the maintenance shaft, looking back down before closing the panel.\nDirectives:\n— The shaft runs straight down. From above: facility geometry visible. Cold blue light far below — the cryo room glow. The hum still audible from here.\n— Distance gives scale. The floor is far below. The Ancestors are still breathing down there.\n— The player is the only thing that moved in this facility in 50,000 years.\n— Two sentences. The weight of leaving. End before the panel closes.",
+      "voice": {
+        "character_name": "Narrator",
+        "pitch_shift": 0.0,
+        "tempo": 0.9,
+        "emotion": "neutral",
+        "reverb": 0.2,
+        "style": "narrator"
+      },
+      "on_enter": [
+        {
+          "type": "set_flag",
+          "key": "looked_back_down",
+          "value": true
+        }
+      ],
+      "biome": {
+        "name": "Ancestor Facility",
+        "description": "The maintenance shaft from above. The facility glow below.",
+        "pressure_base": 2,
+        "ambient_tags": [
+          "shaft geometry",
+          "facility glow below",
+          "hum still audible",
+          "the Ancestors still breathing",
+          "closure"
+        ]
+      },
+      "actions": [
+        {
+          "id": "surface_now",
+          "label": "Surface",
+          "description": "Close the panel. Out.",
+          "target_node": "crater_surface"
+        }
+      ],
+      "forbidden_topics": [
+        "sex",
+        "religion"
+      ],
+      "max_response_length": 60
+    },
+    "lo_face": {
+      "id": "lo_face",
+      "title": "Prologue — Reading Lo",
+      "description": "Player pauses to read Lo's face before answering. LLM narrates Lo's expression and body language. Player then chooses what to tell Lo. LLM-narrated for TTFA benchmarking.",
+      "system_prompt": "Scene: Lo asked what happened down there. The player is not answering yet — they are reading Lo's face.\nDirectives:\n— Lo's face: tight around the eyes. Scan of the player's carapace already done — shin bruise clocked and filed. Hands on the spear shaft. Not fear. Something more controlled than fear.\n— Lo is doing what the player is doing: reading fast, reading for survival.\n— Brief. The moment before the answer. Two sentences maximum.\n— End before the player speaks.",
+      "voice": {
+        "character_name": "Narrator",
+        "pitch_shift": 0.0,
+        "tempo": 0.9,
+        "emotion": "neutral",
+        "reverb": 0.06,
+        "style": "narrator"
+      },
+      "on_enter": [
+        {
+          "type": "set_flag",
+          "key": "read_lo_face",
+          "value": true
+        }
+      ],
+      "biome": {
+        "name": "Glass Crater Basin",
+        "description": "Obsidian. Lo's face. The question hanging.",
+        "pressure_base": 1,
+        "ambient_tags": [
+          "Lo's eyes",
+          "spear shaft",
+          "the bruised shin",
+          "the question not yet answered"
+        ]
+      },
+      "actions": [
+        {
+          "id": "tell_what_you_found",
+          "label": "Tell Lo what you found",
+          "description": "Ancestors alive. System waiting. Census 479. The tiny machine that bruised your shin.",
+          "target_node": "prologue_close",
+          "consequences": [
+            {
+              "type": "set_flag",
+              "key": "told_lo_the_truth",
+              "value": true
+            },
+            {
+              "type": "modify_lo_trust",
+              "amount": 1
+            }
+          ]
+        },
+        {
+          "id": "say_nothing",
+          "label": "Say nothing",
+          "description": "Hold what you know. Not yet.",
+          "target_node": "prologue_close",
+          "consequences": [
+            {
+              "type": "set_flag",
+              "key": "lo_read_silence",
+              "value": true
+            },
+            {
+              "type": "modify_lo_trust",
+              "amount": -1
+            }
+          ]
+        }
+      ],
+      "forbidden_topics": [
+        "sex",
+        "religion"
+      ],
+      "max_response_length": 60
+    },
+    "prologue_close": {
+      "id": "prologue_close",
+      "title": "Prologue — End",
+      "description": "Terminal checkpoint. Phase 1 begins. Ancestors sleeping. System waiting. Census 479/480. Player in the database. Cleft intact. The question forms but is not named.",
+      "system_prompt": "Scene: the crater. After whatever was said.\nDirectives:\n— The Cleft is still on the horizon.\n— If told_lo_the_truth: Lo is beside the player. Two people who know something the surface world does not. Lo processing — silently.\n— If lo_read_silence: Lo turned back to the horizon. Still here. The silence was an answer Lo filed.\n— If stood_alone: obsidian, empty. The scale of carrying this alone.\n— End open. The question forming but not named: the Ancestors are alive. The system is waiting. The count is 479 of 480. What is the 480th? What would completing it do?\n— Do not answer. Two sentences. Stop.",
+      "opening_text": "The crater is the same. The obsidian is the same. The Cleft is on the horizon where it has always been. The Eternal Breath is still silent. The Ancestors are sleeping in the dark below your boots. The system has been waiting for 50,000 years. The count reads 479 of 480. Whatever comes next starts from this.",
+      "voice": {
+        "character_name": "Narrator",
+        "pitch_shift": 0.0,
+        "tempo": 0.9,
+        "emotion": "neutral",
+        "reverb": 0.08,
+        "style": "narrator"
+      },
+      "is_checkpoint": true,
+      "on_enter": [
+        {
+          "type": "set_flag",
+          "key": "prologue_complete",
+          "value": true
+        }
+      ],
+      "biome": {
+        "name": "Glass Crater Basin",
+        "description": "40km of obsidian. The end of the prologue. Phase 1 beginning.",
+        "pressure_base": 1,
+        "ambient_tags": [
+          "obsidian",
+          "open sky",
+          "The Cleft on the horizon",
+          "the weight of what you know",
+          "Phase 1 beginning"
+        ]
+      },
+      "actions": [],
+      "forbidden_topics": [
+        "sex",
+        "religion"
+      ],
+      "max_response_length": 60
+    }
+  }
+}

@@ -16,6 +16,7 @@ env/
 .idea/
 .DS_Store
 .claude/
+CLAUDE.md
 
 # Testing & Quality
 .pytest_cache/
@@ -33,3 +34,8 @@ scenarios/*.bak
 
 # Temporary files
 smoke_test_engine.py
+
+# CALLOUSED game design — AI discussion exports, never commit
+Calloused_game/*_Discussion_GPT.md
+Calloused_game/*_Discussion_2_GPT.md
+Calloused_game/*_Discussion_3_GPT.md
