@@ -239,7 +239,7 @@ async def voice_loop(scenario_path: Path) -> None:
     engine = GaldrEngine(scenario=scenario, llm=llm, tts=_NullTTS())
 
     print("\n" + "=" * 50)
-    print("         G.A.L.D.R. // CALLOUSED")
+    print("              CALLOUSED")
     print("=" * 50)
 
     # 3. Resume from checkpoint or start fresh

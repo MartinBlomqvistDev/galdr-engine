@@ -1,7 +1,7 @@
-"""Slår ihop ambient-data till en promptsträng.
+"""Assembles ambient data into a prompt string.
 
-Engine kallar build_ambient_context() – behöver inte veta vilka
-API:er som lyckades. Tom sträng = inget att injicera.
+Engine calls build_ambient_context() -- does not need to know which APIs succeeded.
+Empty string means nothing to inject.
 """
 
 from __future__ import annotations
@@ -16,11 +16,11 @@ logger = logging.getLogger(__name__)
 
 
 async def build_ambient_context(lat: float | None, lon: float | None) -> str:
-    """Hämta väder + dagsljus parallellt, returnera som stage direction.
+    """Fetch weather and daylight in parallel, return as a stage direction.
 
-    Utan GPS: hoppar väder, tar dagsljus från klockan.
-    Sträng injiceras i prompten som atmosfärisk bakgrund – inte som
-    fakta spelaren kan fråga om.
+    Without GPS: skips weather, takes daylight from system clock.
+    String is injected into the prompt as atmospheric background -- not as
+    facts the player can ask about.
     """
     if lat is not None and lon is not None:
         weather_data, daylight_data = await asyncio.gather(

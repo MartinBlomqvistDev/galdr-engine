@@ -1,4 +1,4 @@
-"""GALDR Engine – Röstbaserad spelmotor för interaktiv storytelling."""
+"""GALDR Engine — voice-first async AI orchestration for interactive storytelling."""
 
 __version__ = "0.1.0"
 

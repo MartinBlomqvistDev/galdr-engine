@@ -29,7 +29,7 @@ def get_engine() -> GaldrEngine:
 # ---------------------------------------------------------------------------
 
 class CreateSessionRequest(BaseModel):
-    character_name: str = "Äventyrare"
+    character_name: str = "Traveler"
 
 
 class CreateSessionResponse(BaseModel):

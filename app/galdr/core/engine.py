@@ -473,9 +473,9 @@ class GaldrEngine:
         available: list[NodeAction],
     ) -> NodeAction | None:
         """Offline matching — no LLM required. Priority order:
-        1. Exact digit → 1-based list index
+        1. Exact digit -> 1-based list index
         2. Exact action ID
-        3. Starts-with fuzzy keyword (handles Swedish inflections like lyssna/lyssnar)
+        3. Word-overlap fuzzy match against label, description, and ID
         4. yes/no heuristics
         """
         text = player_input.lower().strip()
@@ -510,13 +510,12 @@ class GaldrEngine:
         if best_score > 0:
             return best_action
 
-        if text in ("ja", "okej", "ok", "sure", "yes", "visst", "absolut"):
+        if text in ("ok", "sure", "yes", "yeah", "yep", "alright"):
             return available[0]
-        if text in ("nej", "nope", "no", "inte"):
-            # Try to find a refusal/exit action
+        if text in ("nope", "no", "nah", "never"):
             for action in available:
                 label_l = action.label.lower()
-                if any(w in label_l for w in ("nej", "vägra", "gå", "lämna", "inte")):
+                if any(w in label_l for w in ("no", "refuse", "leave", "go", "nothing")):
                     return action
             return available[-1] if len(available) > 1 else None
 
@@ -529,16 +528,17 @@ class GaldrEngine:
     ) -> NodeAction | None:
         """Identifies player intent using a constrained LLM prompt."""
         action_descriptions = "\n".join(
-            f"- ID: {a.id} | Label: {a.label} | Beskrivning: {a.description}"
+            f"- ID: {a.id} | Label: {a.label} | Description: {a.description}"
             for a in available
         )
 
         prompt = (
-            f"Spelaren sa: \"{player_input}\"\n\n"
-            f"Tillgängliga handlingar:\n{action_descriptions}\n\n"
-            f"Vilken handling matchar bäst spelarens intention? "
-            f"Svara BARA med handlingens ID, eller 'none' om ingen matchar.\n"
-            f"Svar:"
+            f"The player said: \"{player_input}\"\n\n"
+            f"Available actions:\n{action_descriptions}\n\n"
+            f"Which action best matches the player's intent? "
+            f"Consider synonyms and creative phrasings (e.g. 'headbutt' matches 'charge at it'). "
+            f"Reply with ONLY the action ID, or 'none' if nothing matches.\n"
+            f"Answer:"
         )
 
         try:

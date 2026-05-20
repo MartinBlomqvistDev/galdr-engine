@@ -1,4 +1,4 @@
-"""Tester för state management."""
+"""Tests for state management."""
 
 from galdr.core.state import (
     Ability,
@@ -30,8 +30,8 @@ def test_character_defaults():
 
 def test_game_state_record_dialog():
     state = GameState()
-    state.record_dialog("player", "Hej!")
-    state.record_dialog("Ekot", "Välkommen, vandrare.")
+    state.record_dialog("player", "Hello!")
+    state.record_dialog("Narrator", "Welcome, traveler.")
     assert len(state.dialog_history) == 2
     assert state.turn_count == 2
     assert state.dialog_history[0].speaker == "player"
@@ -39,13 +39,13 @@ def test_game_state_record_dialog():
 
 def test_game_state_visit_location():
     state = GameState()
-    state.visit_location("torget", "Stortorget")
-    assert "torget" in state.world.locations
-    assert state.world.locations["torget"].visited is True
-    assert state.world.locations["torget"].visit_count == 1
+    state.visit_location("crater", "Glass Crater Basin")
+    assert "crater" in state.world.locations
+    assert state.world.locations["crater"].visited is True
+    assert state.world.locations["crater"].visit_count == 1
 
-    state.visit_location("torget", "Stortorget")
-    assert state.world.locations["torget"].visit_count == 2
+    state.visit_location("crater", "Glass Crater Basin")
+    assert state.world.locations["crater"].visit_count == 2
 
 
 def test_narrative_flags():
@@ -68,10 +68,9 @@ def test_get_recent_context():
 def test_state_serialization():
     state = GameState()
     state.character.name = "Sigurd"
-    state.character.inventory.append(InventoryItem(name="Svärd", description="Gammalt"))
+    state.character.inventory.append(InventoryItem(name="Blade", description="Old and worn."))
     state.narrative_flags.set_flag("quest_started", True)
 
-    # Serialisera och deserialisera
     json_str = state.model_dump_json()
     restored = GameState.model_validate_json(json_str)
 
