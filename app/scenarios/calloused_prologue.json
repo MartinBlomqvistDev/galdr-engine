@@ -717,7 +717,7 @@
         "sex",
         "religion"
       ],
-      "max_response_length": 80
+      "max_response_length": 55
     },
     "dark_probe": {
       "id": "dark_probe",
@@ -1179,7 +1179,7 @@
         "sex",
         "religion"
       ],
-      "max_response_length": 60
+      "max_response_length": 40
     },
     "lo_face": {
       "id": "lo_face",

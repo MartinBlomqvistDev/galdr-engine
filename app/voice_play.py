@@ -16,7 +16,6 @@ from __future__ import annotations
 import argparse
 import asyncio
 import logging
-import random
 import re
 import sys
 from pathlib import Path
@@ -62,18 +61,6 @@ def _node_voice(node) -> VoiceParams:
         style=v.style,
     )
 
-_INPUT_PROMPTS: list[tuple[str, VoiceParams]] = [
-    ("What do you do?", VoiceParams(character_name="Narrator", emotion="neutral",  style="narrator", tempo=0.90, reverb=0.05)),
-    ("What do you do?", VoiceParams(character_name="Narrator", emotion="whisper",  style="whisper",  tempo=0.82, reverb=0.15)),
-    ("What do you do?", VoiceParams(character_name="Narrator", emotion="neutral",  style="narrator", tempo=0.78, reverb=0.08)),
-    ("What do you do?", VoiceParams(character_name="Narrator", emotion="warm",     style="warm",     tempo=0.93, reverb=0.03)),
-    ("What do you do?", VoiceParams(character_name="Narrator", emotion="neutral",  style="narrator", tempo=0.85, reverb=0.20)),
-    ("What do you do?", VoiceParams(character_name="Narrator", emotion="whisper",  style="whisper",  tempo=0.72, reverb=0.25)),
-]
-
-
-def _input_prompt() -> tuple[str, VoiceParams]:
-    return random.choice(_INPUT_PROMPTS)
 
 
 class _NullTTS:
@@ -364,7 +351,7 @@ async def voice_loop(scenario_path: Path) -> None:
             continue
         elif current_node.actions:
             print(f"\n[Listening — node: {current_node.id}]")
-            await speak(tts, *_input_prompt())
+            await speak(tts, "What do you do?", _node_voice(current_node))
             user_input = await stt.listen_from_mic()
         else:
             print("\n[Listening...]")
@@ -372,7 +359,7 @@ async def voice_loop(scenario_path: Path) -> None:
 
         if not user_input:
             logger.info("[LISTEN] no input detected — re-prompting")
-            await speak(tts, *_input_prompt())
+            await speak(tts, "What do you do?", _node_voice(current_node))
             user_input = await stt.listen_from_mic()
             if not user_input:
                 continue
@@ -412,7 +399,7 @@ async def voice_loop(scenario_path: Path) -> None:
         elif state.current_node_id == prev_node_id and current_node.opening_text:
             # Node didn't change and has scripted text — player gave unrecognized input.
             # Re-prompt rather than letting the LLM generate off-piste narration.
-            await speak(tts, *_input_prompt())
+            await speak(tts, "What do you do?", _node_voice(current_node))
         else:
             # No scripted text — stream LLM response sentence by sentence
             pending_input = await narrate_stream(tts, token_stream, voice)

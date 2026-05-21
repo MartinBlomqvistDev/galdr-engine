@@ -89,13 +89,15 @@ def build_system_prompt(
     lo_trust = char.lo_trust
     lo_status = {0: "Lo has left — do not mention Lo", 1: "Lo is cold, minimal interaction", 2: "Lo is wary", 3: "Lo is neutral", 4: "Lo is warm, watchful", 5: "Lo fully trusts the player — rare, understated warmth"}.get(lo_trust, "Lo is neutral")
 
+    inventory_str = ', '.join(i.name for i in char.inventory) or 'Empty'
     parts.append(
         f"\n## Player Character"
         f"\nName: {char.name}"
         f"\nHP: {char.hp}/{char.max_hp}"
         f"\nPressure: {pressure}/10"
         f"\nLo: {lo_status}"
-        f"\nInventory: {', '.join(i.name for i in char.inventory) or 'Empty'}"
+        f"\nInventory: {inventory_str}"
+        f"\nThe player ONLY has the items listed above. Never invent, grant, or reference any item not in this list."
         + pressure_directive
     )
 
@@ -134,7 +136,7 @@ def build_system_prompt(
     parts.append(
         f"\n## Rules"
         f"\n- ENGLISH ONLY. Never respond in Swedish or any other language. Every word must be English."
-        f"\n- Maximum {node.max_response_length} words per response"
+        f"\n- HARD LIMIT: {node.max_response_length} words maximum. Count carefully. Stop before reaching this limit. Fewer words is better."
         f"\n- Drive the story forward, never be passive"
         f"\n- End with an implicit or explicit question or prompt"
         f"\n- You must NOT break character"
