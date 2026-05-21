@@ -149,6 +149,12 @@ class GaldrEngine:
                 next_node_id = matched_action.target_node or state.current_node_id
                 for c in matched_action.consequences:
                     state_changes.append(c.apply(state))
+            if matched_action.stat_weights:
+                for stat, weight in matched_action.stat_weights.items():
+                    state.character.stat_accumulator[stat] = (
+                        state.character.stat_accumulator.get(stat, 0.0) + weight
+                    )
+                logger.info("[STAT ACCUM] action=%s -> %s", matched_action.id, state.character.stat_accumulator)
         step_times["mechanics"] = (time.perf_counter() - t0) * 1000
 
         # Step 4: Node transition
@@ -290,6 +296,12 @@ class GaldrEngine:
                 next_node_id = matched_action.target_node or state.current_node_id
                 for c in matched_action.consequences:
                     state_changes.append(c.apply(state))
+            if matched_action.stat_weights:
+                for stat, weight in matched_action.stat_weights.items():
+                    state.character.stat_accumulator[stat] = (
+                        state.character.stat_accumulator.get(stat, 0.0) + weight
+                    )
+                logger.info("[STAT ACCUM] action=%s -> %s", matched_action.id, state.character.stat_accumulator)
         step_times["mechanics"] = (time.perf_counter() - t0) * 1000
 
         t0 = time.perf_counter()

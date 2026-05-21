@@ -151,6 +151,9 @@ class Consequence(BaseModel):
             case "visit_location":
                 state.visit_location(self.location, self.location_name)
                 return f"Du besökte {self.location_name or self.location}"
+            case "crystallize_stats":
+                state.character.crystallize_stats()
+                return "Stats crystallized from prologue actions"
             case _:
                 return ""
 
@@ -178,6 +181,10 @@ class NodeAction(BaseModel):
 
     consequences: list[Consequence] = Field(default_factory=list)
     failure_consequences: list[Consequence] = Field(default_factory=list)
+
+    # Diegetic character building: accumulated regardless of skill check outcome.
+    # The choice reveals the tendency; the dice determine the result.
+    stat_weights: dict[str, float] = Field(default_factory=dict)
 
     def is_available(self, state: GameState) -> bool:
         return all(c.evaluate(state) for c in self.conditions)

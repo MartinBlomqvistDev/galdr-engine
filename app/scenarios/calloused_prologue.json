@@ -3,14 +3,14 @@
   "title": "CALLOUSED — Prologue: The Drop",
   "description": "17 nodes. Player and Lo investigate the stopped Eternal Breath on the Glass Crater floor. Ground buckles under player — falls through into the Ancestor Facility. Lo left above at the crack. Below: facility_scan (diegetic calibration via smart-dust biometric scan), maintenance unit (tiny ceramic floor-scrubber, 50,000-year circuit — NOT a threat drone), cryo room (sleeping Ancestors, all occupied), terminal blocked 479/480, system detects and logs player. Player climbs out via facility maintenance shaft near original crack. Lo is at the crack waiting. Reunion. Phase 1: Ancestors alive, Cleft intact, system logged the player, census 479/480. v3.1.0: no hatch, no grid-reader, no HP damage, slip/go_still never wound, only charge/panel can fail into dark_wounded, dark_wounded = shin bruise from Roomba. LLM-streamed exploration nodes: dark_probe, pod_close_look, terminal_query, terminal_resistance, cryo_corridor, shaft_look_down, lo_face.",
   "author": "Martin Blomqvist / GALDR Engine",
-  "version": "3.0.0",
+  "version": "3.2.0",
   "global_system_prompt": "You are the narrator of CALLOUSED — a voice-only RPG set in a geo-broken world 50,000 years from now. Rules: second-person present tense. Gender-neutral player. Never read stat values or roll results aloud — describe outcomes qualitatively. Sentences under 14 words. Prioritize touch and sound over sight. The world is not hostile — it is indifferent. The system cannot complete its startup. It has been waiting for 50,000 years. English.",
   "start_node": "crater_investigation",
   "end_nodes": [
     "prologue_close"
   ],
   "calibration_enabled": false,
-  "calibration_node": "facility_scan",
+  "calibration_node": null,
   "default_voice": {
     "character_name": "Narrator",
     "pitch_shift": 0.0,
@@ -77,6 +77,7 @@
           "dc": 8,
           "target_node": "the_fall",
           "failure_node": "the_fall",
+          "stat_weights": {"wisdom": 2.0},
           "consequences": [
             {
               "type": "set_flag",
@@ -101,6 +102,7 @@
           "label": "Call to Lo. The ground feels wrong.",
           "description": "Lo turns toward you. You open your mouth. Then the ground moves.",
           "target_node": "the_fall",
+          "stat_weights": {"charisma": 1.5},
           "consequences": [
             {
               "type": "set_flag",
@@ -240,6 +242,7 @@
           "dc": 14,
           "target_node": "cryo_room",
           "failure_node": "cryo_room",
+          "stat_weights": {"dexterity": 2.0},
           "consequences": [
             {
               "type": "set_flag",
@@ -267,6 +270,7 @@
           "dc": 12,
           "target_node": "cryo_room",
           "failure_node": "cryo_room",
+          "stat_weights": {"wisdom": 2.5},
           "consequences": [
             {
               "type": "set_flag",
@@ -294,6 +298,7 @@
           "dc": 12,
           "target_node": "cryo_room",
           "failure_node": "dark_wounded",
+          "stat_weights": {"strength": 2.5},
           "consequences": [
             {
               "type": "set_flag",
@@ -321,6 +326,7 @@
           "dc": 13,
           "target_node": "cryo_room",
           "failure_node": "dark_wounded",
+          "stat_weights": {"intelligence": 2.5},
           "consequences": [
             {
               "type": "set_flag",
@@ -344,7 +350,8 @@
           "id": "probe_with_sound",
           "label": "Make a sound — read the space by echo",
           "description": "A click, a tap, a word. Let the corridor answer back before committing to a direction.",
-          "target_node": "dark_probe"
+          "target_node": "dark_probe",
+          "stat_weights": {"wisdom": 1.5}
         }
       ],
       "forbidden_topics": [
@@ -442,6 +449,7 @@
           "dc": 10,
           "target_node": "console_chamber",
           "failure_node": "console_chamber",
+          "stat_weights": {"wisdom": 1.5},
           "consequences": [
             {
               "type": "set_flag",
@@ -474,19 +482,22 @@
           "id": "examine_one_pod",
           "label": "Move to the nearest pod — look at what is inside",
           "description": "A face through the glass. Human. Preserved. A ceramic disc in the headrest housing.",
-          "target_node": "pod_close_look"
+          "target_node": "pod_close_look",
+          "stat_weights": {"intelligence": 1.0}
         },
         {
           "id": "move_to_the_far_door",
           "label": "Move to the far door",
           "description": "Past the rows. Through the room. The door on the far side.",
-          "target_node": "console_chamber"
+          "target_node": "console_chamber",
+          "stat_weights": {"constitution": 1.5}
         },
         {
           "id": "walk_the_row",
           "label": "Walk the full length — read the scale before you go",
           "description": "Past all of them. Count what is here.",
-          "target_node": "cryo_corridor"
+          "target_node": "cryo_corridor",
+          "stat_weights": {"intelligence": 0.5, "wisdom": 0.5}
         }
       ],
       "forbidden_topics": [
@@ -540,6 +551,7 @@
           "dc": 13,
           "target_node": "proximity_auth",
           "failure_node": "proximity_auth",
+          "stat_weights": {"intelligence": 2.0},
           "consequences": [
             {
               "type": "set_flag",
@@ -560,6 +572,7 @@
           "label": "Take the data card",
           "description": "Maintenance Caste record. Whoever left this was not supposed to leave anything.",
           "target_node": "proximity_auth",
+          "stat_weights": {"wisdom": 0.5, "constitution": 0.5},
           "consequences": [
             {
               "type": "set_flag",
@@ -577,13 +590,15 @@
           "id": "turn_to_leave",
           "label": "There is nothing you can do here. Leave.",
           "description": "The system cannot be accessed without satisfying a condition the player does not yet know how to satisfy.",
-          "target_node": "proximity_auth"
+          "target_node": "proximity_auth",
+          "stat_weights": {"constitution": 1.5}
         },
         {
           "id": "speak_to_the_system",
           "label": "Speak to it — ask it something directly",
           "description": "The terminal is active and has been waiting. Say something to it.",
-          "target_node": "terminal_query"
+          "target_node": "terminal_query",
+          "stat_weights": {"charisma": 1.5}
         }
       ],
       "forbidden_topics": [
@@ -634,13 +649,15 @@
           "id": "leave",
           "label": "Leave",
           "description": "Nothing more to do here. Not yet.",
-          "target_node": "the_ascent"
+          "target_node": "the_ascent",
+          "stat_weights": {"constitution": 0.5}
         },
         {
           "id": "try_to_force_the_terminal",
           "label": "Force the terminal — override, smash, find a bypass",
           "description": "Player attempts to override, damage, or physically force the authentication block.",
           "target_node": "terminal_resistance",
+          "stat_weights": {"strength": 1.5},
           "consequences": [
             {
               "type": "set_flag",
@@ -685,7 +702,8 @@
           "id": "leave",
           "label": "Leave",
           "description": "Nothing more to do here. Not yet.",
-          "target_node": "the_ascent"
+          "target_node": "the_ascent",
+          "stat_weights": {"constitution": 0.5}
         },
         {
           "id": "take_fragment",
@@ -699,6 +717,7 @@
             }
           ],
           "target_node": "terminal_resistance",
+          "stat_weights": {"dexterity": 0.5},
           "consequences": [
             {
               "type": "add_item",
@@ -750,6 +769,7 @@
           "label": "Move — you know what is out there now",
           "description": "The echo gave enough. Move through the corridor toward the far end.",
           "target_node": "cryo_room",
+          "stat_weights": {"dexterity": 0.5},
           "consequences": [
             {
               "type": "set_flag",
@@ -819,6 +839,7 @@
           "label": "Leave it. Just look.",
           "description": "Look. Don't take. Move on.",
           "target_node": "console_chamber",
+          "stat_weights": {"wisdom": 0.5},
           "consequences": [
             {
               "type": "set_flag",
@@ -909,13 +930,15 @@
           "id": "surface",
           "label": "Surface",
           "description": "Push through. Out of the facility. Back into the world.",
-          "target_node": "crater_surface"
+          "target_node": "crater_surface",
+          "stat_weights": {"constitution": 1.0}
         },
         {
           "id": "look_back_down",
           "label": "Pause — look back down before you close the panel",
           "description": "The facility is still down there. The Ancestors are still breathing.",
-          "target_node": "shaft_look_down"
+          "target_node": "shaft_look_down",
+          "stat_weights": {"wisdom": 1.0}
         }
       ],
       "forbidden_topics": [
@@ -1021,6 +1044,7 @@
             }
           ],
           "target_node": "prologue_close",
+          "stat_weights": {"charisma": 2.0},
           "consequences": [
             {
               "type": "set_flag",
@@ -1044,6 +1068,7 @@
             }
           ],
           "target_node": "prologue_close",
+          "stat_weights": {"wisdom": 0.5},
           "consequences": [
             {
               "type": "set_flag",
@@ -1067,6 +1092,7 @@
             }
           ],
           "target_node": "prologue_close",
+          "stat_weights": {"constitution": 0.5},
           "consequences": [
             {
               "type": "set_flag",
@@ -1079,7 +1105,8 @@
           "id": "watch_lo",
           "label": "Look at Lo's face before you answer",
           "description": "Read what they already know before you decide what to say.",
-          "target_node": "lo_face"
+          "target_node": "lo_face",
+          "stat_weights": {"wisdom": 1.0}
         }
       ],
       "forbidden_topics": [
@@ -1218,6 +1245,7 @@
           "label": "Tell Lo what you found",
           "description": "Ancestors alive. System waiting. Census 479. The tiny machine that bruised your shin.",
           "target_node": "prologue_close",
+          "stat_weights": {"charisma": 2.0},
           "consequences": [
             {
               "type": "set_flag",
@@ -1235,6 +1263,7 @@
           "label": "Say nothing",
           "description": "Hold what you know. Not yet.",
           "target_node": "prologue_close",
+          "stat_weights": {"wisdom": 0.5},
           "consequences": [
             {
               "type": "set_flag",
@@ -1274,6 +1303,9 @@
           "type": "set_flag",
           "key": "prologue_complete",
           "value": true
+        },
+        {
+          "type": "crystallize_stats"
         }
       ],
       "biome": {

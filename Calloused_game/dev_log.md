@@ -1097,11 +1097,165 @@ Nodes confirmed good as-is (no changes): `crater_investigation`, `crater_surface
 
 ---
 
+---
+
+## 2026-05-21 -- Voice Switch: en-GB-RyanNeural
+
+**Rationale:** en-GB-SoniaNeural was the working voice through benchmark 06. Auditioning male voices post-VoiceParams wiring. en-GB-RyanNeural selected.
+
+**Selection criteria vs Calloused:** Deep, measured, slightly weathered. Credible for a narrator who has seen civilisation collapse and is describing it without editorialising. Responds well to whisper style (used heavily in dark/wound nodes). GB accent adds distance -- not American, not neutral. The world of MC is not contemporary.
+
+**Other candidates auditioned:** en-AU-WilliamNeural (slightly warm, less gravity), en-GB-OliverNeural (younger register, less weight).
+
+**Change:** `voice_id` in scenario or TTS init updated to `en-GB-RyanNeural`. All authored VoiceParams carry forward unchanged -- emotion/tempo/reverb apply identically.
+
+---
+
+## 2026-05-21 -- Benchmark 07: Audio Pipeline Bugs
+
+**Context:** First full playthrough with RyanNeural + authored VoiceParams. Three bugs surfaced immediately.
+
+**Bug 1 -- whisper style inaudible:** `dark_wounded` and `dark_probe` have `style="whisper"`. Azure renders this near-silent on RyanNeural at 16kHz mono output. Diagnosed as SSML style tag interaction with the synthesis rate at low tempo. Workaround: `reverb` post-processing brings the signal up; `tempo=0.85` provides enough amplitude at this voice. Confirmed playable in session.
+
+**Bug 2 -- reverb bypass:** `reverb_processing_enabled` defaulted `False` in `config.py` despite the `.env` guard existing. Changed default to `True`. Reverb (scipy fftconvolve, ~2-8ms overhead at 16kHz) is now on by default and can be disabled via `REVERB_PROCESSING_ENABLED=false`.
+
+**Bug 3 -- VoiceParams fields missing from interfaces.py:** Engine-level `VoiceParams` lacked `tempo` and `pitch_shift`. `_node_voice()` in `voice_play.py` was pulling these from node data but the dataclass dropped them silently. Added both fields (`pitch_shift: float = 0.0`, `tempo: float = 1.0`) to `VoiceParams` in `galdr/services/interfaces.py`.
+
+---
+
+## 2026-05-21 -- Benchmark 07: Swedish Generation + Layer 1 Fix
+
+**Incident:** cryo_room node (`tokens_in=1344`) generated Swedish output. The narrator began speaking Swedish; the Azure TTS attempted to pronounce it. Layer 8 contained "ENGLISH ONLY" but was insufficient at high token counts on the swedencentral endpoint.
+
+**Root cause:** Azure GPT-4o on `swedencentral` has a regional prior toward Swedish under dense context. Layer 8 rules are processed last -- by that point the model's generation direction is already set. A constraint at the end of a long prompt is less effective than one at the start.
+
+**Fix:** Added LANGUAGE constraint as the very first text in Layer 1 (before the narrator identity line):
+
+```text
+LANGUAGE: English only. Every single word of your response must be English.
+Never use Swedish or any other language under any circumstances.
+```
+
+Layer 8 "ENGLISH ONLY" rule kept as backstop. Confirmed fixed in benchmark 08 -- no Swedish generated across all nodes including cryo_room at `tokens_in=1344+`.
+
+**Benchmark 07 results summary:**
+
+- TTFA mean ~2005ms, p95 ~2700ms (target: p95 < 500ms -- MISS, but baseline expected at this stage)
+- LLM total stream 41-49s (7-13 sentences at Azure TTS latency -- correct, `total_ms` includes playback)
+- Issues identified: Swedish generation, axe hallucination, response length overruns, random listen prompt voice
+
+---
+
+## 2026-05-21 -- Benchmark 08: Inventory Guard, Word Limits, Listen Prompts, Lore Fix
+
+### Inventory guard
+
+**Problem (from benchmark 07):** LLM invented an axe the player did not have. Inventory block listed items but had no boundary assertion.
+
+**Fix:** Added explicit directive to Layer 5 of system prompt:
+
+```text
+The player ONLY has the items listed above. Never invent, grant, or reference any item not in this list.
+```
+
+### Word limit tightening -- three-layer approach
+
+**Problem:** terminal_resistance was generating ~13 sentences against a "two to four sentences" system_prompt instruction. shaft_look_down generating ~9 sentences against "two sentences."
+
+**Approach:** Single-layer fixes were insufficient. Required three layers working together:
+
+1. **JSON limits reduced**: shaft_look_down 60→40, terminal_resistance 80→55→45, the_ascent 60→50, cryo_room 90→70
+2. **Layer 8 strengthened**: "Maximum X words" → "HARD LIMIT: X words maximum. Count carefully. Stop before reaching this limit. Fewer words is better."
+3. **Layer 3 injection**: `[N WORDS MAXIMUM]` appended directly to the scene block so the limit appears visually adjacent to the "two sentences" instruction -- most effective placement.
+
+### Listen prompt voice anchored
+
+**Problem (from benchmark 07):** `_INPUT_PROMPTS` was a random pool of 6 phrase/voice presets with random selection. tempo=0.72 was appearing on nodes the dramatist had scored differently. Random voice delivery broke authored emotional continuity.
+
+**Fix:** Removed `_INPUT_PROMPTS` list and `_input_prompt()` function entirely. Removed `import random`. Replaced all three call sites with:
+
+```python
+await speak(tts, "What do you do?", _node_voice(current_node))
+```
+
+Listen prompts now use the same voice as the node they belong to -- dramatist intent is preserved.
+
+### 479/480 census vs pod count lore fix
+
+**Problem (from benchmark 07/08):** Player correctly noted "it's not 479 active pods -- there are thousands of ancestors down here." LLM was conflating the MC surface census count (479/480 registered descendants) with the cryo pod population (hundreds of separate Ancestors). The cryo_room biome lore_hints placed the census number in the same context block as the pod room.
+
+**Fix:**
+
+- Added CRITICAL DISTINCTION directive to cryo_room system_prompt: 479/480 = surface census of MC descendants (people like the player). Pods hold hundreds of separate Ancestors. Two distinct populations. Never conflate.
+- Rewrote cryo_room biome lore_hint to explicitly separate the two counts.
+- Clarified console_chamber lore_hint to reinforce surface vs Ancestor distinction.
+
+**Benchmark 08 results:**
+
+- TTFA mean 1832ms, p95 2368ms (MISS on 500ms target -- expected; target is aspirational for current architecture)
+- Swedish generation: confirmed absent across all nodes
+- Listen prompt voice: consistent with node voice throughout
+- Word counts: 10-15% over limits on some nodes (narrator logging added after this run; will measure in benchmark 09)
+
+---
+
+## 2026-05-21 -- Codebase Trim + Parse Enhancements
+
+### Dead code removal
+
+- **`narrate()` function** (`voice_play.py`): Defined but never called. Main loop uses `narrate_sentences` and `narrate_stream` exclusively. Removed entirely.
+- **`stt` parameter from `narrate_sentences`**: Accepted but never used in body. Removed from signature and all three call sites.
+- **`import random`**: Only used by the removed `_INPUT_PROMPTS` pool. Removed.
+
+### Narrator dialogue logging
+
+**Problem:** No way to see what the narrator actually said during a benchmark run. Word count analysis impossible without transcript.
+
+**Fix:** Added `[NARRATOR]` log lines to both narration paths:
+
+- `narrate_sentences`: logs the full joined text immediately after sentence split, before playback
+- `narrate_stream`: accumulates tokens into `_spoken` list, logs after stream drains (both the fallback path and the pipelining path)
+- Pattern: `[NARRATOR] {full text spoken}`
+- `parse_benchmark.py` now captures these with `_NARRATOR_PAT` and reports word count stats (min/mean/p50/p95/max in words) and a full dialogue transcript.
+
+### Pre-synthesis during auto-delay
+
+**Problem:** Auto-next transitions waited for the full delay, then called `enter_node`. For LLM nodes (e.g. dark_wounded → cryo_room, 3s delay) this serialised a 3s delay with a full LLM call time.
+
+**Fix:** Advance `current_node_id` and create `enter_task` before `asyncio.sleep`. LLM call overlaps with the delay window:
+
+```python
+# Before
+await asyncio.sleep(current_node.auto_delay_seconds)
+state.current_node_id = current_node.auto_next
+response = await engine.enter_node(state.session_id)
+
+# After
+state.current_node_id = current_node.auto_next
+enter_task = asyncio.create_task(engine.enter_node(state.session_id))
+await asyncio.sleep(current_node.auto_delay_seconds)
+response = await enter_task
+```
+
+For scripted opening_text nodes: task resolves nearly instantly, no measurable benefit. For LLM nodes with short delays: full LLM latency saved.
+
+### parse_benchmark.py enhancements
+
+Added narrator word count reporting and full dialogue transcript output:
+
+- `parse_narrator_words()`: counts words per narrator turn from `[NARRATOR]` log lines
+- `report_words()`: prints word count stats (n/min/mean/p50/p95/max) in same format as latency table
+- `build_transcript()`: extracts `[NARRATOR]` and `[USER INPUT]` lines into ordered dialogue pairs
+- `print_transcript()`: prints full PLAYER/NARRATOR dialogue for post-run review and debugging
+- `--no-transcript` flag: suppress transcript output when only stats are needed
+
+---
+
 ## Pending / Next
 
-- [ ] Thesis deadline 2026-05-22 -- 2 days. Write RQ1 (TTFA) section with collected data.
-- [ ] Reframe TTFA in thesis: "LLM-to-first-sentence latency" not "input-to-first-audio." True TTFA = TTFA value + TTS synthesis (~200-650ms). Current p50 approximately 1894ms LLM-first-sentence; approximately 2.1s true TTFA.
-- [ ] Voice decision: en-GB-SoniaNeural current. Continue auditioning male voices post-thesis.
+- [ ] Benchmark 09: first run with narrator logging active. Measure word counts against limits. Target: p95 narrator turns under stated node limits.
+- [ ] Thesis deadline 2026-05-22 -- 1 day. Write RQ1 (TTFA) section using benchmark 07/08 data.
+- [ ] Reframe TTFA in thesis: "LLM-to-first-sentence latency" not "input-to-first-audio." True TTFA = [STREAM TTFA] value + TTS synthesis (~200-650ms). Current p50 approximately 1832ms; true TTFA approximately 2.1s.
 - [ ] Calibration long-term: replace question-based intake with choice-driven stat emergence from prologue play. Post-thesis.
 - [ ] Barge-in (post-thesis): requires headphones or echo cancellation. Windows WASAPI concurrent stream conflict on speakers.
 - [ ] Act 1 opening: overland travel from crater to The Cleft. Lo delivers world-knowledge during the walk.

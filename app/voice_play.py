@@ -29,7 +29,6 @@ if sys.platform == "win32" and hasattr(sys.stdout, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 
 from galdr.config import settings
-from galdr.core.calibration import run_calibration
 from galdr.core.engine import GaldrEngine
 from galdr.core.nodes import Scenario
 from galdr.core.saves import checkpoint_exists, delete_checkpoint, load_checkpoint, save_checkpoint
@@ -279,19 +278,6 @@ async def voice_loop(scenario_path: Path) -> None:
     else:
         state = engine.create_session()
 
-    if not resuming:
-        # Diegetic calibration — fires mid-game at calibration_node, not at startup
-        if scenario.calibration_enabled:
-            state.character.stats = await run_calibration(
-                llm=llm,
-                speak=lambda text: speak(tts, text, _NARRATOR_VOICE),
-                listen=stt.listen_from_mic,
-            )
-            logger.info("[CALIBRATION DONE] stats=%s", state.character.stats.model_dump())
-
-    # calibration_done tracks whether diegetic mid-game calibration has fired this session
-    calibration_done = resuming  # already done if resuming from checkpoint
-
     # 4. Opening Narration — sentence-level playback; barge-in per sentence
     pending_input = ""
     if not resuming:
@@ -323,17 +309,6 @@ async def voice_loop(scenario_path: Path) -> None:
             # Auto-transition node — no player input required
             logger.info("[AUTO_NEXT] %s -> %s (delay=%.1fs)", current_node.id, current_node.auto_next, current_node.auto_delay_seconds)
             print(f"\n[AUTO] {current_node.id} -> {current_node.auto_next} in {current_node.auto_delay_seconds:.0f}s")
-            # Diegetic calibration — fires on the designated node, once per session
-            if scenario.calibration_node == current_node.id and not calibration_done:
-                calibration_done = True
-                state.character.stats = await run_calibration(
-                    llm=llm,
-                    speak=lambda text: speak(tts, text, _NARRATOR_VOICE),
-                    listen=stt.listen_from_mic,
-                )
-                await speak(tts, "Registry entry sealed. Operational profile locked.", _NARRATOR_VOICE)
-                logger.info("[CALIBRATION DONE] stats=%s", state.character.stats.model_dump())
-            # Pre-advance: start enter_node during the delay window
             state.current_node_id = current_node.auto_next
             enter_task = asyncio.create_task(engine.enter_node(state.session_id))
             await asyncio.sleep(current_node.auto_delay_seconds)

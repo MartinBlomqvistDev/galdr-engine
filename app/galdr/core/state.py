@@ -69,6 +69,26 @@ class Character(BaseModel):
     # Lo companion trust — 0 = Lo has left or is hostile, 5 = full bond.
     # Default 3 (neutral). Falls to 0 triggers Lo's silent departure.
     lo_trust: int = Field(default=3, ge=0, le=5)
+    # Diegetic stat accumulator: weighted by player actions during the prologue.
+    # Crystallized into CharacterStats at the designated crystallization node.
+    stat_accumulator: dict[str, float] = Field(default_factory=dict)
+
+    def crystallize_stats(self) -> None:
+        """Map accumulated action weights to final CharacterStats via standard array.
+
+        Ranks all six abilities by accumulated weight, then assigns the D&D 5e
+        standard array (15, 14, 13, 12, 10, 8) in rank order. Ties broken
+        alphabetically so results are deterministic. Clears the accumulator.
+        """
+        import logging
+        _log = logging.getLogger(__name__)
+        standard = [15, 14, 13, 12, 10, 8]
+        all_stats = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"]
+        ranked = sorted(all_stats, key=lambda s: (self.stat_accumulator.get(s, 0.0), -ord(s[0])), reverse=True)
+        result = {stat: standard[i] for i, stat in enumerate(ranked)}
+        _log.info("[CRYSTALLIZE] accumulator=%s -> stats=%s", self.stat_accumulator, result)
+        self.stats = CharacterStats(**result)
+        self.stat_accumulator = {}
 
 
 # ---------------------------------------------------------------------------
