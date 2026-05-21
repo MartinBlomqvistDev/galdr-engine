@@ -56,10 +56,9 @@ class Settings(BaseSettings):
     max_response_latency_ms: int = 2000
     max_concurrent_sessions: int = 50
 
-    # Reverb post-processing — HOLDOUT until TTFA p95 < 500ms is confirmed.
-    # Adds scipy fftconvolve to each spoken sentence before sd.play().
-    # Measured cost: ~2-8ms per sentence at 16kHz. Toggle via .env.
-    reverb_processing_enabled: bool = False
+    # Reverb post-processing via scipy fftconvolve before sd.play().
+    # Measured cost: ~2-8ms per sentence at 16kHz. Disable via REVERB_PROCESSING_ENABLED=false in .env.
+    reverb_processing_enabled: bool = True
 
     @computed_field
     @property

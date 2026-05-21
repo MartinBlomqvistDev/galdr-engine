@@ -181,29 +181,44 @@ class AzureSpeechTTSService:
         self._get_bytes_synth()
         logger.info("[TTS WARMUP] synthesizers ready in %.0fms", (time.perf_counter() - t0) * 1000)
 
+    # Maps VoiceParams.emotion to Azure SSML mstts:express-as style.
+    # Only styles confirmed supported by en-GB-SoniaNeural are listed.
+    # Unmapped emotions fall through to plain prosody (no express-as tag).
+    _EMOTION_STYLE: dict[str, str] = {
+        "whisper":   "whispering",
+        "nostalgic": "narration-relaxed",
+        "warm":      "narration-relaxed",
+        "cold":      "newscast",
+        "calm":      "narration-relaxed",
+    }
+
     @staticmethod
-    def _build_ssml(text: str, voice: str, rate: str = "0.9") -> str:
+    def _build_ssml(text: str, voice: str, emotion: str = "neutral", tempo: float = 0.9) -> str:
         escaped = (
             text.replace("&", "&amp;")
                 .replace("<", "&lt;")
                 .replace(">", "&gt;")
         )
+        rate = f"{tempo:.2f}"
+        style = AzureSpeechTTSService._EMOTION_STYLE.get(emotion)
+        inner = f'<prosody rate="{rate}">{escaped}</prosody>'
+        if style:
+            inner = f'<mstts:express-as style="{style}">{inner}</mstts:express-as>'
         return (
             '<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" '
-            'xml:lang="en-US">'
-            f'<voice name="{voice}">'
-            f'<prosody rate="{rate}">{escaped}</prosody>'
-            '</voice>'
+            'xmlns:mstts="http://www.w3.org/2001/mstts" xml:lang="en-GB">'
+            f'<voice name="{voice}">{inner}</voice>'
             '</speak>'
         )
 
     async def synthesize(self, text: str, params: VoiceParams) -> bytes:
         voice = self._VOICE_MAP.get(params.style, self._DEFAULT_VOICE)
-        ssml = self._build_ssml(text, voice)
+        ssml = self._build_ssml(text, voice, params.emotion, params.tempo)
         t0 = time.perf_counter()
         loop = asyncio.get_event_loop()
         audio = await loop.run_in_executor(None, self._synth_to_bytes, ssml)
-        logger.info("[TTS] voice=%s chars=%d latency_ms=%.0f", voice, len(text), (time.perf_counter() - t0) * 1000)
+        logger.info("[TTS] voice=%s emotion=%s tempo=%.2f chars=%d latency_ms=%.0f",
+                    voice, params.emotion, params.tempo, len(text), (time.perf_counter() - t0) * 1000)
         return audio
 
     def _synth_to_bytes(self, ssml: str) -> bytes:
@@ -229,9 +244,10 @@ class AzureSpeechTTSService:
             audio_array = apply_reverb(wav_bytes_to_pcm_int16(wav), params.reverb, 16000)
             await loop.run_in_executor(None, lambda: (sd.play(audio_array, samplerate=16000), sd.wait()))
         else:
-            ssml = self._build_ssml(text, voice)
+            ssml = self._build_ssml(text, voice, params.emotion, params.tempo)
             await loop.run_in_executor(None, self._synth_to_speaker, ssml)
-        logger.info("[TTS->speaker] voice=%s chars=%d latency_ms=%.0f", voice, len(text), (time.perf_counter() - t0) * 1000)
+        logger.info("[TTS->speaker] voice=%s emotion=%s tempo=%.2f chars=%d latency_ms=%.0f",
+                    voice, params.emotion, params.tempo, len(text), (time.perf_counter() - t0) * 1000)
 
     def _synth_to_speaker(self, ssml: str) -> None:
         import azure.cognitiveservices.speech as speechsdk
@@ -249,7 +265,7 @@ class AzureSpeechTTSService:
         stt: "AzureSpeechSTTService",
     ) -> str:
         voice = self._VOICE_MAP.get(params.style, self._DEFAULT_VOICE)
-        ssml = self._build_ssml(text, voice)
+        ssml = self._build_ssml(text, voice, params.emotion, params.tempo)
         t0 = time.perf_counter()
         loop = asyncio.get_event_loop()
         result = await loop.run_in_executor(None, self._speak_barge_in_sync, ssml, stt, params.reverb)
