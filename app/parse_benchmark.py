@@ -4,6 +4,7 @@ Usage:
     python parse_benchmark.py benchmark_01.log
     python parse_benchmark.py benchmark_01.log benchmark_02.log ...
     cat benchmark_01.log | python parse_benchmark.py -
+    python parse_benchmark.py benchmark_09.log --no-transcript
 """
 
 from __future__ import annotations
@@ -27,6 +28,9 @@ _PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     ("Azure TTS synthesis",            re.compile(r"\[TTS\] voice=\S+ chars=\d+ latency_ms=(\d+(?:\.\d+)?)")),
     ("LLM call (non-streaming)",       re.compile(r"\[LLM CALL\] tokens_in=\d+ tokens_out=\d+ latency_ms=(\d+(?:\.\d+)?)")),
 ]
+
+_NARRATOR_PAT = re.compile(r"\[NARRATOR\] (.+)")
+_USER_PAT     = re.compile(r"\[USER INPUT\]: (.+)")
 
 
 def _percentile(data: list[float], p: float) -> float:
@@ -61,6 +65,28 @@ def parse_lines(lines: list[str]) -> dict[str, list[float]]:
     return results
 
 
+def parse_narrator_words(lines: list[str]) -> list[int]:
+    counts = []
+    for line in lines:
+        m = _NARRATOR_PAT.search(line)
+        if m:
+            counts.append(len(m.group(1).split()))
+    return counts
+
+
+def build_transcript(lines: list[str]) -> list[tuple[str, str]]:
+    entries: list[tuple[str, str]] = []
+    for line in lines:
+        m = _NARRATOR_PAT.search(line)
+        if m:
+            entries.append(("N", m.group(1)))
+            continue
+        m = _USER_PAT.search(line)
+        if m:
+            entries.append(("P", m.group(1)))
+    return entries
+
+
 def report(results: dict[str, list[float]]) -> None:
     print(f"\n{'Metric':<35} {'n':>4}  {'min':>7}  {'mean':>7}  {'p50':>7}  {'p95':>7}  {'max':>7}")
     print("-" * 80)
@@ -85,9 +111,32 @@ def report(results: dict[str, list[float]]) -> None:
         print()
 
 
+def report_words(word_counts: list[int]) -> None:
+    if not word_counts:
+        return
+    s = _stats([float(w) for w in word_counts])
+    print(f"{'Narrator word counts':<35} {s['n']:>4.0f}  "
+          f"{s['min']:>6.0f}w   {s['mean']:>6.0f}w   "
+          f"{s['p50']:>6.0f}w   {s['p95']:>6.0f}w   {s['max']:>6.0f}w")
+    print()
+
+
+def print_transcript(entries: list[tuple[str, str]]) -> None:
+    if not entries:
+        return
+    print("=" * 70)
+    print("DIALOGUE TRANSCRIPT")
+    print("=" * 70)
+    for speaker, text in entries:
+        tag = "PLAYER  " if speaker == "P" else "NARRATOR"
+        print(f"[{tag}] {text}")
+    print()
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Parse GALDR benchmark log for latency stats")
     parser.add_argument("files", nargs="*", default=["-"], help="Log files to parse (- for stdin)")
+    parser.add_argument("--no-transcript", action="store_true", help="Suppress dialogue transcript")
     args = parser.parse_args()
 
     all_lines: list[str] = []
@@ -112,6 +161,10 @@ def main() -> None:
         sys.exit(1)
 
     report(results)
+    report_words(parse_narrator_words(all_lines))
+
+    if not args.no_transcript:
+        print_transcript(build_transcript(all_lines))
 
 
 if __name__ == "__main__":

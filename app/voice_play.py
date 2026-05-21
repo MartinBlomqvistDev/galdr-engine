@@ -87,20 +87,6 @@ async def speak(tts, text: str, voice: VoiceParams) -> None:
             sd.wait()
 
 
-async def narrate(tts, stt, text: str, voice: VoiceParams) -> str:
-    """Speak narrative text with barge-in support.
-
-    Returns the player's captured speech if they interrupted, else ''.
-    Any non-empty return value should be used as the next player input.
-    """
-    if not text:
-        return ""
-    if hasattr(tts, "speak_with_barge_in"):
-        captured = await tts.speak_with_barge_in(text, voice, stt)
-        return captured or ""
-    await speak(tts, text, voice)
-    return ""
-
 
 async def narrate_stream(tts, token_stream, voice: VoiceParams) -> str:
     """Sentence-level streaming narration with synthesis pipelining.
@@ -191,7 +177,7 @@ def _split_text_sentences(text: str) -> list[str]:
     return [p.strip() for p in parts if p.strip()]
 
 
-async def narrate_sentences(tts, stt, text: str, voice: VoiceParams) -> str:
+async def narrate_sentences(tts, text: str, voice: VoiceParams) -> str:
     """Sentence-level narration for scripted text with synthesis pipelining.
 
     Synthesizes sentence N+1 while N is playing — hides the per-call TTS
@@ -312,7 +298,7 @@ async def voice_loop(scenario_path: Path) -> None:
         initial_response = await engine.enter_node(state.session_id)
         opening_node = scenario.get_node(state.current_node_id)
         opening_voice = _node_voice(opening_node) if opening_node else _NARRATOR_VOICE
-        pending_input = await narrate_sentences(tts, stt, initial_response.text, opening_voice)
+        pending_input = await narrate_sentences(tts, initial_response.text, opening_voice)
         if pending_input:
             logger.info("[BARGE-IN during opening] captured: %s", pending_input)
 
@@ -347,13 +333,15 @@ async def voice_loop(scenario_path: Path) -> None:
                 )
                 await speak(tts, "Registry entry sealed. Operational profile locked.", _NARRATOR_VOICE)
                 logger.info("[CALIBRATION DONE] stats=%s", state.character.stats.model_dump())
-            await asyncio.sleep(current_node.auto_delay_seconds)
+            # Pre-advance: start enter_node during the delay window
             state.current_node_id = current_node.auto_next
-            response = await engine.enter_node(state.session_id)
+            enter_task = asyncio.create_task(engine.enter_node(state.session_id))
+            await asyncio.sleep(current_node.auto_delay_seconds)
+            response = await enter_task
             next_node = scenario.get_node(state.current_node_id)
             if next_node:
                 voice = _node_voice(next_node)
-                pending_input = await narrate_sentences(tts, stt, response.text, voice)
+                pending_input = await narrate_sentences(tts, response.text, voice)
                 if next_node.is_checkpoint:
                     save_checkpoint(state, scenario.id)
                     await speak(tts, "Biometrics stabilizing. Neural backup synchronized.", _NARRATOR_VOICE)
@@ -397,7 +385,7 @@ async def voice_loop(scenario_path: Path) -> None:
                 node_id=current_node.id,
                 emotion=current_node.voice.emotion,
             )
-            pending_input = await narrate_sentences(tts, stt, current_node.opening_text, voice)
+            pending_input = await narrate_sentences(tts, current_node.opening_text, voice)
             # End node reached — break before loop restarts and speaks again
             if state.current_node_id in scenario.end_nodes:
                 break

@@ -493,7 +493,7 @@
         "sex",
         "religion"
       ],
-      "max_response_length": 90
+      "max_response_length": 70
     },
     "console_chamber": {
       "id": "console_chamber",
