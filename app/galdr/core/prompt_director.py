@@ -60,7 +60,10 @@ def build_system_prompt(
 
     # Layer 3: node-specific direction (Director)
     if node.system_prompt:
-        parts.append(f"\n## Current Scene: {node.title}\n{node.system_prompt}")
+        parts.append(
+            f"\n## Current Scene: {node.title}\n{node.system_prompt}"
+            f"\n[{node.max_response_length} WORDS MAXIMUM]"
+        )
 
     if node.context_hint:
         parts.append(f"\nTone/Genre: {node.context_hint}")

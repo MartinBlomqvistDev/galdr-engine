@@ -124,11 +124,15 @@ async def narrate_stream(tts, token_stream, voice: VoiceParams) -> str:
         # Fallback for TTS services without synthesize()
         t0 = time.perf_counter()
         first = True
+        _spoken: list[str] = []
         async for sentence in split_sentences(token_stream):
+            _spoken.append(sentence)
             if first:
                 logger.info("[STREAM TTFA] %.0fms to first sentence", (time.perf_counter() - t0) * 1000)
                 first = False
             await speak(tts, sentence, voice)
+        if _spoken:
+            logger.info("[NARRATOR] %s", " ".join(_spoken))
         return ""
 
     loop = asyncio.get_event_loop()
@@ -146,8 +150,10 @@ async def narrate_stream(tts, token_stream, voice: VoiceParams) -> str:
     first = True
     pending: bytes | None = None
     synth_task = None
+    _spoken: list[str] = []
 
     async for sentence in split_sentences(token_stream):
+        _spoken.append(sentence)
         if first:
             logger.info("[STREAM TTFA] %.0fms to first sentence", (time.perf_counter() - t0) * 1000)
             first = False
@@ -166,6 +172,8 @@ async def narrate_stream(tts, token_stream, voice: VoiceParams) -> str:
         if pending:
             await loop.run_in_executor(None, _play, pending)
 
+    if _spoken:
+        logger.info("[NARRATOR] %s", " ".join(_spoken))
     return ""
 
 
@@ -193,6 +201,7 @@ async def narrate_sentences(tts, stt, text: str, voice: VoiceParams) -> str:
     sentences = _split_text_sentences(text)
     if not sentences:
         return ""
+    logger.info("[NARRATOR] %s", " ".join(sentences))
     if len(sentences) == 1 or not hasattr(tts, "synthesize"):
         for s in sentences:
             await speak(tts, s, voice)

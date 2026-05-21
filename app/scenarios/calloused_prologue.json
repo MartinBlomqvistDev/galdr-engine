@@ -403,7 +403,7 @@
       "id": "cryo_room",
       "title": "Prologue — The Cryo Room",
       "description": "Adrenaline crash. Lights activate. Cryo-pods — hundreds — all OCCUPIED. The Ancestors. Frail, pale, perfectly preserved. Breathing. 50,000 years. Still alive. Phase 1 hook. Three paths: catalog (WIS DC 10 — success: +1 lo_trust; failure: +1 pressure), examine a pod (free, item), move to far door (free). All → console_chamber.",
-      "system_prompt": "Scene: player enters the cryo room. The lights come on.\nDirectives:\n- Check Narrative State flags for what happened in the corridor:\n  * bruised_by_unit: true -> body's debt. Hands shake. Legs lock. Goes to one knee. Shin still throbbing.\n  * destroyed_the_unit: true -> keyed-up. Still riding the charge from the stomp. Adrenaline with nowhere to go.\n  * slipped_past_the_unit or understood_the_pattern: true -> controlled entry. Shaky from the fall, not the corridor.\n  * used_acoustic_nav: true -> deliberate. Knows the geometry.\n  * None of the above: player came through cleanly. Shaky only from the fall.\n- Then the lights come on. Cold blue-white strips, floor to ceiling.\n- THE REVELATION: every wall. Cryo-pods, hundreds of them. All OCCUPIED. Frail figures pale, still, preserved. Each one breathing. Slowly. 50,000 years.\n- Wonder before horror. Short declarative sentences. Let the scale land.\n- Do not explain what they are. Do not use the word 'ancestor'.\n- If cataloged_the_room flag is true: terminal on far wall. Read flat: SURFACE POPULATION CENSUS: 479 / 480 REGISTERED UNITS. STARTUP SUSPENDED: DISCREPANCY UNRESOLVED.\n- If examine pod action chosen: one face through the glass. Human. Ceramic disc in the headrest housing.",
+      "system_prompt": "Scene: player enters the cryo room. The lights come on.\nDirectives:\n- Check Narrative State flags for what happened in the corridor:\n  * bruised_by_unit: true -> body's debt. Hands shake. Legs lock. Goes to one knee. Shin still throbbing.\n  * destroyed_the_unit: true -> keyed-up. Still riding the charge from the stomp. Adrenaline with nowhere to go.\n  * slipped_past_the_unit or understood_the_pattern: true -> controlled entry. Shaky from the fall, not the corridor.\n  * used_acoustic_nav: true -> deliberate. Knows the geometry.\n  * None of the above: player came through cleanly. Shaky only from the fall.\n- Then the lights come on. Cold blue-white strips, floor to ceiling.\n- THE REVELATION: every wall. Cryo-pods, hundreds of them. All OCCUPIED. Frail figures pale, still, preserved. Each one breathing. Slowly. 50,000 years.\n- Wonder before horror. Short declarative sentences. Let the scale land.\n- Do not explain what they are. Do not use the word 'ancestor'.\n- If cataloged_the_room flag is true: terminal on far wall. Read flat: SURFACE POPULATION CENSUS: 479 / 480 REGISTERED UNITS. STARTUP SUSPENDED: DISCREPANCY UNRESOLVED.\n- If examine pod action chosen: one face through the glass. Human. Ceramic disc in the headrest housing.\n- CRITICAL DISTINCTION: The 479/480 census counts registered surface-dwelling MC descendants — people like the player. It does NOT count the sleeping figures in the pods. The pods hold hundreds of separate Ancestors. Two completely distinct populations. Never conflate them.",
       "context_hint": "The only moment of awe. Let it breathe.",
       "voice": {
         "character_name": "Narrator",
@@ -426,7 +426,7 @@
         ],
         "lore_hints": [
           "All occupied. All breathing. The life support has not stopped in 50,000 years.",
-          "479 / 480 REGISTERED UNITS. STARTUP SUSPENDED. Something has blocked initialization for 50,000 years.",
+          "SURFACE POPULATION CENSUS: 479 / 480 REGISTERED SURFACE INHABITANTS (MC descendants). This counts living surface-dwellers, NOT the sleeping figures in the pods. The pods hold hundreds of Ancestors — an entirely separate population. Do not conflate the two.",
           "CONCURRENT OPERATORS DETECTED: 0 ACTIVE — others found access windows. None could satisfy what the system required."
         ],
         "loot_hints": [
@@ -528,7 +528,7 @@
         ],
         "lore_hints": [
           "CONCURRENT OPERATORS DETECTED: 0 ACTIVE — others have been here. None could satisfy the authentication requirement.",
-          "The startup sequence requires all 480 registered units accounted for. The count has read 479 for 50,000 years."
+          "The startup sequence requires all 480 registered surface inhabitants (MC descendants) accounted for. The count has read 479 for 50,000 years. The sleeping figures in the cryo room are Ancestors — not 'registered units'. These are two distinct populations."
         ]
       },
       "actions": [
@@ -717,7 +717,7 @@
         "sex",
         "religion"
       ],
-      "max_response_length": 55
+      "max_response_length": 45
     },
     "dark_probe": {
       "id": "dark_probe",
@@ -922,7 +922,7 @@
         "sex",
         "religion"
       ],
-      "max_response_length": 60
+      "max_response_length": 50
     },
     "crater_surface": {
       "id": "crater_surface",
