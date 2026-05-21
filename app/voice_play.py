@@ -145,9 +145,13 @@ async def narrate_stream(tts, token_stream, voice: VoiceParams) -> str:
         return ""
 
     loop = asyncio.get_event_loop()
+    from galdr.utils.audio import apply_reverb
+    from galdr.config import settings as _s
 
     def _play(audio: bytes) -> None:
         arr = np.frombuffer(audio, dtype=np.int16)
+        if _s.reverb_processing_enabled and voice.reverb > 0.0:
+            arr = apply_reverb(arr, voice.reverb, 16000)
         sd.play(arr, samplerate=16000)
         sd.wait()
 
@@ -211,8 +215,13 @@ async def narrate_sentences(tts, stt, text: str, voice: VoiceParams) -> str:
     import sounddevice as sd
     loop = asyncio.get_event_loop()
 
+    from galdr.utils.audio import apply_reverb
+    from galdr.config import settings as _s
+
     def _play(audio: bytes) -> None:
         arr = np.frombuffer(audio, dtype=np.int16)
+        if _s.reverb_processing_enabled and voice.reverb > 0.0:
+            arr = apply_reverb(arr, voice.reverb, 16000)
         sd.play(arr, samplerate=16000)
         sd.wait()
 

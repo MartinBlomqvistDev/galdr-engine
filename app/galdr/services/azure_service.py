@@ -111,20 +111,22 @@ class AzureSpeechTTSService:
     """
 
     # Narrator voice candidates (swap _NARRATOR for A/B testing):
+    # British English (male)
+    #   en-GB-RyanNeural              <- current | warm baritone, strong narrator quality
+    #                                    styles: whispering, narration-professional, chat, newscast
+    # Australian English (male)
+    #   en-AU-WilliamNeural           — warm, grounded; same style set as Ryan
     # US English (male)
     #   en-US-RyanMultilingualNeural  — warm, clear, multilingual
     #   en-US-DavisNeural             — expressive, darker register
     #   en-US-ChristopherNeural       — steady, reliable narration
-    # US English (female)
-    #   en-US-JaneNeural              — calm authority  <- current
-    #   en-US-SaraNeural              — clear, measured
     # British English (female)
-    #   en-GB-SoniaNeural             — warm but measured, strong narrator quality
+    #   en-GB-SoniaNeural             — warm but measured; styles: whispering, narration-relaxed, newscast
     # Other English (female)
     #   en-IE-EmilyNeural             — Irish, quiet authority
     #   en-AU-NatashaNeural           — Australian, dry and grounded
     #   en-NZ-MollyNeural             — New Zealand, understated
-    _NARRATOR = "en-GB-SoniaNeural"
+    _NARRATOR = "en-GB-RyanNeural"
 
     _VOICE_MAP = {
         "narrator":    _NARRATOR,
@@ -182,14 +184,18 @@ class AzureSpeechTTSService:
         logger.info("[TTS WARMUP] synthesizers ready in %.0fms", (time.perf_counter() - t0) * 1000)
 
     # Maps VoiceParams.emotion to Azure SSML mstts:express-as style.
-    # Only styles confirmed supported by en-GB-SoniaNeural are listed.
+    # Styles are voice-specific. Current voice: en-GB-RyanNeural.
+    # Ryan supports: whispering, narration-professional, chat, newscast.
+    # Sonia supports: whispering, narration-relaxed, newscast.
     # Unmapped emotions fall through to plain prosody (no express-as tag).
     _EMOTION_STYLE: dict[str, str] = {
-        "whisper":   "whispering",
-        "nostalgic": "narration-relaxed",
-        "warm":      "narration-relaxed",
+        # "whispering" SSML style is inaudible in practice -- acoustic whisper
+        # is near-silent through speakers. Whisper tension is carried by slow
+        # tempo (0.82) + reverb, not by the SSML style tag.
+        "nostalgic": "narration-professional",
+        "warm":      "chat",
         "cold":      "newscast",
-        "calm":      "narration-relaxed",
+        "calm":      "narration-professional",
     }
 
     @staticmethod
@@ -239,9 +245,10 @@ class AzureSpeechTTSService:
         if settings.reverb_processing_enabled and params.reverb > 0.0:
             import numpy as np
             import sounddevice as sd
-            from galdr.utils.audio import apply_reverb, wav_bytes_to_pcm_int16
-            wav = await self.synthesize(text, params)
-            audio_array = apply_reverb(wav_bytes_to_pcm_int16(wav), params.reverb, 16000)
+            from galdr.utils.audio import apply_reverb
+            raw = await self.synthesize(text, params)  # Raw16Khz16BitMonoPcm, no header
+            arr = np.frombuffer(raw, dtype=np.int16)
+            audio_array = apply_reverb(arr, params.reverb, 16000)
             await loop.run_in_executor(None, lambda: (sd.play(audio_array, samplerate=16000), sd.wait()))
         else:
             ssml = self._build_ssml(text, voice, params.emotion, params.tempo)

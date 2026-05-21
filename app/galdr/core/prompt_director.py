@@ -131,7 +131,7 @@ def build_system_prompt(
     # Layer 8: hard rules (always last)
     parts.append(
         f"\n## Rules"
-        f"\n- Reply in English"
+        f"\n- ENGLISH ONLY. Never respond in Swedish or any other language. Every word must be English."
         f"\n- Maximum {node.max_response_length} words per response"
         f"\n- Drive the story forward, never be passive"
         f"\n- End with an implicit or explicit question or prompt"
