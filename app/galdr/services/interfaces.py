@@ -3,9 +3,11 @@ from pydantic import BaseModel
 
 class VoiceParams(BaseModel):
     character_name: str
+    pitch_shift: float = 0.0
+    tempo: float = 1.0
     emotion: str = "neutral"
-    style: str = "narrator"
     reverb: float = 0.0
+    style: str = "narrator"
 
 @runtime_checkable
 class LLMService(Protocol):

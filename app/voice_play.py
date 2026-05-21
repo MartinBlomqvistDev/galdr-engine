@@ -50,6 +50,18 @@ logger = logging.getLogger(__name__)
 
 _NARRATOR_VOICE = VoiceParams(character_name="Narrator", style="narrator")
 
+
+def _node_voice(node) -> VoiceParams:
+    v = node.voice
+    return VoiceParams(
+        character_name=v.character_name,
+        pitch_shift=v.pitch_shift,
+        tempo=v.tempo,
+        emotion=v.emotion,
+        reverb=v.reverb,
+        style=v.style,
+    )
+
 _INPUT_PROMPTS: list[tuple[str, VoiceParams]] = [
     ("What do you do?", VoiceParams(character_name="Narrator", emotion="neutral",  style="narrator", tempo=0.90, reverb=0.05)),
     ("What do you do?", VoiceParams(character_name="Narrator", emotion="whisper",  style="whisper",  tempo=0.82, reverb=0.15)),
@@ -293,7 +305,9 @@ async def voice_loop(scenario_path: Path) -> None:
     pending_input = ""
     if not resuming:
         initial_response = await engine.enter_node(state.session_id)
-        pending_input = await narrate_sentences(tts, stt, initial_response.text, _NARRATOR_VOICE)
+        opening_node = scenario.get_node(state.current_node_id)
+        opening_voice = _node_voice(opening_node) if opening_node else _NARRATOR_VOICE
+        pending_input = await narrate_sentences(tts, stt, initial_response.text, opening_voice)
         if pending_input:
             logger.info("[BARGE-IN during opening] captured: %s", pending_input)
 
@@ -333,11 +347,7 @@ async def voice_loop(scenario_path: Path) -> None:
             response = await engine.enter_node(state.session_id)
             next_node = scenario.get_node(state.current_node_id)
             if next_node:
-                voice = VoiceParams(
-                    character_name="Narrator",
-                    emotion=next_node.voice.emotion,
-                    style=next_node.voice.style,
-                )
+                voice = _node_voice(next_node)
                 pending_input = await narrate_sentences(tts, stt, response.text, voice)
                 if next_node.is_checkpoint:
                     save_checkpoint(state, scenario.id)
@@ -372,11 +382,7 @@ async def voice_loop(scenario_path: Path) -> None:
         if not current_node:
             break
 
-        voice = VoiceParams(
-            character_name="Narrator",
-            emotion=current_node.voice.emotion,
-            style=current_node.voice.style,
-        )
+        voice = _node_voice(current_node)
 
         if state.current_node_id != prev_node_id and current_node.opening_text:
             # Node has scripted opening — discard token_stream (no LLM call made)
