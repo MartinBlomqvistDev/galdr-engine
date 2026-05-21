@@ -1048,6 +1048,55 @@ This is the intended behavior: all state-dependent narration in the prologue is 
 
 ---
 
+## 2026-05-21 -- Acoustic Layer Fix: VoiceParams Wired to SSML
+
+**Problem:** `_build_ssml()` in `azure_service.py` generated identical SSML for every node -- `rate="0.9"` hardcoded, no `mstts:express-as` tag. `VoiceParams.emotion` and `VoiceParams.tempo` existed in the data model and were passed in, but neither was read. All nodes sounded identical regardless of authored `emotion` or `tempo`.
+
+**Fix:** Rewrote `_build_ssml()` to accept `emotion` and `tempo` parameters:
+
+- Added `_EMOTION_STYLE` class dict mapping engine emotion strings to Azure mstts style names:
+  - `"whisper"` -> `"whispering"`
+  - `"nostalgic"`, `"warm"`, `"calm"` -> `"narration-relaxed"`
+  - `"cold"` -> `"newscast"` (excluded from narrator; kept for future NPC use)
+- `emotion` drives `mstts:express-as` tag injection when a mapping exists. Unmapped emotions (e.g. "neutral") produce no style tag -- Azure default delivery.
+- `tempo` drives `prosody rate="{tempo:.2f}"` tag.
+- Added `xmlns:mstts` to SSML root element (required by Azure for mstts tags to parse correctly). Fixed `xml:lang` to `en-GB` (was `en-US` -- mismatched SoniaNeural's locale).
+- Updated all three callers (`synthesize`, `speak`, `speak_with_barge_in`) to pass `params.emotion, params.tempo`.
+- Log lines updated to include emotion and tempo.
+
+**Also fixed:** `reverb_processing_enabled` default in `config.py` was `False`. Changed to `True`. Reverb post-processing (scipy fftconvolve, ~2-8ms at 16kHz) is now on by default. Disableable via `REVERB_PROCESSING_ENABLED=false` in `.env`.
+
+---
+
+## 2026-05-21 -- VoiceParams Authored for All Prologue Nodes
+
+**Problem:** All prologue nodes had `emotion="neutral"` except `the_dark` (whisper) and `cryo_room`/`cryo_corridor` (nostalgic). With the acoustic layer now wired, the remaining 12 nodes sounded identical -- flat, no tonal variation.
+
+**Design standard:** Human narrator. Matt Mercer / Critical Role as the benchmark. No robotic delivery. The narrator must feel present, not artificial. Removed "cold/newscast" from all narrator nodes -- Azure newscast style sounds broadcast-robotic. Tension is carried by whisper, not coldness.
+
+**Two-layer tonality:** Layer 1 = authored `VoiceParams` per node (TTS acoustic delivery, static dramatist intent). Layer 2 = game state (pressure, lo_trust, flags) injected into system prompt (LLM narrative register, dynamic). Both layers now operational.
+
+**Changes applied to `calloused_prologue.json` v3.1.0:**
+
+| Node | emotion | tempo | reverb | Character |
+| --- | --- | --- | --- | --- |
+| `the_fall` | whisper | 0.82 | 0.45 | Impact. Dark. Disoriented. |
+| `facility_scan` | neutral | 0.85 | 0.50 | Ancient machine voice. Deep reverb. |
+| `dark_wounded` | whisper | 0.85 | 0.35 | Hurt, low, humiliated. |
+| `dark_probe` | whisper | 0.85 | 0.35 | Careful, listening. |
+| `console_chamber` | nostalgic | 0.90 | 0.30 | Weight of 50,000 years. |
+| `pod_close_look` | nostalgic | 0.95 | 0.20 | Intimate. One face through glass. |
+| `proximity_auth` | whisper | 0.82 | 0.30 | The system sees you. |
+| `terminal_resistance` | whisper | 0.85 | 0.30 | Cold indifference meets futility. |
+| `shaft_look_down` | neutral | 0.88 | 0.40 | The weight of leaving. |
+| `the_ascent` | neutral | 0.95 | 0.10 | Climbing toward open air. Dry. |
+| `lo_face` | warm | 0.88 | 0.05 | Surface. Reunion approaching. |
+| `prologue_close` | warm | 0.88 | 0.08 | The question that won't be named. |
+
+Nodes confirmed good as-is (no changes): `crater_investigation`, `crater_surface`, `lo_aftermath`, `cryo_room`, `cryo_corridor`, `the_dark`.
+
+---
+
 ## Pending / Next
 
 - [ ] Thesis deadline 2026-05-22 -- 2 days. Write RQ1 (TTFA) section with collected data.

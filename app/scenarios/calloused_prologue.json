@@ -125,9 +125,9 @@
       "voice": {
         "character_name": "Narrator",
         "pitch_shift": 0.0,
-        "tempo": 0.85,
-        "emotion": "neutral",
-        "reverb": 0.3,
+        "tempo": 0.82,
+        "emotion": "whisper",
+        "reverb": 0.45,
         "style": "narrator"
       },
       "on_enter": [
@@ -178,7 +178,7 @@
         "pitch_shift": -0.1,
         "tempo": 0.85,
         "emotion": "neutral",
-        "reverb": 0.4,
+        "reverb": 0.5,
         "style": "narrator"
       },
       "biome": {
@@ -363,7 +363,7 @@
         "character_name": "Narrator",
         "pitch_shift": -0.05,
         "tempo": 0.85,
-        "emotion": "neutral",
+        "emotion": "whisper",
         "reverb": 0.35,
         "style": "narrator"
       },
@@ -505,8 +505,8 @@
         "character_name": "Narrator",
         "pitch_shift": 0.0,
         "tempo": 0.9,
-        "emotion": "neutral",
-        "reverb": 0.25,
+        "emotion": "nostalgic",
+        "reverb": 0.3,
         "style": "narrator"
       },
       "on_enter": [
@@ -601,8 +601,8 @@
       "voice": {
         "character_name": "Narrator",
         "pitch_shift": -0.05,
-        "tempo": 0.85,
-        "emotion": "neutral",
+        "tempo": 0.82,
+        "emotion": "whisper",
         "reverb": 0.3,
         "style": "narrator"
       },
@@ -665,7 +665,7 @@
         "character_name": "Narrator",
         "pitch_shift": -0.05,
         "tempo": 0.85,
-        "emotion": "neutral",
+        "emotion": "whisper",
         "reverb": 0.3,
         "style": "narrator"
       },
@@ -728,7 +728,7 @@
         "character_name": "Narrator",
         "pitch_shift": -0.05,
         "tempo": 0.85,
-        "emotion": "neutral",
+        "emotion": "whisper",
         "reverb": 0.35,
         "style": "narrator"
       },
@@ -774,7 +774,7 @@
         "character_name": "Narrator",
         "pitch_shift": 0.0,
         "tempo": 0.95,
-        "emotion": "neutral",
+        "emotion": "nostalgic",
         "reverb": 0.2,
         "style": "narrator"
       },
@@ -883,7 +883,7 @@
         "pitch_shift": 0.0,
         "tempo": 0.95,
         "emotion": "neutral",
-        "reverb": 0.2,
+        "reverb": 0.1,
         "style": "narrator"
       },
       "on_enter": [
@@ -1143,9 +1143,9 @@
       "voice": {
         "character_name": "Narrator",
         "pitch_shift": 0.0,
-        "tempo": 0.9,
+        "tempo": 0.88,
         "emotion": "neutral",
-        "reverb": 0.2,
+        "reverb": 0.4,
         "style": "narrator"
       },
       "on_enter": [
@@ -1189,9 +1189,9 @@
       "voice": {
         "character_name": "Narrator",
         "pitch_shift": 0.0,
-        "tempo": 0.9,
-        "emotion": "neutral",
-        "reverb": 0.06,
+        "tempo": 0.88,
+        "emotion": "warm",
+        "reverb": 0.05,
         "style": "narrator"
       },
       "on_enter": [
@@ -1263,8 +1263,8 @@
       "voice": {
         "character_name": "Narrator",
         "pitch_shift": 0.0,
-        "tempo": 0.9,
-        "emotion": "neutral",
+        "tempo": 0.88,
+        "emotion": "warm",
         "reverb": 0.08,
         "style": "narrator"
       },
