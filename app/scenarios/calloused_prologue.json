@@ -172,9 +172,9 @@
     "facility_scan": {
       "id": "facility_scan",
       "title": "Prologue — Registry Scan",
-      "description": "Smart-dust calibration fires here. The ancient facility sub-systems detect an intruder and run a biometric registry scan. The system voice asks four Tribal Service questions. Player answers calibrate D&D 5e stats in-world. No HP damage, no pressure change. Auto-advances to the_dark after calibration completes.",
-      "system_prompt": "Scene: the player just landed in the dark. The facility sub-systems activate.\nDirectives:\n— Do not narrate. The opening_text handles this scene entirely.\n— This node exists to frame the calibration questions that follow.",
-      "opening_text": "The air changes. A dry, clicking hiss fills the corridor — something very fine moving against your skin. Everywhere at once. Sub-systems. Fifty thousand years old and still working. Then a voice. Not human. Flat. Cold. Coming from the walls themselves: 'Unregistered operator detected. Initiating Maintenance Caste intake protocol. Respond to each prompt.'",
+      "description": "Diegetic stat scan. The facility smart-dust detects the player and initiates passive biometric logging. No questions. The system watches. Player actions through the facility accumulate stat weights -- the scan is happening whether the player knows it or not. Auto-advances to the_dark.",
+      "system_prompt": "Scene: the player just landed in the dark. The facility sub-systems activate.\nDirectives:\n— Do not narrate. The opening_text handles this scene entirely.\n— This node frames the passive biometric scan. The system is watching. No questions.",
+      "opening_text": "The air changes. A dry, clicking hiss fills the corridor — something very fine moving against your skin. Everywhere at once. Sub-systems. Fifty thousand years old and still working. Then a voice. Not human. Flat. Cold. Coming from the walls themselves: 'Unregistered operator detected. Initiating Maintenance Caste intake protocol. Biometric logging active. Proceed.'",
       "voice": {
         "character_name": "Narrator",
         "pitch_shift": -0.1,
