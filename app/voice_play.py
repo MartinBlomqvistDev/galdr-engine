@@ -103,17 +103,16 @@ async def narrate_stream(tts, token_stream, voice: VoiceParams) -> str:
     import time
     import numpy as np
     import sounddevice as sd
-    from galdr.utils.sentence_splitter import split_sentences
 
     if not hasattr(tts, "synthesize"):
         # Fallback for TTS services without synthesize()
         t0 = time.perf_counter()
         first = True
         _spoken: list[str] = []
-        async for sentence in split_sentences(token_stream):
+        async for sentence in _chunked_stream(token_stream):
             _spoken.append(sentence)
             if first:
-                logger.info("[STREAM TTFA] %.0fms to first sentence", (time.perf_counter() - t0) * 1000)
+                logger.info("[STREAM TTFA] %.0fms to first chunk", (time.perf_counter() - t0) * 1000)
                 first = False
             await speak(tts, sentence, voice)
         if _spoken:
@@ -137,12 +136,12 @@ async def narrate_stream(tts, token_stream, voice: VoiceParams) -> str:
     synth_task = None
     _spoken: list[str] = []
 
-    async for sentence in split_sentences(token_stream):
+    async for sentence in _chunked_stream(token_stream):
         _spoken.append(sentence)
         if first:
-            logger.info("[STREAM TTFA] %.0fms to first sentence", (time.perf_counter() - t0) * 1000)
+            logger.info("[STREAM TTFA] %.0fms to first chunk", (time.perf_counter() - t0) * 1000)
             first = False
-            # Start synthesizing first sentence immediately
+            # Start synthesizing first chunk immediately
             synth_task = asyncio.create_task(tts.synthesize(sentence, voice))
         else:
             # Wait for previous synthesis, start next, play previous
@@ -165,6 +164,11 @@ async def narrate_stream(tts, token_stream, voice: VoiceParams) -> str:
 _SENT_SPLIT = re.compile(r'(?<=[.!?])\s+')
 _MD_NOISE = re.compile(r'\*{1,3}|_{1,2}|`|^#{1,6}\s*', re.MULTILINE)
 
+# Minimum chars per TTS call. Fragments under this are merged with neighbours
+# before synthesis. Prevents audible gaps from atmospheric prose like
+# "Not human. Flat. Cold." (three calls) becoming one seamless chunk.
+_MIN_TTS_CHARS = 80
+
 
 def _clean_text(text: str) -> str:
     return _MD_NOISE.sub('', text).strip()
@@ -176,6 +180,48 @@ def _split_text_sentences(text: str) -> list[str]:
     return [p.strip() for p in parts if p.strip()]
 
 
+def _merge_chunks(sentences: list[str], min_chars: int = _MIN_TTS_CHARS) -> list[str]:
+    """Merge consecutive short sentences until each chunk is at least min_chars.
+
+    'Not human. Flat. Cold.' -> one chunk instead of three.
+    Last chunk is emitted regardless of length.
+    """
+    merged: list[str] = []
+    buf = ""
+    for s in sentences:
+        if not buf:
+            buf = s
+        elif len(buf) < min_chars:
+            buf = buf + " " + s
+        else:
+            merged.append(buf)
+            buf = s
+    if buf:
+        merged.append(buf)
+    return merged
+
+
+async def _chunked_stream(token_stream, min_chars: int = _MIN_TTS_CHARS):
+    """Wrap split_sentences and buffer short chunks before yielding.
+
+    Same merging logic as _merge_chunks applied to a live token stream.
+    Delays TTFA by at most one sentence boundary rather than playing
+    each tiny fragment as a separate TTS call.
+    """
+    from galdr.utils.sentence_splitter import split_sentences
+    buf = ""
+    async for sentence in split_sentences(token_stream):
+        if not buf:
+            buf = sentence
+        elif len(buf) < min_chars:
+            buf = buf + " " + sentence
+        else:
+            yield buf
+            buf = sentence
+    if buf:
+        yield buf
+
+
 async def narrate_sentences(tts, text: str, voice: VoiceParams) -> str:
     """Sentence-level narration for scripted text with synthesis pipelining.
 
@@ -183,7 +229,7 @@ async def narrate_sentences(tts, text: str, voice: VoiceParams) -> str:
     latency (2-7s on Azure) behind playback duration. First sentence still
     has the full cold latency; subsequent sentences play with near-zero gap.
     """
-    sentences = _split_text_sentences(text)
+    sentences = _merge_chunks(_split_text_sentences(text))
     if not sentences:
         return ""
     logger.info("[NARRATOR] %s", " ".join(sentences))
