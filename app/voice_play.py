@@ -161,44 +161,16 @@ async def narrate_stream(tts, token_stream, voice: VoiceParams) -> str:
     return ""
 
 
-_SENT_SPLIT = re.compile(r'(?<=[.!?])\s+')
 _MD_NOISE = re.compile(r'\*{1,3}|_{1,2}|`|^#{1,6}\s*', re.MULTILINE)
 
-# Minimum chars per TTS call. Fragments under this are merged with neighbours
-# before synthesis. Prevents audible gaps from atmospheric prose like
-# "Not human. Flat. Cold." (three calls) becoming one seamless chunk.
-_MIN_TTS_CHARS = 80
+# Minimum chars per TTS call for streamed LLM output. Merge short fragments before
+# synthesis to avoid choppy playback from brief phrases.
+_MIN_TTS_CHARS = 200
 
 
 def _clean_text(text: str) -> str:
     return _MD_NOISE.sub('', text).strip()
 
-
-def _split_text_sentences(text: str) -> list[str]:
-    """Split a scripted string into sentences for per-sentence TTS."""
-    parts = _SENT_SPLIT.split(_clean_text(text))
-    return [p.strip() for p in parts if p.strip()]
-
-
-def _merge_chunks(sentences: list[str], min_chars: int = _MIN_TTS_CHARS) -> list[str]:
-    """Merge consecutive short sentences until each chunk is at least min_chars.
-
-    'Not human. Flat. Cold.' -> one chunk instead of three.
-    Last chunk is emitted regardless of length.
-    """
-    merged: list[str] = []
-    buf = ""
-    for s in sentences:
-        if not buf:
-            buf = s
-        elif len(buf) < min_chars:
-            buf = buf + " " + s
-        else:
-            merged.append(buf)
-            buf = s
-    if buf:
-        merged.append(buf)
-    return merged
 
 
 async def _chunked_stream(token_stream, min_chars: int = _MIN_TTS_CHARS):
@@ -223,20 +195,15 @@ async def _chunked_stream(token_stream, min_chars: int = _MIN_TTS_CHARS):
 
 
 async def narrate_sentences(tts, text: str, voice: VoiceParams) -> str:
-    """Sentence-level narration for scripted text with synthesis pipelining.
+    """Single-block synthesis for scripted text.
 
-    Synthesizes sentence N+1 while N is playing — hides the per-call TTS
-    latency (2-7s on Azure) behind playback duration. First sentence still
-    has the full cold latency; subsequent sentences play with near-zero gap.
+    Text is known upfront; one TTS call covers the full block. No pipelining
+    needed since there is no LLM latency to overlap with.
     """
-    sentences = _merge_chunks(_split_text_sentences(text))
-    if not sentences:
+    text = _clean_text(text)
+    if not text:
         return ""
-    logger.info("[NARRATOR] %s", " ".join(sentences))
-    if len(sentences) == 1 or not hasattr(tts, "synthesize"):
-        for s in sentences:
-            await speak(tts, s, voice)
-        return ""
+    logger.info("[NARRATOR] %s", text)
 
     import numpy as np
     import sounddevice as sd
@@ -252,14 +219,12 @@ async def narrate_sentences(tts, text: str, voice: VoiceParams) -> str:
         sd.play(arr, samplerate=16000)
         sd.wait()
 
-    pending = await tts.synthesize(sentences[0], voice)
-    for i in range(len(sentences)):
-        next_task = None
-        if i + 1 < len(sentences):
-            next_task = asyncio.create_task(tts.synthesize(sentences[i + 1], voice))
-        await loop.run_in_executor(None, _play, pending)
-        if next_task is not None:
-            pending = await next_task
+    if hasattr(tts, "synthesize"):
+        audio = await tts.synthesize(text, voice)
+        if audio:
+            await loop.run_in_executor(None, _play, audio)
+    else:
+        await speak(tts, text, voice)
     return ""
 
 

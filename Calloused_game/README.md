@@ -16,7 +16,9 @@ This is a steward story, not a hero story. The player becomes the system.
 
 ## Status
 
-**Prologue complete** (v3.1.0): 22 nodes, full RPG mechanics, diegetic calibration, voice-only playback.
+**Prologue complete** (v3.2.0): 22 nodes, full RPG mechanics, diegetic stat emergence, voice-only playback.
+
+66-test suite covering graph integrity, intent matching, pressure budget, prompt director, and the diegetic stat system. All passing.
 
 Act 1 (overland travel to The Cleft, Lo as guide) is in design.
 
@@ -40,7 +42,7 @@ Requires Azure credentials in `.env` and a microphone. See `app/README.md` for f
 - Pressure (0-10): tracks psychological state; affects narrator register at 4, 7, and 10
 - Lo trust (0-5): companion relationship; Lo leaves at 0
 - Inventory: strictly enforced; LLM cannot invent items the player does not hold
-- Diegetic calibration: player stats emerge from voiced choices, not a menu
+- Diegetic stat emergence: every action carries `stat_weights`; weights accumulate across the prologue; D&D 5e standard array (15/14/13/12/10/8) assigned at prologue close by rank
 - Checkpoint saves on designated nodes ("Neural Sync")
 
 ---

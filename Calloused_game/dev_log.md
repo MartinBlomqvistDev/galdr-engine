@@ -1251,11 +1251,107 @@ Added narrator word count reporting and full dialogue transcript output:
 
 ---
 
+---
+
+## 2026-05-22 -- Diegetic Character Building: Stat Emergence from Prologue Play
+
+### Stats assigned by actions taken, not calibration questions
+
+**Problem with question-based calibration:** Immersive as diegetic fiction, but functionally still a character creation screen: the system asks, the player answers, stats are assigned from a single LLM inference over four responses. No persistent behavior signal. Post-thesis design goal: replace entirely.
+
+**Implementation:**
+
+- `NodeAction` in `nodes.py`: added `stat_weights: dict[str, float]`. Example: `charge_at_it` gives `{"strength": 2.5}`, `go_still` gives `{"wisdom": 2.5}`, `find_the_panel` gives `{"intelligence": 2.5}`.
+- `Character` in `state.py`: added `stat_accumulator: dict[str, float]`. Accumulates weights across all prologue actions regardless of skill check outcome. Choosing to charge is a strength signal whether the stomp lands or not.
+- `engine.py`: weight accumulation runs after the skill check branch in both `process_input` and `process_input_stream`.
+- `Character.crystallize_stats()`: sorts all six stats by accumulated weight descending (tie-break: alphabetical). Assigns D&D 5e standard array (15, 14, 13, 12, 10, 8) in rank order. Clears accumulator.
+- `prologue_close.on_enter`: last consequence is `{"type": "crystallize_stats"}`. Stats lock at end of prologue.
+- `calibration_node` set to `null`. Calibration disabled.
+
+**Stat weight coverage (key assignments):**
+
+| Stat | Primary actions |
+| --- | --- |
+| STR | `charge_at_it` (2.5), `try_to_force_the_terminal` (1.5) |
+| DEX | `slip_through` (2.0), `move_through` dark_probe (0.5) |
+| CON | `move_to_the_far_door` (1.5), `turn_to_leave` (1.5), `surface` (1.0) |
+| INT | `find_the_panel` (2.5), `study_the_terminal` (2.0), `catalog_the_pods` (1.5) |
+| WIS | `go_still` (2.5), `read_the_ground` (2.0), observation/patience choices |
+| CHA | `tell_lo_what_you_found` (2.0), `call_to_lo` (1.5), `speak_to_the_system` (1.5) |
+
+**Scenario version:** `calloused_prologue.json` promoted to v3.2.0.
+
+**Test suite:** 66 tests across 7 classes in `tests/test_diegetic_stats.py`. Covers: `NodeAction` stat_weights parsing, `Character.crystallize_stats()` standard array assignment and tie-breaking, accumulation logic, consequence type dispatch, engine integration with mock dice, TTS chunk merging unit tests, full scenario stat_weights coverage. All 66 pass. Async tests use `asyncio.run()` wrappers (pytest-asyncio not installed).
+
+---
+
+## 2026-05-22 -- TTS Budget Optimization: Single-Block Scripted Synthesis + Stream Chunking
+
+### narrate_sentences simplified; _MIN_TTS_CHARS raised to 200
+
+**Previous architecture:** `narrate_sentences` split scripted `opening_text` into sentences, merged short ones (80-char threshold), then synthesized N+1 while playing N. Correct for long texts. With v3.0 prologue design, scripted `opening_text` only exists on 5 of 22 nodes; those texts are 1-3 sentences. Pipelining adds complexity with no measurable benefit.
+
+**New `narrate_sentences`:** Sends full text as one TTS call. One round-trip, one audio block. Azure TTS handles 2000+ chars per call; longest prologue `opening_text` is ~300 chars. Warm synthesis latency: 200-400ms, same as the old first-sentence cost.
+
+**Removed dead code:** `_split_text_sentences`, `_merge_chunks`, `_SENT_SPLIT` constant.
+
+**`_MIN_TTS_CHARS` raised from 80 to 200 (LLM-streamed content only):**
+
+80 was set to collapse atmospheric fragments ("Not human. Flat. Cold." = 3 calls) into one chunk. 200 typically collapses a full LLM paragraph. TTFA increases by at most one sentence boundary. Subsequent chunks are longer, fewer TTS round-trips. Cost unchanged (per character, not per call).
+
+**Budget context:** Azure Neural TTS costs ~$0.004/1000 chars. ElevenLabs costs ~$0.30/1000 chars. The only meaningful budget lever is service choice; call count is irrelevant at per-char pricing. These changes improve audio quality and reduce connection overhead, not spend.
+
+---
+
+## 2026-05-22 -- Benchmark 09 Analysis: Three Issues Found
+
+### Intent misfire, LLM em dashes, scanner anthropomorphization
+
+**Issue 1 -- Intent misfire at proximity_auth:**
+
+"I look around and I go back if needed to look around at the, uh, what is this place?" matched `try_to_force_the_terminal` instead of `leave`. Player received STR +1.5 accumulation instead of CON +0.5. Character emerged from prologue with str=13 instead of int=13. Root cause: the LLM intent matcher reads "what is this place" as exploratory aggression; `leave` has weaker signal than `try_to_force`. Not yet fixed.
+
+**Issue 2 -- LLM em dashes in narration:**
+
+All LLM-generated nodes used em dashes ("The air -- dry, cool -- fills your lungs"). Azure TTS reads them as pauses, not punctuation. Sentences fragment at each dash.
+
+**Fix:** Added `Never use em dashes in narration.` to `global_system_prompt`.
+
+**Issue 3 -- Scanner anthropomorphization:**
+
+`cryo_room` LLM output: "Why does it feel... aware?" — implies the maintenance unit has interiority. Violates core design (the unit does not know the player exists). The `the_dark.system_prompt` directive "It does not know the player is here" was insufficient.
+
+**Fix:** Added to `the_dark.system_prompt`: "NEVER suggest the maintenance unit is aware, curious, or sentient. It is a floor-scrubber. It cannot perceive the player. Do not write lines like 'it seems to sense you' or 'why does it feel aware'. It is indifferent. It is working."
+
+---
+
 ## Pending / Next
 
-- [ ] Benchmark 09: first run with narrator logging active. Measure word counts against limits. Target: p95 narrator turns under stated node limits.
-- [ ] Thesis deadline 2026-05-22 -- 1 day. Write RQ1 (TTFA) section using benchmark 07/08 data.
-- [ ] Reframe TTFA in thesis: "LLM-to-first-sentence latency" not "input-to-first-audio." True TTFA = [STREAM TTFA] value + TTS synthesis (~200-650ms). Current p50 approximately 1832ms; true TTFA approximately 2.1s.
-- [ ] Calibration long-term: replace question-based intake with choice-driven stat emergence from prologue play. Post-thesis.
-- [ ] Barge-in (post-thesis): requires headphones or echo cancellation. Windows WASAPI concurrent stream conflict on speakers.
-- [ ] Act 1 opening: overland travel from crater to The Cleft. Lo delivers world-knowledge during the walk.
+### Engine (post-thesis)
+
+- [ ] **Intent misfire at proximity_auth**: "look around / go back" matching `try_to_force_the_terminal`. Options: add a "look around" action to proximity_auth; tighten action descriptions so `try_to_force` requires unambiguous force language; add negative examples to the intent prompt.
+- [ ] **Add more choices**: User-identified gap. Every scene needs at least 3-4 meaningful action options. Prologue is currently 2-4 per node; mid-range nodes feel thin.
+- [ ] **Benchmark 10**: First run with single-block `narrate_sentences` and `_MIN_TTS_CHARS=200`. Verify no audio regression; collect new word count data.
+- [ ] **Barge-in**: Requires headphones or echo cancellation. Windows WASAPI concurrent stream conflict on speakers. Post-thesis.
+- [ ] **Act 1**: Overland travel from crater to The Cleft. Lo as guide and world-knowledge delivery. Post-thesis.
+
+### Thesis (COWORK session, 2026-05-22)
+
+**RQ tasks — write these today:**
+
+- [ ] **RQ1 framing**: "What TTFA is achievable for a cloud-LLM voice-first interactive narrative system?" Data source: benchmarks 02-09, n=24+ TTFA measurements.
+  - Label the metric correctly: `[STREAM TTFA]` = LLM-to-first-sentence latency. True time-to-first-audio = `[STREAM TTFA]` + TTS synthesis warm (~200-650ms). State both numbers.
+  - Reported values: p50 ~1832ms (LLM only), true TTFA p50 ~2.1s, p95 ~2.4-3.7s.
+  - Bottleneck: Azure OpenAI first-token latency (1.5-2.5s). Not the GALDR pipeline.
+  - Pipeline overhead (steps 1-4): 300-1100ms at p95; 10-15% of total TTFA.
+  - Frame as descriptive characterization, not pass/fail against 500ms target. 500ms is achievable only with local inference or edge-deployed models.
+
+- [ ] **RQ2 (architecture)**: Describe the 8-step loop, streaming pipeline, lazy token generator pattern. Key claim: scripted nodes never call the LLM; the generator is discarded. Latency savings: one wasted LLM call avoided per scripted transition.
+
+- [ ] **RQ3 (accessibility)**: Voice-only design contract. No screen. D&D 5e skill checks as narrative gate (not UI gate). Diegetic calibration (stat emergence from play vs. character creation screen). Two-layer narrator tonality (authored TTS params + LLM register driven by game state). Evidence: benchmark logs, VoiceParams authoring, flag injection.
+
+- [ ] **Method section note**: Add commit hash or scenario version (v3.2.0) to fix the evaluation baseline. Benchmarks 02-09 run against different code; state which fixes were live for each run.
+
+- [ ] **Limitations**: TTFA bottleneck is cloud LLM latency, not system design. Barge-in disabled on Windows WASAPI with speakers. Single-language scenario; intent matching untested beyond English.
+
+- [ ] **Commit before session**: `git add` and commit all changes from today (stat system, prompt fixes, TTS simplification) before thesis writing session. Clean diff = clean appendix.
