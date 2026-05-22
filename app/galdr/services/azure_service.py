@@ -189,7 +189,7 @@ class AzureSpeechTTSService:
     # Sonia supports: whispering, narration-relaxed, newscast.
     # Unmapped emotions fall through to plain prosody (no express-as tag).
     _EMOTION_STYLE: dict[str, str] = {
-        # "whispering" SSML style is inaudible in practice -- acoustic whisper
+        # "whispering" SSML style is inaudible in practice; acoustic whisper
         # is near-silent through speakers. Whisper tension is carried by slow
         # tempo (0.82) + reverb, not by the SSML style tag.
         "nostalgic": "narration-professional",

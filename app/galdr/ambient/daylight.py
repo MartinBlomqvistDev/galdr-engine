@@ -1,6 +1,6 @@
 """Daylight phase via Sunrise-Sunset API and local system time.
 
-API: https://sunrise-sunset.org/api -- free, no key required.
+API: https://sunrise-sunset.org/api (free, no key required).
 Without GPS, falls back to system clock (coarse but sufficient for atmosphere).
 """
 
@@ -57,7 +57,7 @@ async def fetch_daylight(lat: float, lon: float) -> DaylightData:
 
 
 def fetch_daylight_local() -> DaylightData:
-    """Phase from system time -- used when GPS is unavailable."""
+    """Phase from system time: used when GPS is unavailable."""
     hour = datetime.now().hour
     return DaylightData(phase=_hour_phase(hour), hour=hour)
 

@@ -318,7 +318,7 @@ class GaldrEngine:
         combined_context = "\n".join(filter(None, [geo_context, ambient_context]))
         available = node.get_available_actions(state)
         pre_latency = int((time.perf_counter() - start_time) * 1000)
-        logger.info("[STREAM] steps 1-4 done in %dms -- LLM stream is lazy", pre_latency)
+        logger.info("[STREAM] steps 1-4 done in %dms; LLM stream is lazy", pre_latency)
 
         partial = EngineResponse(
             text="",

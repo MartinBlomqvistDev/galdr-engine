@@ -1,123 +1,193 @@
 # GALDR Engine
 
-Voice-first orchestration for interactive fiction — headless, event-driven, and designed for low-latency narrative delivery.
+Voice-first AI orchestration for interactive storytelling. Headless, event-driven, designed for low-latency narrative delivery.
 
-### Core Principle: Separation of Concerns
-GALDR implements a strict boundary between dramaturgical structure and generative language:
-
-- **Graph (Graph Control):** The dramatist defines the scene structure, mechanics, and branching via a directed graph.
-- **Director (Creative Layer):** The AI improvises dialogue within the specific constraints of the current node.
-
-This architecture ensures narrative consistency (the AI cannot break the story graph) while maintaining conversational fluidity.
+A dramatist authors a directed graph of narrative nodes. Within each node, an AI character improvises dialogue freely. The two layers never cross: graph structure is the dramatist's domain, language is the AI's. This split is called *nod-regi* (graph control) and *prompt-regi* (character direction).
 
 ---
 
-## Processing Pipeline
+## What it does
 
-1. **Intent Matching**: Maps player input to node actions (LLM-based with heuristic fallback).
-2. **Mechanical Resolution**: RPG-style skill checks (D&D 5e-inspired) validated via Pydantic.
-3. **State Mutation**: Atomic updates to GameState (inventory, flags, HP).
-4. **Context Construction**: Dynamic system prompt generation from node metadata and world state.
-5. **Inference**: LLM generation and deterministic content filtering.
-6. **Synthesis**: TTS generation with per-node voice parameters (pitch, reverb, style).
+- **GPS-triggered narrative**: nodes activate on proximity. Reverb adjusts dynamically as the player approaches. Built for outdoor and site-specific performance.
+- **D&D 5e skill checks**: every player action is mechanically resolved before the LLM generates. Dice result shapes what the AI says; the AI never decides outcomes.
+- **Streaming TTS pipeline**: LLM token stream splits into sentences. Sentence N+1 synthesizes while N plays. Near-zero inter-sentence gap after the first sentence.
+- **Two-layer narrator tonality**: authored `VoiceParams` per node (TTS acoustic delivery, static dramatist intent) + game state injected into system prompt (LLM narrative register, dynamic).
+- **Ambient context layer**: daylight phase, weather (WMO codes), biome tags injected per node. The narrator knows the time of day and conditions without being told in-scene.
+- **Offline-first**: full game mechanics (dice, flags, transitions) run without any API key. Mock services substitute AI in tests and demos.
+- **Multi-backend**: Azure OpenAI + Azure Speech (current), ElevenLabs TTS (high fidelity, optional), OpenAI (alternative LLM), mock (offline/CI).
 
-See [ARCHITECTURE.md](ARCHITECTURE.md) for a technical deep-dive into the 8-step orchestration loop and p95 latency targets.
+---
+
+## Processing pipeline
+
+```text
+Player speech (microphone)
+         |
+         v
+    Azure Speech STT
+         |
+         v
+    GPS + ambient context    <-- proximity check, daylight, weather
+         |
+         v
+    Intent matching          <-- LLM constrained to node's available actions
+         |
+         v
+    Skill check              <-- gates state mutations before LLM is called
+         |
+         v
+    State mutation           <-- consequences applied atomically (Pydantic-validated)
+         |
+         v
+    Prompt director          <-- 8-layer system prompt: node + game state + dice result
+         |
+         v
+    LLM (streaming token stream)
+         |
+         v
+    Sentence splitter        <-- splits live token stream into playable sentences
+         |
+         v
+    TTS synthesis            <-- pipelined: sentence N+1 synthesizes while N plays
+         |
+         v
+    Playback (sounddevice, 16kHz, reverb post-processing)
+```
+
+The sentence pipeline hides synthesis latency behind playback. Near-zero inter-sentence gap after the first sentence arrives from the token stream.
 
 ---
 
 ## Repo layout
 
-```
-galdr/
-├── core/
-│   ├── engine.py        # The 8-step orchestration loop
-│   ├── nodes.py         # NarrativeNode, Condition, Consequence, Scenario
-│   ├── prompt_director.py # Builds LLM system prompts from node + game state
-│   ├── state.py         # GameState, Character, World — all Pydantic
-│   └── dice.py          # Skill checks, DC, nat 20/1, narrative quality tiers
-├── voice/
-│   ├── tts.py           # TTS with per-node voice morphing (pitch, tempo, emotion)
-│   └── stt.py           # Whisper transcription
-├── api/
-│   ├── routes.py        # REST (session management, input, state inspection)
-│   └── websocket.py     # Real-time handler — text in, text+audio out
-├── geo/
-│   └── geofence.py      # Haversine proximity + reverb from distance
-├── guardrails/
-│   └── filter.py        # Hard global blocks + soft per-scene topic filtering
-└── db/
-    └── repository.py    # In-memory for now, Postgres-shaped for later
-
-scenarios/
-├── calloused.json           # Full arc — 22 nodes, Acts 1–2
-└── calloused_prologue.json  # 5-node Kern crossing — reference scenario
-
-tests/                   # 46 tests including two full end-to-end playthroughs
-play.py                  # Terminal client — playable offline, no API key needed
-static/index.html        # Minimal browser client
+```text
+app/
+├── galdr/
+│   ├── core/
+│   │   ├── engine.py              # 8-step orchestration loop
+│   │   ├── nodes.py               # NarrativeNode, Condition, Consequence, Scenario
+│   │   ├── prompt_director.py     # 8-layer system prompt builder
+│   │   ├── state.py               # GameState, Character, World: all Pydantic
+│   │   ├── dice.py                # Skill checks, DC, nat 20/1, narrative quality tiers
+│   │   ├── saves.py               # Checkpoint persistence
+│   │   └── calibration.py         # Stat calibration (legacy; replaced by diegetic emergence v3.2.0)
+│   ├── services/
+│   │   ├── interfaces.py          # VoiceParams, service protocols
+│   │   ├── azure_service.py       # Azure OpenAI LLM + Azure Speech STT/TTS
+│   │   ├── elevenlabs_service.py  # ElevenLabs TTS (higher fidelity, optional)
+│   │   ├── openai_service.py      # OpenAI LLM backend (alternative)
+│   │   └── mock_service.py        # Offline stubs: full mechanics, no API keys
+│   ├── voice/
+│   │   ├── tts.py                 # TTS abstraction layer
+│   │   └── stt.py                 # STT abstraction layer
+│   ├── api/
+│   │   ├── routes.py              # REST: session management, input, state inspection
+│   │   ├── websocket.py           # Real-time: text in, text+audio out
+│   │   └── middleware.py          # Telemetry middleware (p95 latency tracking)
+│   ├── geo/
+│   │   └── geofence.py            # Haversine proximity + reverb from distance
+│   ├── guardrails/
+│   │   └── filter.py              # Hard global blocks + soft per-scene topic filtering
+│   ├── ambient/
+│   │   ├── context.py             # Ambient context builder (daylight + weather)
+│   │   ├── daylight.py            # Daylight phase from lat/lon + time
+│   │   └── weather.py             # WMO weather codes to narrator-facing descriptions
+│   ├── db/
+│   │   └── repository.py          # In-memory store (PostgreSQL-shaped for production)
+│   ├── utils/
+│   │   ├── sentence_splitter.py   # Async token stream -> sentence iterator
+│   │   ├── audio.py               # Reverb post-processing (scipy fftconvolve)
+│   │   └── vad.py                 # Voice activity detection for barge-in
+│   ├── config.py                  # Pydantic Settings, all credentials from .env
+│   └── main.py                    # FastAPI app entry point
+├── scenarios/
+│   └── calloused_prologue.json    # 22-node prologue (CALLOUSED exam PoC)
+├── voice_play.py                  # Voice-only loop (CALLOUSED PoC entry point)
+├── parse_benchmark.py             # Latency + word count analysis from log files
+└── tests/                         # 142 tests across 13 modules
 ```
 
 ---
 
-## Running it
+## Running
+
+Requires Python 3.12 and a microphone.
 
 ```bash
 pip install -e .
 
-# Offline — full game mechanics, scripted responses, no key needed
-python play.py
+# CALLOUSED voice PoC
+python app/voice_play.py
+python app/voice_play.py --scenario app/scenarios/calloused_prologue.json
 
-# With API server
+# FastAPI server
 uvicorn galdr.main:app --reload
 # Web UI:   http://localhost:8000
 # API docs: http://localhost:8000/docs
 
-# With real AI dialogue (BYOK)
-cp .env.example .env    # add OPENAI_API_KEY
-uvicorn galdr.main:app --reload
+# Benchmark analysis
+python app/parse_benchmark.py app/benchmark_01.log
+python app/parse_benchmark.py app/benchmark_01.log --no-transcript
 
 # Tests
-python -m pytest tests/ -v
+python -m pytest app/tests/ -v
 ```
 
 ---
 
-## API
+## Configuration
 
+Copy `.env.example` to `.env`:
+
+```env
+AZURE_OPENAI_API_KEY=...
+AZURE_OPENAI_ENDPOINT=https://...
+AZURE_OPENAI_DEPLOYMENT=gpt-4o
+AZURE_SPEECH_KEY=...
+AZURE_SPEECH_REGION=swedencentral
+
+# Optional: falls back to Azure Speech TTS if absent
+ELEVENLABS_API_KEY=...
+ELEVENLABS_VOICE_ID=...
+
+# Optional
+REVERB_PROCESSING_ENABLED=true
 ```
-POST /api/v1/sessions                  New session
-POST /api/v1/sessions/{id}/enter       Trigger node opening text
-POST /api/v1/sessions/{id}/input       Player input → engine response
-GET  /api/v1/sessions/{id}/state       Current state snapshot
-GET  /api/v1/scenario                  Loaded scenario info
 
-WS   /ws/{session_id}                  Real-time: text in, text+audio out
-```
+Without keys the engine runs in mock mode: full game mechanics, scripted node text, no live AI or TTS.
 
 ---
 
-## BYOK
+## Demo: CALLOUSED (Prologue)
 
-Set `OPENAI_API_KEY` in `.env`. The engine runs without it — offline mode uses the scenario's scripted texts and full game mechanics. Swapping the LLM or TTS backend is a one-file change.
+The included scenario is CALLOUSED, a voice-only RPG and exam PoC. Player and Lo investigate a stopped geothermal vent on a glass crater floor. The ground cracks. The player falls through into an Ancestor Facility 50,000 years dormant: a ceramic maintenance unit on a fixed circuit, hundreds of sleeping Ancestors, a census frozen at 479 of 480. 22 nodes. D&D 5e mechanics. Diegetic stat emergence. No screen.
 
----
-
-## Demo: Ekokammaren
-
-The included scenario is *Malmö's Hidden Voices* — a GPS-triggered story set in Malmö city centre where players follow a disembodied voice (The Echo) through historical locations. Built to test the engine outdoors, with reverb adjusting dynamically as players approach each node.
-
-Runs fine locally without GPS. Use number keys or free text to navigate.
+GPS-triggered scenarios, multi-character casts, and outdoor performance are engine capabilities not exercised in this PoC.
 
 ---
 
-## Key design choices
+## Key design decisions
 
-| Choice | Why |
-|--------|-----|
+| Decision | Reason |
+|----------|--------|
 | Pydantic for all state | Mutations fail loudly, not silently |
-| Skill checks before LLM generation | Mechanics drive the story — AI narrates the outcome |
-| Graph as a directed graph | AI can improvise within scenes, can't skip between them |
-| Dual-layer content filtering | Global hard blocks + per-scene soft blocks for narrative context |
-| Offline-first fallback | The engine should be demonstrable without credentials |
+| Skill checks before LLM generation | Mechanics drive the story; AI narrates the outcome, never decides it |
+| 8-layer system prompt | Broadest constraints first, scene-specific last. Order is a funnel, not a list |
+| LANGUAGE constraint in Layer 1 | Azure gpt-4o on swedencentral defaults to Swedish under dense context; Layer 1 placement overrides before generation direction is set |
+| Streaming sentence pipeline | Hides 2-7s synthesis latency behind playback. Near-zero inter-sentence gap |
+| Lazy token generator | `process_input_stream()` returns a generator; scripted nodes discard it without iterating, zero wasted LLM calls on scripted transitions |
+| Two-layer tonality | Layer 1: authored VoiceParams per node (TTS acoustic, static). Layer 2: pressure/lo_trust/flags in system prompt (LLM register, dynamic) |
+| Narrative flags in system prompt | LLM reads structured state, not conversation history. Narrator only references events that actually happened |
+
+---
+
+## Latency profile (benchmark 08, Azure gpt-4o, en-GB-RyanNeural)
+
+| Metric | mean | p50 | p95 |
+|--------|------|-----|-----|
+| TTFA (input -> first sentence) | 1832ms | ~1800ms | 2368ms |
+| Pre-LLM overhead (steps 1-4) | ~180ms | -- | -- |
+
+`[STREAM TTFA]` measures LLM-to-first-sentence latency. True time-to-first-audio = TTFA + TTS synthesis warm (~200-650ms). Bottleneck is Azure OpenAI first-token latency (~1.6s). The engine pipeline contributes ~10-15% of total TTFA.
 
 Full design reasoning in [ARCHITECTURE.md](ARCHITECTURE.md).

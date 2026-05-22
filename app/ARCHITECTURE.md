@@ -110,7 +110,7 @@ The split exists because prompt instructions are probabilistic (the LLM can igno
 
 ## Voice and geofence
 
-`VoiceParams` on each node defines pitch shift, tempo, emotion, and reverb level. These are passed to TTS at generation time. In the PoC, these map to OpenAI TTS voice selection and speed. In production, they'll drive the custom neural model trained on the voice actor's recordings.
+`VoiceParams` on each node defines pitch shift, tempo, emotion, and reverb level. These are passed to TTS at generation time. These drive SSML parameters (emotion style, rate) for Azure Neural TTS and output format/voice selection for ElevenLabs. Reverb is applied as post-processing via scipy fftconvolve on the raw PCM.
 
 `geofence.py` calculates Haversine distance to each node's GPS anchor. Proximity feeds two things: a narrative context string injected into the prompt ("the player is 12m away, approaching — build tension"), and the reverb parameter passed to TTS. Linear reverb falloff was chosen over exponential because outdoor performance is unpredictable and linear is easier to tune during field testing.
 
@@ -122,6 +122,6 @@ The split exists because prompt instructions are probabilistic (the LLM can igno
 
 **No authentication.** Sessions are identified by UUID. For the Ekokammaren pilot, single-device use in a supervised context, this is fine. An auth layer would sit in FastAPI middleware and not touch the engine.
 
-**No streaming LLM responses.** The TTS pipeline currently waits for the full generated text before synthesising. Streaming text → chunked TTS is the obvious latency improvement for production, but it adds significant complexity to the WebSocket protocol and wasn't worth it for the PoC.
+**No GALDR Studio.** The visual node editor is not built. The JSON scenario format was designed as the target format for a node-based GUI; the data model is stable, the editor is Year 2.
 
 **GALDR Studio (the visual node editor)** isn't built yet. The JSON scenario format was designed to be the target format for a node-based GUI — the data model is stable, the editor is Year 2.

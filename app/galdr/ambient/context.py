@@ -1,6 +1,6 @@
 """Assembles ambient data into a prompt string.
 
-Engine calls build_ambient_context() -- does not need to know which APIs succeeded.
+Engine calls build_ambient_context(); does not need to know which APIs succeeded.
 Empty string means nothing to inject.
 """
 
@@ -19,7 +19,7 @@ async def build_ambient_context(lat: float | None, lon: float | None) -> str:
     """Fetch weather and daylight in parallel, return as a stage direction.
 
     Without GPS: skips weather, takes daylight from system clock.
-    String is injected into the prompt as atmospheric background -- not as
+    String is injected into the prompt as atmospheric background, not as
     facts the player can ask about.
     """
     if lat is not None and lon is not None:

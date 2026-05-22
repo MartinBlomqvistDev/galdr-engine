@@ -70,7 +70,7 @@ class _NullTTS:
 
 
 async def speak(tts, text: str, voice: VoiceParams) -> None:
-    """Plain playback -- no barge-in. Use only for system prompts where interruption is meaningless."""
+    """Plain playback: no barge-in. Use only for system prompts where interruption is meaningless."""
     text = _clean_text(text)
     if not text:
         return
