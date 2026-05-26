@@ -17,7 +17,7 @@ GALDR's answer is a strict separation of concerns: the dramatist controls *struc
 
 ## Technical Design Patterns & Observability
 
-To meet the **p95 < 500ms** latency target while maintaining a clean, testable codebase, GALDR employs several key architectural patterns:
+GALDR employs several key architectural patterns to keep the pre-LLM pipeline lean and testable. Measured overhead for steps 1-4 is ~180ms; the dominant latency is Azure OpenAI first-token (~1.6s), which the sentence-level streaming pipeline partially overlaps with TTS synthesis.
 
 ### 1. Inversion of Control (IoC) & Dependency Injection
 The `GaldrEngine` does not depend on concrete implementations of AI services (OpenAI, local models, etc.). Instead, it depends on **Protocols** (`LLMService`, `TTSService`).
@@ -123,5 +123,3 @@ The split exists because prompt instructions are probabilistic (the LLM can igno
 **No authentication.** Sessions are identified by UUID. For the Ekokammaren pilot, single-device use in a supervised context, this is fine. An auth layer would sit in FastAPI middleware and not touch the engine.
 
 **No GALDR Studio.** The visual node editor is not built. The JSON scenario format was designed as the target format for a node-based GUI; the data model is stable, the editor is Year 2.
-
-**GALDR Studio (the visual node editor)** isn't built yet. The JSON scenario format was designed to be the target format for a node-based GUI — the data model is stable, the editor is Year 2.

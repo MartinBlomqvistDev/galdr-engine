@@ -2,7 +2,7 @@
 
 Voice-first AI orchestration for interactive storytelling. Headless, event-driven, designed for low-latency narrative delivery.
 
-A dramatist authors a directed graph of narrative nodes. Within each node, an AI character improvises dialogue freely. The two layers never cross: graph structure is the dramatist's domain, language is the AI's. This split is called *nod-regi* (graph control) and *prompt-regi* (character direction).
+A dramatist authors a directed graph of narrative nodes. Within each node, an AI character improvises dialogue freely. The two layers never cross: graph structure is the dramatist's domain, language is the AI's. The two layers are graph control (story structure, authored) and character direction (language, generated).
 
 ---
 

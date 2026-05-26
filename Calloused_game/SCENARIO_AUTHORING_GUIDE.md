@@ -44,7 +44,7 @@ Scenarios are loaded by Python class `Scenario` (Pydantic v2). Every field name 
 | `global_system_prompt` | string | no | Prepended to every node's `system_prompt` |
 | `start_node` | string | yes | Must match a key in `nodes` |
 | `end_nodes` | array of strings | yes | At least one. These nodes end the session. |
-| `calibration_enabled` | bool | no | Default `false`. If `true`, runs the 4-question Tribal Service stat calibration before the opening node. CALLOUSED uses this. |
+| `calibration_enabled` | bool | no | Default `false`. If `true`, runs the 4-question Tribal Service stat calibration before the opening node. CALLOUSED has this disabled since v3.2.0 (diegetic stat emergence replaced it). |
 | `default_voice` | VoiceParams | no | Used when a node has no `voice` field |
 | `nodes` | object | yes | Keys are node IDs; values are NarrativeNode objects |
 
@@ -178,7 +178,7 @@ Applied via `consequences`, `failure_consequences`, or `on_enter`.
 { "type": "modify_hp",   "amount": -6 }
 { "type": "set_weather", "value": "acid rain" }
 { "type": "set_time",    "value": "nightfall" }
-{ "type": "visit_location", "location": "the_ribs", "location_name": "The Ribs" }
+{ "type": "visit_location", "location": "vestal", "location_name": "Vestal" }
 ```
 
 | `type` | Required fields | Notes |
@@ -208,20 +208,20 @@ Applied via `consequences`, `failure_consequences`, or `on_enter`.
 
 | Field | Type | Default | Allowed values |
 | --- | --- | --- | --- |
-| `character_name` | string | `"Berättaren"` | Any string. The name used internally; not read aloud. |
-| `emotion` | string | `"neutral"` | `neutral`, `varm`, `hotfull`, `viskande`, `auktoritär`, `nostalgisk` |
-| `reverb` | float | `0.0` | `0.0` (dry room) to `1.0` (heavy echo). Suggested: 0.05 outdoors, 0.1 indoor, 0.2 stone corridor, 0.3 cavern. Currently metadata; scipy post-processing is a stretch goal. |
-| `pitch_shift` | float | `0.0` | `-1.0` (very deep) to `1.0` (very high). Currently metadata. |
-| `tempo` | float | `1.0` | `0.5` (slow) to `2.0` (fast). Currently metadata. |
+| `character_name` | string | `"Narrator"` | Any string. Used internally; not read aloud. |
+| `emotion` | string | `"neutral"` | `neutral`, `warm`, `whisper`, `nostalgic`, `threatening`, `cold` |
+| `reverb` | float | `0.0` | `0.0` (dry) to `1.0` (heavy echo). Suggested: 0.05 outdoors, 0.1 indoor, 0.2 stone corridor, 0.3 cavern. Applied as scipy fftconvolve post-processing on raw PCM. |
+| `pitch_shift` | float | `0.0` | `-1.0` (very deep) to `1.0` (very high). Not implemented in current Azure backend; reserved. |
+| `tempo` | float | `1.0` | `0.5` (slow) to `2.0` (fast). Applied to Azure SSML prosody rate. |
 | `style` | string | `"narrator"` | `narrator`, `character`, `whisper`, `dramatic` |
 
 **Emotion guide for CALLOUSED:**
 - `neutral` — standard narration, glass crater, neutral information
-- `varm` — emotional weight, warmth, relief, endings with hope
-- `hotfull` — danger, threat, combat aftermath, the Ancestors
-- `viskande` — stealth sections, tight spaces, the Underground
-- `nostalgisk` — ruins, Worker Logs, relics, memories of the surface world
-- `auktoritär` — the Ancestors speaking (even second-hand through logs)
+- `warm` — emotional weight, warmth, relief, endings with hope
+- `threatening` — danger, tension, aftermath
+- `whisper` — stealth sections, tight spaces, the Underground
+- `nostalgic` — ruins, Worker Logs, relics, memories of the surface world
+- `cold` — the Ancestors speaking (even second-hand through logs)
 
 ---
 
@@ -262,7 +262,7 @@ Applied via `consequences`, `failure_consequences`, or `on_enter`.
 | The Singing Ruins | Maddening, beautiful | Wind through whistle-holes, ceramic dust, distant pipe-organ tone |
 | The Underground | Sterile, still, 20°C | No smell, no wind, footsteps echo perfectly, anxiety of perfection |
 | The Cleft | Home, vertical, cramped | Rope bridges, goat smell, distant hammering |
-| The Ribs | Commerce, neutral, ancient | Fossilized bone arch above, trade voices, grease smell |
+| Vestal | Commerce, neutral, ancient | Fossilized bone arch above, trade voices, grease smell |
 | The Vent | Industrial, intense heat | Forging sounds, thermal glass gleam, sweat |
 
 ### The player character
@@ -296,15 +296,15 @@ The narrator **never reads a stat value or roll result aloud**. Outcomes are alw
 ## Full Example Node
 
 ```json
-"scav_silo_entrance": {
-  "id": "scav_silo_entrance",
-  "title": "Scav-Silo — Entrance Shaft",
-  "description": "Player enters the silo. No light. Must navigate by sound or find a light source. Blade trap is active.",
-  "system_prompt": "The player is in total darkness inside an ancient maintenance sub-station. The air smells of ceramics and dry machine oil. Something is spinning — a high whirring sound, rhythmic, close. The player cannot see. Build dread slowly. Do not describe the blade directly until the player takes an action toward it.",
-  "opening_text": "The hatch seals above you with a hiss and the darkness is total. No light anywhere. The air is dry, ceramic-clean, and still. But something spins — a high-frequency whirr, rhythmic, coming from your left, maybe three meters. The floor is smooth under your boots.",
+"dark_corridor": {
+  "id": "dark_corridor",
+  "title": "The Dark Corridor",
+  "description": "Player enters a facility corridor with no light. Must navigate by sound or find a light source. A maintenance unit is on circuit nearby.",
+  "system_prompt": "The player is in total darkness inside an ancient facility corridor. The air smells of ceramics and dry machine oil. Something moves — a low rhythmic sound, close. The player cannot see. Build unease slowly. The unit does not know the player is here. It is working.",
+  "opening_text": "The passage seals behind you and the darkness is total. No light anywhere. The air is dry, ceramic-clean, and still. But something moves — a low rhythmic sound, coming from ahead, maybe three meters. The floor is smooth under your boots.",
   "voice": {
     "character_name": "Narrator",
-    "emotion": "viskande",
+    "emotion": "whisper",
     "reverb": 0.2,
     "style": "narrator"
   },
@@ -312,21 +312,20 @@ The narrator **never reads a stat value or roll result aloud**. Outcomes are alw
   "forbidden_topics": ["sex", "religion"],
   "max_response_length": 70,
   "on_enter": [
-    { "type": "set_flag", "key": "in_silo", "value": true }
+    { "type": "set_flag", "key": "in_corridor", "value": true }
   ],
   "actions": [
     {
       "id": "move_toward_sound",
       "label": "Move carefully toward the sound",
-      "description": "Player moves slowly left, arms out, listening to the whirring to locate it.",
+      "description": "Player moves slowly forward, arms out, listening to locate the source.",
       "skill_check": "dexterity",
       "dc": 14,
-      "target_node": "silo_past_blade",
-      "failure_node": "silo_injured",
+      "target_node": "corridor_past_unit",
+      "failure_node": "corridor_injured",
       "consequences": [],
       "failure_consequences": [
-        { "type": "modify_hp", "amount": -6 },
-        { "type": "set_flag", "key": "fatigued", "value": true }
+        { "type": "set_flag", "key": "shin_bruised", "value": true }
       ]
     },
     {
@@ -335,23 +334,23 @@ The narrator **never reads a stat value or roll result aloud**. Outcomes are alw
       "description": "Player goes motionless, mapping the room by sound alone.",
       "skill_check": "wisdom",
       "dc": 10,
-      "target_node": "silo_surveyed",
-      "failure_node": "scav_silo_entrance",
+      "target_node": "corridor_surveyed",
+      "failure_node": "dark_corridor",
       "consequences": [
-        { "type": "set_flag", "key": "silo_mapped_by_sound", "value": true }
+        { "type": "set_flag", "key": "corridor_mapped_by_sound", "value": true }
       ],
       "failure_consequences": []
     },
     {
       "id": "feel_for_wall",
       "label": "Feel along the wall for anything useful",
-      "description": "Player backs to the nearest wall and sweeps it with both hands, looking for a switch, a rack, anything.",
-      "target_node": "silo_found_glow_rod",
+      "description": "Player backs to the nearest wall and sweeps it with both hands, looking for a switch or panel.",
+      "target_node": "corridor_found_panel",
       "conditions": [
-        { "type": "flag", "key": "in_silo", "value": true }
+        { "type": "flag", "key": "in_corridor", "value": true }
       ],
       "consequences": [
-        { "type": "add_item", "item_name": "Glow Rod", "item_description": "A ceramic tube that emits cold light when snapped. One use." }
+        { "type": "add_item", "item_name": "Data Card", "item_description": "A ceramic wafer. Surface markings in a script you cannot read." }
       ]
     }
   ]
@@ -364,7 +363,7 @@ The narrator **never reads a stat value or roll result aloud**. Outcomes are alw
 
 The engine uses a sentence-level streaming pipeline. TTFA (time to first audio after player input) is approximately:
 
-> STT recognition (~1.5s) + intent match (~200ms) + first LLM sentence (~500ms) + ElevenLabs (~300ms) ≈ **~2.5s**
+> Pre-LLM pipeline (~180ms) + Azure first-token latency (~1.6s) + TTS synthesis warm (~200-650ms) ≈ **~2-2.5s** to first audio. Source: benchmark 08, Azure gpt-4o, en-GB-RyanNeural.
 
 Authors can reduce TTFA by:
 

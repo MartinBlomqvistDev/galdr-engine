@@ -90,7 +90,7 @@ def build_system_prompt(
         pressure_directive = "\nPRESSURE 10: COLLAPSE. Player cannot continue. Force an incapacitation beat immediately."
 
     lo_trust = char.lo_trust
-    lo_status = {0: "Lo has left — do not mention Lo", 1: "Lo is cold, minimal interaction", 2: "Lo is wary", 3: "Lo is neutral", 4: "Lo is warm, watchful", 5: "Lo fully trusts the player — rare, understated warmth"}.get(lo_trust, "Lo is neutral")
+    lo_status = {0: "Lo has left; do not mention Lo", 1: "Lo is cold, minimal interaction", 2: "Lo is wary", 3: "Lo is neutral", 4: "Lo is warm, watchful", 5: "Lo fully trusts the player; rare, understated warmth"}.get(lo_trust, "Lo is neutral")
 
     inventory_str = ', '.join(i.name for i in char.inventory) or 'Empty'
     parts.append(

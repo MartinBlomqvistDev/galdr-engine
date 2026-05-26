@@ -6,9 +6,13 @@ A voice-first interactive story built on the GALDR Engine. No screen. No GUI. Ju
 
 ## Premise
 
-The player wakes at the bottom of a shaft. The surface is 70 metres up. Somewhere below: hundreds of sleeping Ancestors, a civilization 50,000 years dormant, and a facility grid that is failing.
+Player and Lo are on the Glass Crater floor. Three days since the Eternal Breath stopped. They came to look. The obsidian buckles; the player falls through into the Ancestor Facility below. Lo is left at the crack above.
 
-479 of 480 registered descendants of the Missionaries of the Covenant are alive on the surface. The player is one of them. The terminal at the bottom of the shaft authenticates the player not because of lineage; because they showed up first.
+Below: a ceramic maintenance unit running its 50,000-year circuit, indifferent; a cryo room of sleeping Ancestors, still breathing, all occupied; a terminal blocked at 479/480. The facility has been mid-startup for fifty thousand years, waiting for the last registered surface unit to complete the census count. When the player stands at the terminal, the system detects them. It cannot authenticate. The count stays at 479/480.
+
+The player climbs out via a maintenance shaft. Lo is at the crack, waiting.
+
+Surface premise: find the Ancestors, get them to fix the failing grid. Actual premise: what happens when someone built to survive is forced to decide who gets to live?
 
 This is a steward story, not a hero story. The player becomes the system.
 

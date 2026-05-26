@@ -35,6 +35,9 @@ scenarios/*.bak
 # Temporary files
 smoke_test_engine.py
 
+# Internal memos — never commit
+GALDRxAZURE.md
+
 # CALLOUSED game design — AI discussion exports, never commit
 Calloused_game/*_Discussion_GPT.md
 Calloused_game/*_Discussion_2_GPT.md
