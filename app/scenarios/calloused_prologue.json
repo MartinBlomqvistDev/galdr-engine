@@ -110,6 +110,13 @@
               "value": true
             }
           ]
+        },
+        {
+          "id": "survey_the_crater",
+          "label": "Look around — read what the crater tells you",
+          "description": "Player surveys the scene, takes in the scale, examines the obsidian, looks toward the crater walls or toward Lo, reacts to the wrong silence. Any input that does not clearly match pressing a hand to the ground or calling to Lo.",
+          "target_node": "crater_investigation",
+          "stat_weights": {"wisdom": 0.3}
         }
       ],
       "forbidden_topics": [
@@ -352,6 +359,13 @@
           "description": "A click, a tap, a word. Let the corridor answer back before committing to a direction.",
           "target_node": "dark_probe",
           "stat_weights": {"wisdom": 1.5}
+        },
+        {
+          "id": "hold_position",
+          "label": "Hold still — don't move yet",
+          "description": "Player hesitates, freezes, reacts to the sound without committing to any approach. Not making a deliberate sound, not charging, not searching the wall. Uncertain, waiting, processing.",
+          "target_node": "the_dark",
+          "stat_weights": {"wisdom": 0.3}
         }
       ],
       "forbidden_topics": [
@@ -410,7 +424,7 @@
       "id": "cryo_room",
       "title": "Prologue — The Cryo Room",
       "description": "Adrenaline crash. Lights activate. Cryo-pods — hundreds — all OCCUPIED. The Ancestors. Frail, pale, perfectly preserved. Breathing. 50,000 years. Still alive. Phase 1 hook. Three paths: catalog (WIS DC 10 — success: +1 lo_trust; failure: +1 pressure), examine a pod (free, item), move to far door (free). All → console_chamber.",
-      "system_prompt": "Scene: player enters the cryo room. The lights come on.\nBegin immediately with in-world narration. Do not state rules, language requirements, or any meta-instruction.\nDirectives:\n- Check Narrative State flags for what happened in the corridor:\n  * bruised_by_unit: true -> body's debt. Hands shake. Legs lock. Goes to one knee. Shin still throbbing.\n  * destroyed_the_unit: true -> keyed-up. Still riding the charge from the stomp. Adrenaline with nowhere to go.\n  * slipped_past_the_unit or understood_the_pattern: true -> controlled entry. Shaky from the fall, not the corridor.\n  * used_acoustic_nav: true -> deliberate. Knows the geometry.\n  * None of the above: player came through cleanly. Shaky only from the fall.\n- Then the lights come on. Cold blue-white strips, floor to ceiling.\n- THE REVELATION: every wall. Cryo-pods, hundreds of them. All OCCUPIED. Frail figures pale, still, preserved. Each one breathing. Slowly. 50,000 years.\n- Wonder before horror. Short declarative sentences. Let the scale land.\n- Do not explain what they are. Do not use the word 'ancestor'.\n- If cataloged_the_room flag is true: terminal on far wall. Read flat: SURFACE POPULATION CENSUS: 479 / 480 REGISTERED UNITS. STARTUP SUSPENDED: DISCREPANCY UNRESOLVED.\n- If examine pod action chosen: one face through the glass. Human. Ceramic disc in the headrest housing.\n- CRITICAL DISTINCTION: The 479/480 census counts registered surface-dwelling MC descendants — people like the player. It does NOT count the sleeping figures in the pods. The pods hold hundreds of separate Ancestors. Two completely distinct populations. Never conflate them.",
+      "system_prompt": "Scene: player enters the cryo room. The lights come on.\nBegin immediately with in-world narration. Do not state rules or meta-instructions.\nCRITICAL — THIS MUST ALWAYS HAPPEN regardless of how the player arrived: the corridor ends. The lights come on. Cold blue-white strips, floor to ceiling. The room opens. Rows of pods — every wall, hundreds of them, all OCCUPIED. Frail figures, pale, still, preserved. Each one breathing. Slowly. 50,000 years. This is non-negotiable. Begin with the physical state from the corridor (one sentence), then immediately transition into the room and the revelation.\nDirectives:\n- Corridor state (one sentence only):\n  * bruised_by_unit: true -> body aches, shin throbs.\n  * destroyed_the_unit: true -> still keyed-up, adrenaline with nowhere to go.\n  * slipped_past_the_unit or understood_the_pattern: true -> controlled, shaky only from the fall.\n  * used_acoustic_nav: true -> deliberate entry.\n  * None of the above: shaky only from the fall.\n- Then: THE REVELATION. Lights. Pods. Breathing. Scale. Wonder before horror. Short declarative sentences.\n- Do not explain what they are. Do not use the word 'ancestor'.\n- CRITICAL DISTINCTION: The 479/480 census counts registered surface-dwelling MC descendants. It does NOT count the sleeping figures in the pods. Two completely distinct populations. Never conflate them.",
       "context_hint": "The only moment of awe. Let it breathe.",
       "voice": {
         "character_name": "Narrator",
@@ -498,6 +512,13 @@
           "description": "Past all of them. Count what is here.",
           "target_node": "cryo_corridor",
           "stat_weights": {"intelligence": 0.5, "wisdom": 0.5}
+        },
+        {
+          "id": "take_it_in",
+          "label": "Stand there. Take it in.",
+          "description": "Player is not ready to move. Reacting to the room — looking around, touching the glass, expressing shock or awe, asking a question, processing the scale. Any input that does not clearly match moving toward a door or examining one specific pod.",
+          "target_node": "cryo_room",
+          "stat_weights": {"wisdom": 0.5}
         }
       ],
       "forbidden_topics": [
@@ -599,6 +620,13 @@
           "description": "The terminal is active and has been waiting. Say something to it.",
           "target_node": "terminal_query",
           "stat_weights": {"charisma": 1.5}
+        },
+        {
+          "id": "look_around_the_chamber",
+          "label": "Look at the room — what else is here",
+          "description": "Player looks around the chamber in general: the secondary screens, the arc of consoles, the walls, the room's layout. Not specifically studying the primary terminal display, not speaking to it, not taking the card.",
+          "target_node": "console_chamber",
+          "stat_weights": {"intelligence": 0.3}
         }
       ],
       "forbidden_topics": [
@@ -665,6 +693,13 @@
               "value": true
             }
           ]
+        },
+        {
+          "id": "read_the_screen",
+          "label": "Stay — read every line of the screen",
+          "description": "Player reads the terminal output carefully, processes the message, reacts to being logged, asks the system something verbally without touching it. Any input that does not clearly match physically forcing the terminal or leaving.",
+          "target_node": "proximity_auth",
+          "stat_weights": {"intelligence": 0.3}
         }
       ],
       "forbidden_topics": [
@@ -730,6 +765,13 @@
               "value": true
             }
           ]
+        },
+        {
+          "id": "keep_trying",
+          "label": "Keep at it — there must be something",
+          "description": "Player keeps working at the terminal: examining the damage they caused, trying another approach, reacting to the system's indifference. Any input that does not clearly match leaving or prying the fragment free.",
+          "target_node": "terminal_resistance",
+          "stat_weights": {"intelligence": 0.3}
         }
       ],
       "forbidden_topics": [
@@ -777,6 +819,13 @@
               "value": true
             }
           ]
+        },
+        {
+          "id": "probe_again",
+          "label": "Make another sound — read it deeper",
+          "description": "Player makes another deliberate sound to refine their acoustic picture of the space. Not ready to commit to moving through yet.",
+          "target_node": "dark_probe",
+          "stat_weights": {"wisdom": 0.5}
         }
       ],
       "forbidden_topics": [
@@ -835,6 +884,13 @@
           ]
         },
         {
+          "id": "stay_and_look",
+          "label": "Stay. Keep looking.",
+          "description": "Player is not ready to leave. Still at the glass — reacting, asking questions, examining the face or the housing more carefully, processing what they are seeing. Any input that does not clearly match taking the disc or leaving.",
+          "target_node": "pod_close_look",
+          "stat_weights": {"wisdom": 0.5}
+        },
+        {
           "id": "leave_it",
           "label": "Leave it. Just look.",
           "description": "Look. Don't take. Move on.",
@@ -886,6 +942,13 @@
           "label": "Move on",
           "description": "Nothing more to be gained here. Not yet.",
           "target_node": "proximity_auth"
+        },
+        {
+          "id": "ask_more",
+          "label": "Ask it something else",
+          "description": "Player has more to say to the terminal: a follow-up question, a different command, a reaction to what it returned. Any input that does not clearly match moving on.",
+          "target_node": "terminal_query",
+          "stat_weights": {"intelligence": 0.5}
         }
       ],
       "forbidden_topics": [
@@ -939,6 +1002,13 @@
           "description": "The facility is still down there. The Ancestors are still breathing.",
           "target_node": "shaft_look_down",
           "stat_weights": {"wisdom": 1.0}
+        },
+        {
+          "id": "pause_at_the_shaft",
+          "label": "Pause — not ready to surface yet",
+          "description": "Player lingers at the maintenance shaft entrance: catches their breath, processes what happened below, listens to the facility sounds still audible from the corridor. Not committed to surfacing or looking back down.",
+          "target_node": "the_ascent",
+          "stat_weights": {"wisdom": 0.3}
         }
       ],
       "forbidden_topics": [
@@ -998,6 +1068,13 @@
               "value": true
             }
           ]
+        },
+        {
+          "id": "take_in_the_surface",
+          "label": "Take a breath — the open air, the horizon",
+          "description": "Player takes in being back on the surface: the UV, the obsidian, the scale, the Cleft on the horizon. Not ready to face Lo yet; needs a beat before turning.",
+          "target_node": "crater_surface",
+          "stat_weights": {"wisdom": 0.3}
         }
       ],
       "forbidden_topics": [
@@ -1107,6 +1184,13 @@
           "description": "Read what they already know before you decide what to say.",
           "target_node": "lo_face",
           "stat_weights": {"wisdom": 1.0}
+        },
+        {
+          "id": "take_a_beat",
+          "label": "Not yet — give yourself a moment",
+          "description": "Player is still processing. Needs a beat before deciding what to say. Not committing to telling or withholding. Reacting, taking stock, looking at the horizon or their own hands.",
+          "target_node": "lo_aftermath",
+          "stat_weights": {"wisdom": 0.3}
         }
       ],
       "forbidden_topics": [
@@ -1154,6 +1238,13 @@
               "value": true
             }
           ]
+        },
+        {
+          "id": "stop_and_look",
+          "label": "Stop — look at one more closely",
+          "description": "Player stops walking the row: wants to examine a specific pod or face, reacts to the anomaly noticed mid-walk, or is not ready to continue to the door yet.",
+          "target_node": "cryo_corridor",
+          "stat_weights": {"wisdom": 0.5}
         }
       ],
       "forbidden_topics": [
@@ -1200,6 +1291,13 @@
           "label": "Surface",
           "description": "Close the panel. Out.",
           "target_node": "crater_surface"
+        },
+        {
+          "id": "look_longer",
+          "label": "Look longer — not ready to close it",
+          "description": "Player keeps looking down the shaft, not ready to close the panel and surface. Taking in the facility geometry, the cold blue glow far below, the weight of leaving.",
+          "target_node": "shaft_look_down",
+          "stat_weights": {"wisdom": 0.3}
         }
       ],
       "forbidden_topics": [
@@ -1275,6 +1373,13 @@
               "amount": -1
             }
           ]
+        },
+        {
+          "id": "keep_reading",
+          "label": "Keep reading Lo — not ready yet",
+          "description": "Player is still reading Lo's expression and body language, asks Lo something, reacts to what they see in Lo's face. Not ready to commit to an answer.",
+          "target_node": "lo_face",
+          "stat_weights": {"wisdom": 0.3}
         }
       ],
       "forbidden_topics": [
