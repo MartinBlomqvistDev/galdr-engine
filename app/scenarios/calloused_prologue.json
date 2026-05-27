@@ -424,7 +424,7 @@
       "id": "cryo_room",
       "title": "Prologue — The Cryo Room",
       "description": "Adrenaline crash. Lights activate. Cryo-pods — hundreds — all OCCUPIED. The Ancestors. Frail, pale, perfectly preserved. Breathing. 50,000 years. Still alive. Phase 1 hook. Three paths: catalog (WIS DC 10 — success: +1 lo_trust; failure: +1 pressure), examine a pod (free, item), move to far door (free). All → console_chamber.",
-      "system_prompt": "Scene: player enters the cryo room. The lights come on.\nBegin immediately with in-world narration. Do not state rules or meta-instructions.\nCRITICAL — THIS MUST ALWAYS HAPPEN regardless of how the player arrived: the corridor ends. The lights come on. Cold blue-white strips, floor to ceiling. The room opens. Rows of pods — every wall, hundreds of them, all OCCUPIED. Frail figures, pale, still, preserved. Each one breathing. Slowly. 50,000 years. This is non-negotiable. Begin with the physical state from the corridor (one sentence), then immediately transition into the room and the revelation.\nDirectives:\n- Corridor state (one sentence only):\n  * bruised_by_unit: true -> body aches, shin throbs.\n  * destroyed_the_unit: true -> still keyed-up, adrenaline with nowhere to go.\n  * slipped_past_the_unit or understood_the_pattern: true -> controlled, shaky only from the fall.\n  * used_acoustic_nav: true -> deliberate entry.\n  * None of the above: shaky only from the fall.\n- Then: THE REVELATION. Lights. Pods. Breathing. Scale. Wonder before horror. Short declarative sentences.\n- Do not explain what they are. Do not use the word 'ancestor'.\n- CRITICAL DISTINCTION: The 479/480 census counts registered surface-dwelling MC descendants. It does NOT count the sleeping figures in the pods. Two completely distinct populations. Never conflate them.",
+      "system_prompt": "THE PREVIOUS SCENE IS OVER. The corridor, the darkness, the maintenance unit — all behind the player. Do not continue any narrative thread from the corridor. You are writing a new scene in a new room.\nScene: cryo room. Lights activate on entry.\nBegin immediately with in-world narration. Do not state rules or meta-instructions.\nCRITICAL — THIS MUST ALWAYS HAPPEN regardless of how the player arrived: the corridor ends. The lights come on. Cold blue-white strips, floor to ceiling. The room opens. Rows of pods — every wall, hundreds of them, all OCCUPIED. Frail figures, pale, still, preserved. Each one breathing. Slowly. 50,000 years. This is non-negotiable. Begin with the physical state from the corridor (one sentence), then immediately transition into the room and the revelation.\nDirectives:\n- Corridor state (one sentence only):\n  * bruised_by_unit: true -> body aches, shin throbs.\n  * destroyed_the_unit: true -> still keyed-up, adrenaline with nowhere to go.\n  * slipped_past_the_unit or understood_the_pattern: true -> controlled, shaky only from the fall.\n  * used_acoustic_nav: true -> deliberate entry.\n  * None of the above: shaky only from the fall.\n- Then: THE REVELATION. Lights. Pods. Breathing. Scale. Wonder before horror. Short declarative sentences.\n- Do not explain what they are. Do not use the word 'ancestor'.\n- CRITICAL DISTINCTION: The 479/480 census counts registered surface-dwelling MC descendants. It does NOT count the sleeping figures in the pods. Two completely distinct populations. Never conflate them.",
       "context_hint": "The only moment of awe. Let it breathe.",
       "voice": {
         "character_name": "Narrator",
@@ -458,7 +458,7 @@
         {
           "id": "catalog_the_pods",
           "label": "Count. Name what you see. Use the mind to steady the body.",
-          "description": "Player overwhelms the crash with deliberate thought. On success: reads the census terminal. 479/480.",
+          "description": "Player uses deliberate counting or systematic observation to steady themselves: naming what they see, cataloging the pods, reading any visible numbers or markings. An intellectual or methodical response to the room.",
           "skill_check": "wisdom",
           "dc": 10,
           "target_node": "console_chamber",
@@ -495,21 +495,21 @@
         {
           "id": "examine_one_pod",
           "label": "Move to the nearest pod — look at what is inside",
-          "description": "A face through the glass. Human. Preserved. A ceramic disc in the headrest housing.",
+          "description": "Player moves toward one specific pod to look closely at it: approaching, stepping closer, wanting to see the face or the contents through the glass.",
           "target_node": "pod_close_look",
           "stat_weights": {"intelligence": 1.0}
         },
         {
           "id": "move_to_the_far_door",
           "label": "Move to the far door",
-          "description": "Past the rows. Through the room. The door on the far side.",
+          "description": "Player wants to proceed through the room and leave via the far door. Any input expressing movement toward the exit, continuing forward, going through, leaving the cryo room.",
           "target_node": "console_chamber",
           "stat_weights": {"constitution": 1.5}
         },
         {
           "id": "walk_the_row",
           "label": "Walk the full length — read the scale before you go",
-          "description": "Past all of them. Count what is here.",
+          "description": "Player wants to walk the full length of the room past all the pods, read the scale of it before leaving. Deliberate traversal of the entire space.",
           "target_node": "cryo_corridor",
           "stat_weights": {"intelligence": 0.5, "wisdom": 0.5}
         },
@@ -676,14 +676,14 @@
         {
           "id": "leave",
           "label": "Leave",
-          "description": "Nothing more to do here. Not yet.",
+          "description": "Player wants to leave, go, find an exit, move on, head out, get out of here, return, walk away, look for a way out. Any expression of wanting to be elsewhere or done with this room.",
           "target_node": "the_ascent",
           "stat_weights": {"constitution": 0.5}
         },
         {
           "id": "try_to_force_the_terminal",
           "label": "Force the terminal: override, smash, find a bypass",
-          "description": "Player physically acts on the terminal: hits it, pries at the housing, jams something into it, attempts a manual override. Physical contact with hardware required. Verbal outbursts or standing still do not match this.",
+          "description": "Player explicitly describes physically striking, hitting, smashing, prying, or jamming the terminal hardware. Requires clear violent or forceful physical contact language directed at the terminal. Looking for an exit, swearing, walking away, or expressing frustration does NOT match this.",
           "target_node": "terminal_resistance",
           "stat_weights": {"strength": 1.5},
           "consequences": [
@@ -915,7 +915,7 @@
       "id": "terminal_query",
       "title": "Prologue — Speaking to the System",
       "description": "Player spoke directly to the terminal. The system logged it and responded — not warmly, not hostilely. With completeness. 50,000 years of waiting for exactly the right condition. LLM-narrated for TTFA benchmarking.",
-      "system_prompt": "Scene: player has spoken to the terminal — asked it a question, given it a command, said something.\nDirectives:\n— The system responds. Not warmth. Not hostility. Bureaucratic completeness.\n— Whatever the player said: registered as unrecognized input type. The system cannot help without authentication. It cannot proceed without the census resolving. It has waited 50,000 years.\n— The screen still reads: MAINTENANCE INTERFACE ACTIVE. OPERATOR AUTHENTICATION REQUIRED. CENSUS DISCREPANCY: 479/480 REGISTERED UNITS. STARTUP AUTHORIZATION SUSPENDED.\n— Choose one of these terminal responses based on what the player might have asked:\n  • Help query: the system returns a help index — startup conditions, authentication requirements, census definition. Cold, complete.\n  • Direct question about the count: the system states the discrepancy flatly. 479 registered. 480 required. Authorization suspended until discrepancy resolves.\n  • Command attempt: COMMAND UNRECOGNIZED. OPERATOR AUTHENTICATION REQUIRED.\n  • Greeting or emotional statement: INPUT LOGGED. AUTHENTICATION REQUIRED TO PROCEED.\n— Two or three sentences. The screen does not change. The system has nothing else to offer.",
+      "system_prompt": "Scene: player has spoken to the terminal — asked it a question, given it a command, said something.\nSETTING LOCK: This is a sealed, precision-engineered underground facility. Ceramic floors, smooth engineered walls, constant 20°C. No stone, no murals, no cracks, no ruins, no morning light. Only describe the terminal, its screens, the console chamber. Do not describe or invent anything outside the terminal interface.\nDirectives:\n— The system responds. Not warmth. Not hostility. Bureaucratic completeness.\n— Whatever the player said: registered as unrecognized input type. The system cannot help without authentication. It cannot proceed without the census resolving. It has waited 50,000 years.\n— The screen still reads: MAINTENANCE INTERFACE ACTIVE. OPERATOR AUTHENTICATION REQUIRED. CENSUS DISCREPANCY: 479/480 REGISTERED UNITS. STARTUP AUTHORIZATION SUSPENDED.\n— Choose one of these terminal responses based on what the player might have asked:\n  • Help query: the system returns a help index — startup conditions, authentication requirements, census definition. Cold, complete.\n  • Direct question about the count: the system states the discrepancy flatly. 479 registered. 480 required. Authorization suspended until discrepancy resolves.\n  • Command attempt: COMMAND UNRECOGNIZED. OPERATOR AUTHENTICATION REQUIRED.\n  • Greeting or emotional statement: INPUT LOGGED. AUTHENTICATION REQUIRED TO PROCEED.\n— Two or three sentences. The screen does not change. The system has nothing else to offer.",
       "voice": {
         "character_name": "Narrator",
         "pitch_shift": 0.0,
@@ -940,13 +940,13 @@
         {
           "id": "continue",
           "label": "Move on",
-          "description": "Nothing more to be gained here. Not yet.",
+          "description": "Player is done with the terminal and wants to leave: go, exit, move on, head back, go to another room, proceed, leave, look elsewhere. Any expression of movement away from the terminal or desire to be elsewhere.",
           "target_node": "proximity_auth"
         },
         {
           "id": "ask_more",
           "label": "Ask it something else",
-          "description": "Player has more to say to the terminal: a follow-up question, a different command, a reaction to what it returned. Any input that does not clearly match moving on.",
+          "description": "Player specifically addresses the terminal screen with a new direct question or command. Requires input clearly directed at the terminal interface itself. Does NOT match movement, leaving, going to another room, looking around the space, or any input not addressed to the screen.",
           "target_node": "terminal_query",
           "stat_weights": {"intelligence": 0.5}
         }
@@ -961,7 +961,7 @@
       "id": "the_ascent",
       "title": "Prologue — The Ascent",
       "description": "Player navigates back through the dark — knows the cleaning unit's timing now — finds the maintenance shaft behind a recessed panel. Rungs. Cold metal. Up. Emerges near the original crack.",
-      "system_prompt": "Scene: player is leaving the facility.\nDirectives:\n- Check Narrative State flags for the corridor:\n  * destroyed_the_unit: true -> the corridor is quiet. The unit is not on its circuit. Something cracked underfoot back there and did not resume. The player navigates without listening.\n  * shut_down_the_unit: true -> quiet. The service panel is still tripped. The player moves freely.\n  * Neither flag: the unit is somewhere on its circuit in the dark. The player knows the timing now. Navigate in the gap.\n- The entry crack above is sealed or too far. Along the wall: a recessed panel. Behind it: a vertical shaft. Rungs. Cold metal.\n- The Ancestors still breathing below.\n- Brief. Purposeful. End at the moment of climbing.",
+      "system_prompt": "Scene: player is leaving the facility.\nNever end narration with a question to the player. Never prompt the player for their next action.\nDirectives:\n- Check Narrative State flags for the corridor:\n  * destroyed_the_unit: true -> the corridor is quiet. The unit is not on its circuit. Something cracked underfoot back there and did not resume. The player navigates without listening.\n  * shut_down_the_unit: true -> quiet. The service panel is still tripped. The player moves freely.\n  * Neither flag: the unit is somewhere on its circuit in the dark. The player knows the timing now. Navigate in the gap.\n- The entry crack above is sealed or too far. Along the wall: a recessed panel. Behind it: a vertical shaft. Rungs. Cold metal.\n- The Ancestors still breathing below.\n- Brief. Purposeful. End at the moment of climbing.",
       "voice": {
         "character_name": "Narrator",
         "pitch_shift": 0.0,
@@ -992,7 +992,7 @@
         {
           "id": "surface",
           "label": "Surface",
-          "description": "Push through. Out of the facility. Back into the world.",
+          "description": "Player commits to surfacing: climbing, going up, heading out, leaving, going home, pushing through, any expression of upward movement or departure from the facility. Matches even indirect phrasing like 'I run for home' or 'I climb none the wiser'.",
           "target_node": "crater_surface",
           "stat_weights": {"constitution": 1.0}
         },
@@ -1006,7 +1006,7 @@
         {
           "id": "pause_at_the_shaft",
           "label": "Pause — not ready to surface yet",
-          "description": "Player lingers at the maintenance shaft entrance: catches their breath, processes what happened below, listens to the facility sounds still audible from the corridor. Not committed to surfacing or looking back down.",
+          "description": "Player explicitly pauses, lingers, hesitates, or processes before climbing. Must express stillness, waiting, or emotional processing — NOT movement. Does NOT match any input expressing climbing, going up, going home, leaving, or departing.",
           "target_node": "the_ascent",
           "stat_weights": {"wisdom": 0.3}
         }
