@@ -72,7 +72,7 @@
         {
           "id": "read_the_ground",
           "label": "Crouch. Press your hand to the obsidian.",
-          "description": "Lo does it. You do it. Read what the ground says about what is below.",
+          "description": "Player physically crouches or presses a hand to the obsidian to read what is below — mirroring what Lo is already doing. Requires physical contact with the ground surface. Verbal or observational input does not match this.",
           "skill_check": "wisdom",
           "dc": 8,
           "target_node": "the_fall",
@@ -100,7 +100,7 @@
         {
           "id": "call_to_lo",
           "label": "Call to Lo. The ground feels wrong.",
-          "description": "Lo turns toward you. You open your mouth. Then the ground moves.",
+          "description": "Player speaks to Lo, addresses Lo by name, or directs any communication toward Lo — asking Lo a question, calling Lo over, saying something to Lo, trying to get Lo's attention. Any speech or gesture directed at Lo matches this, regardless of content.",
           "target_node": "the_fall",
           "stat_weights": {"charisma": 1.5},
           "consequences": [
@@ -114,7 +114,7 @@
         {
           "id": "survey_the_crater",
           "label": "Look around — read what the crater tells you",
-          "description": "Player surveys the scene, takes in the scale, examines the obsidian, looks toward the crater walls or toward Lo, reacts to the wrong silence. Any input that does not clearly match pressing a hand to the ground or calling to Lo.",
+          "description": "Player looks around, observes, takes in the scale, examines the obsidian or the crater walls, or reacts silently to the atmosphere. Internal thought or environmental observation only. Does NOT match if the player speaks to or addresses Lo in any way, or physically touches the ground.",
           "target_node": "crater_investigation",
           "stat_weights": {"wisdom": 0.3}
         }
