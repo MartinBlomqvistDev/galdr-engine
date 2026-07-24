@@ -101,10 +101,10 @@ app/
 │   ├── config.py                  # Pydantic Settings, all credentials from .env
 │   └── main.py                    # FastAPI app entry point
 ├── scenarios/
-│   └── calloused_prologue.json    # 22-node prologue (CALLOUSED exam PoC)
+│   └── calloused_prologue.json    # 19-node prologue (CALLOUSED exam PoC)
 ├── voice_play.py                  # Voice-only loop (CALLOUSED PoC entry point)
 ├── parse_benchmark.py             # Latency + word count analysis from log files
-└── tests/                         # 142 tests across 13 modules
+└── tests/                         # 182 tests across 12 modules
 ```
 
 ---
@@ -157,7 +157,7 @@ Without keys the engine runs in mock mode: full game mechanics, scripted node te
 
 ## Demo: CALLOUSED (Prologue)
 
-The included scenario is CALLOUSED, a voice-only RPG and exam PoC. Player and Lo investigate a stopped geothermal vent on a glass crater floor. The ground cracks. The player falls through into an Ancestor Facility 50,000 years dormant: a ceramic maintenance unit on a fixed circuit, hundreds of sleeping Ancestors, a census frozen at 479 of 480. 22 nodes. D&D 5e mechanics. Diegetic stat emergence. No screen.
+The included scenario is CALLOUSED, a voice-only RPG and exam PoC. Player and Lo investigate a stopped geothermal vent on a glass crater floor. The ground cracks. The player falls through into an Ancestor Facility 50,000 years dormant: a ceramic maintenance unit on a fixed circuit, hundreds of sleeping Ancestors, a census frozen at 479 of 480. 19 nodes. D&D 5e mechanics. Diegetic stat emergence. No screen.
 
 GPS-triggered scenarios, multi-character casts, and outdoor performance are engine capabilities not exercised in this PoC.
 
@@ -171,20 +171,46 @@ GPS-triggered scenarios, multi-character casts, and outdoor performance are engi
 | Skill checks before LLM generation | Mechanics drive the story; AI narrates the outcome, never decides it |
 | 8-layer system prompt | Broadest constraints first, scene-specific last. Order is a funnel, not a list |
 | LANGUAGE constraint in Layer 1 | Azure gpt-4o on swedencentral defaults to Swedish under dense context; Layer 1 placement overrides before generation direction is set |
-| Streaming sentence pipeline | Hides 2-7s synthesis latency behind playback. Near-zero inter-sentence gap |
+| Streaming sentence pipeline | Sentence N+1 synthesises while N plays. Inter-sentence gap 86-450ms (p95), under the 500ms conversational threshold |
 | Lazy token generator | `process_input_stream()` returns a generator; scripted nodes discard it without iterating, zero wasted LLM calls on scripted transitions |
 | Two-layer tonality | Layer 1: authored VoiceParams per node (TTS acoustic, static). Layer 2: pressure/lo_trust/flags in system prompt (LLM register, dynamic) |
 | Narrative flags in system prompt | LLM reads structured state, not conversation history. Narrator only references events that actually happened |
 
 ---
 
-## Latency profile (benchmark 08, Azure gpt-4o, en-GB-RyanNeural)
+## Latency profile (n=46 across benchmarks 02-09, Azure gpt-4o + Azure AI Speech)
 
-| Metric | mean | p50 | p95 |
-|--------|------|-----|-----|
-| TTFA (input -> first sentence) | 1832ms | ~1800ms | 2368ms |
-| Pre-LLM overhead (steps 1-4) | ~180ms | -- | -- |
+Three instruments measure three disjoint, sequential segments. `pre_latency` covers the
+deterministic pipeline, `first_token_ms` covers the LLM round trip, and `[STREAM TTFA]`
+starts when `narrate_stream()` begins, which is *after* the pipeline has returned. Because
+the segments do not overlap, the honest end-to-end figure is their sum.
 
-`[STREAM TTFA]` measures LLM-to-first-sentence latency. True time-to-first-audio = TTFA + TTS synthesis warm (~200-650ms). Bottleneck is Azure OpenAI first-token latency (~1.6s). The engine pipeline contributes ~10-15% of total TTFA.
+| Segment | mean | p50 | p95 |
+|---------|------|-----|-----|
+| Pipeline steps 1-4 (deterministic, pre-LLM) | 712ms | 672ms | 907ms |
+| `[STREAM TTFA]` (LLM call -> first sentence) | 1902ms | 1844ms | 3286ms |
+| Azure OpenAI first token (inside the above) | 1900ms | 1834ms | 3071ms |
+| Azure TTS warm synthesis, sentence 1 | ~250ms | ~196ms | ~450ms |
+| **Input -> first audio (sum, paired n=46)** | **2811ms** | **2726ms** | **4173ms** |
+
+Time to first audio is therefore about **2.7s at p50**, against an original 500ms design
+target that a cloud LLM pipeline does not reach. Per-observation median shares: LLM 67%,
+deterministic pipeline 26%, TTS 7%.
+
+The LLM round trip is the bottleneck and is measured directly: `first_token_ms` p50 1834ms
+over n=46 (min 815ms, max 4401ms). It accounts for essentially all of `[STREAM TTFA]`; the
+sentence splitter adds under 10ms. The deterministic pipeline contributes 672ms and is
+network-independent, so it becomes the binding constraint if inference moves local:
+published Ollama benchmarks on Apple Silicon put local first-token at 50-150ms, which would
+give an estimated input-to-first-audio of roughly 950-1050ms. TTS cold start (5270ms on the
+first synthesis) is not structural; a `warmup()` at session start opens the Azure synthesiser
+WebSocket and eliminates it.
+
+A note on an earlier error, kept because the correction is the useful part. Previous
+revisions reported input-to-first-audio as ~2040ms with the LLM at 62% (~1264ms). That 1264
+was never measured: it is 1844 minus an assumed 580ms pipeline, on the assumption that
+`[STREAM TTFA]` starts at player input. It does not. `t0` is set inside `narrate_stream()`,
+by which point steps 1-4 have already run, so subtracting the pipeline removed 672ms that
+belongs in the total. The figures above sum the three measured segments instead.
 
 Full design reasoning in [app/ARCHITECTURE.md](app/ARCHITECTURE.md).
