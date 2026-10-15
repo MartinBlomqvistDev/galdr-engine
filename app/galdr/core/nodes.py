@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
@@ -20,6 +20,10 @@ from galdr.core.state import Ability, GameState
 # ---------------------------------------------------------------------------
 # Conditions — determine if a transition or action is available
 # ---------------------------------------------------------------------------
+
+ConditionType = Literal[
+    "flag", "stat", "item", "visited", "turn", "lo_trust", "pressure", "always",
+]
 
 class Condition(BaseModel):
     """A condition evaluated against GameState before exposing an action.
@@ -33,8 +37,11 @@ class Condition(BaseModel):
     - lo_trust:  check Lo companion trust  {"type": "lo_trust", "min": 2}
     - pressure:  check current pressure    {"type": "pressure", "max": 6}
     - always:    unconditionally true
+
+    An unknown type fails validation, so a typo in a scenario file raises
+    at load time instead of silently making the action available.
     """
-    type: str
+    type: ConditionType
     key: str = ""
     value: Any = True
     ability: str = ""
@@ -80,12 +87,18 @@ class Condition(BaseModel):
             case "always":
                 return True
             case _:
-                return True
+                raise ValueError(f"Unhandled condition type: {self.type!r}")
 
 
 # ---------------------------------------------------------------------------
 # Consequences — atomic state mutations triggered by actions
 # ---------------------------------------------------------------------------
+
+ConsequenceType = Literal[
+    "set_flag", "add_item", "remove_item", "modify_hp", "modify_pressure",
+    "modify_lo_trust", "set_weather", "set_time", "visit_location",
+    "crystallize_stats",
+]
 
 class Consequence(BaseModel):
     """A state mutation applied after an action succeeds or fails.
@@ -100,8 +113,12 @@ class Consequence(BaseModel):
     - set_weather:       update world weather string
     - set_time:          update time_of_day string
     - visit_location:    mark a location as visited
+    - crystallize_stats: fix ability scores from accumulated stat weights
+
+    An unknown type fails validation, so a typo in a scenario file raises
+    at load time instead of silently doing nothing.
     """
-    type: str
+    type: ConsequenceType
     key: str = ""
     value: Any = None
     amount: int = 0
@@ -155,7 +172,7 @@ class Consequence(BaseModel):
                 state.character.crystallize_stats()
                 return "Stats crystallized from prologue actions"
             case _:
-                return ""
+                raise ValueError(f"Unhandled consequence type: {self.type!r}")
 
 
 # ---------------------------------------------------------------------------

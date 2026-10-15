@@ -1,6 +1,10 @@
 """Tests for the narrative node system."""
 
 import json
+from pathlib import Path
+
+import pytest
+from pydantic import ValidationError
 
 from galdr.core.nodes import (
     Condition,
@@ -151,3 +155,51 @@ def test_scenario_load_save(tmp_path):
     assert loaded.title == "Test Scenario"
     assert "start" in loaded.nodes
     assert loaded.nodes["start"].opening_text == "Välkommen!"
+
+
+def _scenario_with_action(action: dict) -> dict:
+    return {
+        "id": "bad",
+        "title": "Bad",
+        "description": "Scenario with one action",
+        "nodes": {
+            "start": {
+                "id": "start",
+                "title": "Start",
+                "description": "Start node",
+                "actions": [action],
+            },
+        },
+    }
+
+
+def test_unknown_condition_type_raises_on_load(tmp_path):
+    data = _scenario_with_action({
+        "id": "open",
+        "label": "Open",
+        "conditions": [{"type": "flgg", "key": "met_elder"}],
+    })
+    path = tmp_path / "bad_condition.json"
+    path.write_text(json.dumps(data), encoding="utf-8")
+
+    with pytest.raises(ValidationError, match="flgg"):
+        Scenario.load_from_file(path)
+
+
+def test_unknown_consequence_type_raises_on_load(tmp_path):
+    data = _scenario_with_action({
+        "id": "open",
+        "label": "Open",
+        "consequences": [{"type": "set_flagg", "key": "door_open", "value": True}],
+    })
+    path = tmp_path / "bad_consequence.json"
+    path.write_text(json.dumps(data), encoding="utf-8")
+
+    with pytest.raises(ValidationError, match="set_flagg"):
+        Scenario.load_from_file(path)
+
+
+def test_calloused_prologue_loads():
+    path = Path(__file__).resolve().parents[1] / "scenarios" / "calloused_prologue.json"
+    scenario = Scenario.load_from_file(path)
+    assert scenario.start_node in scenario.nodes
