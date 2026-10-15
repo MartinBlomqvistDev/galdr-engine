@@ -12,6 +12,7 @@ Checks that:
 from __future__ import annotations
 
 import re
+from pathlib import Path
 
 import pytest
 
@@ -20,7 +21,7 @@ from galdr.core.prompt_director import build_system_prompt
 from galdr.core.state import GameState, NarrativeFlags
 
 
-SCENARIO_PATH = "app/scenarios/calloused_prologue.json"
+SCENARIO_PATH = Path(__file__).parent.parent / "scenarios" / "calloused_prologue.json"
 
 _EM_DASH = re.compile(r'[—–]')
 _UNICODE_ARROW = re.compile(r'[→←]')
@@ -149,7 +150,9 @@ def test_no_unicode_arrows_in_output():
 
 def test_global_identity_is_first():
     prompt = get_prompt()
-    assert prompt.startswith("You are the narrator of Calloused")
+    # The language rule leads Layer 1; identity follows before any scenario layer.
+    identity = prompt.index("You are the narrator of Calloused")
+    assert identity < prompt.index("## Scenario")
 
 def test_rules_section_present():
     prompt = get_prompt()
@@ -157,4 +160,7 @@ def test_rules_section_present():
 
 def test_english_rule_present():
     prompt = get_prompt()
-    assert "Reply in English" in prompt
+    # English-only sits at the very top: the end of the prompt was not enough
+    # for dense contexts.
+    assert prompt.startswith("LANGUAGE: English only")
+    assert "ENGLISH ONLY" in prompt

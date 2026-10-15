@@ -8,11 +8,13 @@ def mock_scenario():
     return Scenario(
         id="test",
         title="Test Scenario",
+        description="Two-node scenario for the orchestration loop",
         start_node="start",
         nodes={
             "start": NarrativeNode(
                 id="start",
                 title="Start Node",
+                description="Start node",
                 system_prompt="Start prompt",
                 actions=[
                     NodeAction(id="go", label="Go", target_node="end")
@@ -21,6 +23,7 @@ def mock_scenario():
             "end": NarrativeNode(
                 id="end",
                 title="End Node",
+                description="End node",
                 system_prompt="End prompt"
             )
         }
@@ -30,7 +33,6 @@ def mock_scenario():
 async def test_engine_orchestration_loop(mock_scenario):
     # Setup
     ai = MockAIService()
-    ai.next_response = "You walk through the door."
     engine = GaldrEngine(mock_scenario, ai, ai)
     
     session = engine.create_session("Tester")
@@ -41,7 +43,8 @@ async def test_engine_orchestration_loop(mock_scenario):
     assert "llm_gen" in response.step_latencies
     
     # 2. Test input processing
-    response = await engine.process_input(session.session_id, "Gå")
+    ai.next_response = "You walk through the door."
+    response = await engine.process_input(session.session_id, "go")
     
     # Verify the 8-step loop results
     assert response.text == "You walk through the door."

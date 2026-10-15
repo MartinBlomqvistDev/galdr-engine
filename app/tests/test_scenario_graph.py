@@ -84,15 +84,21 @@ def test_auto_next_targets_exist():
 
 
 def test_no_unconditioned_self_loop():
-    """Self-loops are only valid when the action has conditions (flag-gated, disappears after use)."""
+    """A self-loop that mutates state must be gated by conditions.
+
+    An ungated self-loop with consequences can be repeated to farm state
+    (items, trust, pressure). A linger action with no consequences changes
+    nothing and is allowed.
+    """
     data = load()
     errors = []
     for node_key, node in data["nodes"].items():
         for action in node.get("actions", []):
             if action.get("target_node") == node_key:
-                if not action.get("conditions"):
+                if action.get("consequences") and not action.get("conditions"):
                     errors.append(
-                        f"Node '{node_key}' action '{action['id']}' loops to itself with no condition"
+                        f"Node '{node_key}' action '{action['id']}' loops to itself "
+                        "with consequences and no condition"
                     )
     assert not errors, "\n".join(errors)
 

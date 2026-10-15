@@ -97,8 +97,12 @@ def walk_paths(data: dict, start: str, end_nodes: set[str], max_depth: int = 30)
         for action in actions:
             # Success path
             success_target = action.get("target_node")
+            p_delta = get_action_pressure(action, success=True)
+            # A pressure-neutral self-loop (linger action) leaves the tracked
+            # state unchanged, so following it only multiplies identical paths.
+            if success_target == node_id and p_delta == 0:
+                success_target = None
             if success_target:
-                p_delta = get_action_pressure(action, success=True)
                 queue.append(Path_(
                     nodes=current.nodes + [success_target],
                     pressure=pressure + p_delta,
