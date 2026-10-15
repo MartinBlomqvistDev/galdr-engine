@@ -104,7 +104,7 @@ app/
 │   └── calloused_prologue.json    # 19-node prologue (CALLOUSED exam PoC)
 ├── voice_play.py                  # Voice-only loop (CALLOUSED PoC entry point)
 ├── parse_benchmark.py             # Latency + word count analysis from log files
-└── tests/                         # 182 tests across 12 modules
+└── tests/                         # 189 tests across 12 modules
 ```
 
 ---
