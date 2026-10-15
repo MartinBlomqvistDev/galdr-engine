@@ -6,12 +6,13 @@ through here. Nothing is mutated directly in raw dicts.
 
 from __future__ import annotations
 
+import random
 import uuid
 from datetime import datetime
 from enum import Enum
 from typing import Any
 
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict, PrivateAttr
 
 
 # ---------------------------------------------------------------------------
@@ -170,6 +171,25 @@ class GameState(BaseModel):
     player_lon: float | None = None
 
     turn_count: int = 0
+
+    # Dice seed. None means an unseeded RNG (fresh entropy each session).
+    rng_seed: int | None = None
+    _rng: random.Random | None = PrivateAttr(default=None)
+
+    @property
+    def rng(self) -> random.Random:
+        """The session's dice RNG, created from ``rng_seed`` on first use.
+
+        The RNG itself is not serialised. A session reloaded from JSON
+        restarts the sequence from ``rng_seed``, so a seeded session is
+        reproducible by replaying it from the start.
+
+        Returns:
+            The ``random.Random`` instance all rolls for this session use.
+        """
+        if self._rng is None:
+            self._rng = random.Random(self.rng_seed)
+        return self._rng
 
     def record_dialog(self, speaker: str, text: str, node_id: str = "", emotion: str = "neutral"):
         self.dialog_history.append(

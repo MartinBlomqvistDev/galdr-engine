@@ -3,6 +3,8 @@
 from galdr.core.dice import (
     DiceType,
     DifficultyClass,
+    contested_check,
+    damage_roll,
     roll_dice,
     skill_check,
 )
@@ -69,3 +71,34 @@ def test_difficulty_class_values():
     assert DifficultyClass.EASY == 10
     assert DifficultyClass.MEDIUM == 15
     assert DifficultyClass.HARD == 20
+
+
+def _roll_sequence(seed: int | None) -> list[int]:
+    state = GameState(rng_seed=seed)
+    totals = [skill_check(state, Ability.WISDOM, dc=12).roll.rolls[0] for _ in range(20)]
+    contest = contested_check(state, Ability.STRENGTH, opponent_modifier=2)
+    totals += [contest["player_roll"].rolls[0], contest["opponent_roll"].rolls[0]]
+    totals += damage_roll(DiceType.D6, count=4, rng=state.rng).rolls
+    return totals
+
+
+def test_same_seed_same_sequence():
+    assert _roll_sequence(42) == _roll_sequence(42)
+
+
+def test_different_seeds_differ():
+    assert _roll_sequence(42) != _roll_sequence(43)
+
+
+def test_seed_survives_serialisation():
+    state = GameState(rng_seed=7)
+    restored = GameState.model_validate_json(state.model_dump_json())
+    assert restored.rng_seed == 7
+    assert restored.rng.random() == GameState(rng_seed=7).rng.random()
+
+
+def test_roll_dice_uses_given_rng():
+    import random
+    a = roll_dice(DiceType.D20, count=5, rng=random.Random(1))
+    b = roll_dice(DiceType.D20, count=5, rng=random.Random(1))
+    assert a.rolls == b.rolls

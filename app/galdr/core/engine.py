@@ -74,8 +74,10 @@ class GaldrEngine:
 
     # ----- Session management -----
 
-    def create_session(self, character_name: str = "Traveler") -> GameState:
-        state = GameState()
+    def create_session(
+        self, character_name: str = "Traveler", rng_seed: int | None = None
+    ) -> GameState:
+        state = GameState(rng_seed=rng_seed)
         state.character.name = character_name
         state.current_node_id = self.scenario.start_node
         self.sessions[state.session_id] = state

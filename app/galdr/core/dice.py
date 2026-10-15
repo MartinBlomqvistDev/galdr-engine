@@ -1,7 +1,10 @@
 """D&D 5e mechanics: dice rolls, skill checks, DC resolution.
 
-Rolls happen server-side so sessions are fully reproducible — we can log
-and replay exactly what happened, which matters for debugging and auditing.
+Rolls happen server-side through a ``random.Random`` instance. Session-level
+checks use ``GameState.rng``, which is seeded from ``GameState.rng_seed``: the
+same seed and the same sequence of checks give the same rolls, so a session
+can be replayed for debugging and auditing. With no seed the RNG draws fresh
+entropy and rolls are not reproducible.
 """
 
 from __future__ import annotations
@@ -69,10 +72,30 @@ class SkillCheckResult(BaseModel):
     narrative_quality: str = "neutral"  # spectacular | solid | narrow | failure | disaster
 
 
-def roll_dice(dice_type: DiceType = DiceType.D20, count: int = 1, modifier: int = 0) -> DiceRoll:
-    """Roll dice server-side for consistency."""
+# Fallback for rolls made without a session RNG. Unseeded.
+_default_rng = random.Random()
+
+
+def roll_dice(
+    dice_type: DiceType = DiceType.D20,
+    count: int = 1,
+    modifier: int = 0,
+    rng: random.Random | None = None,
+) -> DiceRoll:
+    """Roll dice server-side for consistency.
+
+    Args:
+        dice_type: Which die to roll.
+        count: Number of dice.
+        modifier: Flat bonus added to the sum.
+        rng: RNG to draw from. Defaults to an unseeded module-level RNG.
+
+    Returns:
+        The individual rolls, total and natural 20/1 flags.
+    """
+    rng = rng or _default_rng
     sides = DICE_SIDES[dice_type]
-    rolls = [random.randint(1, sides) for _ in range(count)]
+    rolls = [rng.randint(1, sides) for _ in range(count)]
     total = sum(rolls) + modifier
 
     return DiceRoll(
@@ -101,7 +124,7 @@ def skill_check(state: GameState, ability: Ability, dc: int) -> SkillCheckResult
     - disaster:    nat 1 OR 10+ below DC
     """
     mod = state.character.stats.modifier(ability)
-    die = roll_dice(DiceType.D20, modifier=mod)
+    die = roll_dice(DiceType.D20, modifier=mod, rng=state.rng)
     margin = die.total - dc
 
     if die.natural_20:
@@ -133,9 +156,14 @@ def skill_check(state: GameState, ability: Ability, dc: int) -> SkillCheckResult
     )
 
 
-def damage_roll(dice_type: DiceType, count: int = 1, modifier: int = 0) -> DiceRoll:
-    """Damage roll for combat."""
-    return roll_dice(dice_type, count, modifier)
+def damage_roll(
+    dice_type: DiceType,
+    count: int = 1,
+    modifier: int = 0,
+    rng: random.Random | None = None,
+) -> DiceRoll:
+    """Damage roll for combat. Pass ``state.rng`` for a reproducible session."""
+    return roll_dice(dice_type, count, modifier, rng=rng)
 
 
 def contested_check(
@@ -144,8 +172,12 @@ def contested_check(
     opponent_modifier: int,
 ) -> dict[str, Any]:
     """Player roll vs NPC roll — both sides use the same dice function."""
-    player_roll = roll_dice(DiceType.D20, modifier=state.character.stats.modifier(player_ability))
-    opponent_roll = roll_dice(DiceType.D20, modifier=opponent_modifier)
+    player_roll = roll_dice(
+        DiceType.D20,
+        modifier=state.character.stats.modifier(player_ability),
+        rng=state.rng,
+    )
+    opponent_roll = roll_dice(DiceType.D20, modifier=opponent_modifier, rng=state.rng)
 
     return {
         "player_roll": player_roll,
