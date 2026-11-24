@@ -183,6 +183,6 @@ GPS-triggered scenarios, multi-character casts and outdoor performance are plann
 
 ## Latency profile
 
-This single-run table is superseded. The current profile is in the root [README](../README.md#latency-profile-n46-across-benchmarks-02-09-azure-gpt-4o--azure-ai-speech): input to first audio is about 2.7s at p50 over n=46, of which 672ms is pipeline steps 1-4, almost all of it the intent-matching LLM call.
+This single-run table is superseded. The current profile is in the root [README](../README.md#latency-profile-n44-generated-turns-benchmarks-03-09-azure-gpt-4o--azure-ai-speech): input to first audio is about 2.9s at p50 over n=44 generated turns, of which 669ms is pipeline steps 1-4, almost all of it the intent-matching LLM call.
 
 Full design reasoning in [ARCHITECTURE.md](ARCHITECTURE.md).

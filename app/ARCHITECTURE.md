@@ -1,4 +1,4 @@
-# GALDR — Architecture Notes
+# GALDR: Architecture Notes
 
 Design decisions, tradeoffs, and the reasoning behind them. Meant to be read alongside the code.
 
@@ -8,8 +8,8 @@ Design decisions, tradeoffs, and the reasoning behind them. Meant to be read alo
 
 Generative AI in interactive fiction has two failure modes:
 
-1. **Too free** — chatbot mode. The AI wanders off-story, contradicts itself, breaks immersion the moment a player asks something unexpected.
-2. **Too rigid** — choose-your-own-adventure mode. The author scripts every line. Works at small scale, collapses when players improvise.
+1. **Too free**: chatbot mode. The AI wanders off-story, contradicts itself, breaks immersion the moment a player asks something unexpected.
+2. **Too rigid**: choose-your-own-adventure mode. The author scripts every line. Works at small scale, collapses when players improvise.
 
 GALDR's answer is a strict separation of concerns: the dramatist controls *structure*, the AI controls *language*. Neither touches the other's domain.
 
@@ -17,7 +17,7 @@ GALDR's answer is a strict separation of concerns: the dramatist controls *struc
 
 ## Technical Design Patterns & Observability
 
-GALDR employs several key architectural patterns to keep the pre-LLM pipeline lean and testable. Measured overhead for steps 1-4 is ~180ms; the dominant latency is Azure OpenAI first-token (~1.6s), which the sentence-level streaming pipeline partially overlaps with TTS synthesis.
+GALDR employs several key architectural patterns to keep the pipeline before narration lean and testable. Steps 1-4 take 669ms at p50, almost all of it the intent-matching LLM call; the dominant latency is Azure OpenAI first-token (1842ms at p50), which the sentence-level streaming pipeline partially overlaps with TTS synthesis. The full latency profile is in the root README.
 
 ### 1. Inversion of Control (IoC) & Dependency Injection
 The `GaldrEngine` does not depend on concrete implementations of AI services (OpenAI, local models, etc.). Instead, it depends on **Protocols** (`LLMService`, `TTSService`).
@@ -55,7 +55,7 @@ Every step of the 8-step orchestration loop is measured using high-precision tim
 
 **Why intent matching before skill checks?** Intent matching tells us *which action* the player is attempting. The action definition carries the skill check type and DC. You can't resolve the mechanics before knowing what's being attempted.
 
-**Why skill checks before the LLM?** The dice result is semantic input to the prompt — the AI narrates an outcome, not a process. "You rolled a 17 against DC 15, with a 3-point margin" becomes "you barely managed it, describe the near-failure". If we generated first and checked dice after, the AI would have to be retroactively edited.
+**Why skill checks before the LLM?** The dice result is semantic input to the prompt: the AI narrates an outcome, not a process. "You rolled a 17 against DC 15, with a 3-point margin" becomes "you barely managed it, describe the near-failure". If we generated first and checked dice after, the AI would have to be retroactively edited.
 
 **Why state mutation before prompt construction?** The prompt includes inventory, HP, flags, and world state. It needs to reflect the *post-action* state, not the state from before the player acted.
 
@@ -65,7 +65,7 @@ Every step of the 8-step orchestration loop is measured using high-precision tim
 
 ## State-first design
 
-`GameState` is a Pydantic model. Everything that changes the world — consequences, node transitions, inventory — goes through methods on `GameState` or `NarrativeFlags`. There's no direct dict manipulation.
+`GameState` is a Pydantic model. Everything that changes the world (consequences, node transitions, inventory) goes through methods on `GameState` or `NarrativeFlags`. There's no direct dict manipulation.
 
 This matters because:
 
@@ -90,9 +90,9 @@ The two-tier approach means the engine is always playable. Losing API connectivi
 
 ## Skill checks and narrative quality
 
-`dice.py` implements D&D 5e-style resolution: d20 + ability modifier vs difficulty class. Results map to five narrative tiers: *spectacular*, *solid*, *narrow*, *failure*, *disaster*. These tiers go into the prompt — the AI doesn't receive raw numbers, it receives directorial language.
+`dice.py` implements D&D 5e-style resolution: d20 + ability modifier vs difficulty class. Results map to five narrative tiers: *spectacular*, *solid*, *narrow*, *failure*, *disaster*. These tiers go into the prompt as directorial language, together with the roll's total and the DC.
 
-Natural 20 and natural 1 are treated as special cases regardless of modifiers. A natural 20 from a character with -3 charisma still produces a spectacular outcome — the dice gods intervened. This is a deliberate theatrical choice, not a simulation fidelity choice.
+Natural 20 and natural 1 are treated as special cases regardless of modifiers. A natural 20 from a character with -3 charisma still produces a spectacular outcome: the dice gods intervened. This is a deliberate theatrical choice, not a simulation fidelity choice.
 
 ---
 
@@ -100,9 +100,9 @@ Natural 20 and natural 1 are treated as special cases regardless of modifiers. A
 
 Two layers:
 
-**Layer 1 — Prompt-level (pre-generation).** The system prompt includes forbidden topics per node. This shapes generation before it starts and is cheap.
+**Layer 1: prompt-level (pre-generation).** The system prompt includes forbidden topics per node. This shapes generation before it starts and is cheap.
 
-**Layer 2 — Filter-level (post-generation).** `ContentFilter` runs regex patterns against the generated text. Global hard blocks (self-harm, sexual violence against minors) apply everywhere. Per-node topics apply only in the relevant scene — "religion" might be forbidden in a secular urban narrative but fine in a medieval fantasy.
+**Layer 2: filter-level (post-generation).** `ContentFilter` runs regex patterns against the generated text. Global hard blocks (self-harm, sexual violence against minors) apply on the non-streaming path; the streaming path does not run the filter yet. Per-node topics apply only in the relevant scene: "religion" might be forbidden in a secular urban narrative but fine in a medieval fantasy.
 
 The split exists because prompt instructions are probabilistic (the LLM can ignore them) while regex is deterministic. Hard safety requirements need the deterministic layer.
 
@@ -112,7 +112,7 @@ The split exists because prompt instructions are probabilistic (the LLM can igno
 
 `VoiceParams` on each node defines pitch shift, tempo, emotion, and reverb level. These are passed to TTS at generation time. These drive SSML parameters (emotion style, rate) for Azure Neural TTS and output format/voice selection for ElevenLabs. Reverb is applied as post-processing via scipy fftconvolve on the raw PCM.
 
-`geofence.py` calculates Haversine distance to each node's GPS anchor. Proximity feeds two things: a narrative context string injected into the prompt ("the player is 12m away, approaching — build tension"), and the reverb parameter passed to TTS. Linear reverb falloff was chosen over exponential because outdoor performance is unpredictable and linear is easier to tune during field testing.
+`geofence.py` calculates Haversine distance to each node's GPS anchor. The location layer is planned: proximity is meant to feed a narrative context string injected into the prompt ("the player is 12m away and approaching; build tension") and the reverb parameter passed to TTS, but no position triggers a node yet, and the voice runner does not send one. Linear reverb falloff was chosen over exponential because outdoor performance is unpredictable and linear is easier to tune during field testing.
 
 ---
 

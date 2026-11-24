@@ -178,44 +178,54 @@ GPS-triggered scenarios, multi-character casts and outdoor performance are plann
 
 ---
 
-## Latency profile (n=46 across benchmarks 02-09, Azure gpt-4o + Azure AI Speech)
+## Latency profile (n=44 generated turns, benchmarks 03-09, Azure gpt-4o + Azure AI Speech)
 
 Three instruments measure three disjoint, sequential segments. `pre_latency` covers
 pipeline steps 1-4, `first_token_ms` covers the narration LLM round trip, and `[STREAM TTFA]`
-starts when `narrate_stream()` begins, which is *after* the pipeline has returned. Because
+starts when `narrate_stream()` begins, which is *after* the pipeline has returned. The first
+`[TTS]` line after `[STREAM TTFA]` is the synthesis of the turn's first sentence. Because
 the segments do not overlap, the honest end-to-end figure is their sum. The clock starts
 when the transcript is ready; the time from end of speech to transcript is not logged.
-The logs for benchmarks 02-09 are in `app/`. The player's own lines in them are redacted;
-every timing line is unchanged.
+
+Every row is computed over the same 44 generated turns, pairing each turn's segments;
+percentiles use linear interpolation, as in `parse_benchmark.py`. Benchmark 02 is left out:
+it synthesised and played each sentence in one blocking call, so its TTS figures include
+playback. The logs for benchmarks 02-09 are in `app/`. The player's own lines in them are
+redacted; every timing line is unchanged.
 
 | Segment | mean | p50 | p95 |
 |---------|------|-----|-----|
-| Pipeline steps 1-4 (intent-matching LLM call, then dice, state, transition) | 712ms | 672ms | 907ms |
-| `[STREAM TTFA]` (LLM call -> first sentence) | 1902ms | 1844ms | 3286ms |
-| Azure OpenAI first token (inside the above) | 1900ms | 1834ms | 3071ms |
-| Azure TTS warm synthesis, sentence 1 | ~250ms | ~196ms | ~450ms |
-| **Input -> first audio (sum, paired n=46)** | **2811ms** | **2726ms** | **4173ms** |
+| Pipeline steps 1-4 (intent-matching LLM call, then dice, state, transition) | 713ms | 669ms | 906ms |
+| `[STREAM TTFA]` (LLM call -> first sentence) | 1936ms | 1848ms | 3255ms |
+| Azure OpenAI first token (inside the above) | 1933ms | 1842ms | 3254ms |
+| Azure TTS synthesis, first sentence of the turn | 342ms | 326ms | 611ms |
+| **Input -> first audio (sum, paired n=44)** | **2991ms** | **2914ms** | **4401ms** |
 
-Time to first audio is therefore about **2.7s at p50**, against an original 500ms design
+Time to first audio is therefore about **2.9s at p50**, against an original 500ms design
 target that a cloud LLM pipeline does not reach. Per-observation median shares: narration
-LLM 67%, steps 1-4 26%, TTS 7%.
+LLM 63%, steps 1-4 24%, TTS 11%.
 
-The LLM round trip is the bottleneck and is measured directly: `first_token_ms` p50 1834ms
-over n=46 (min 815ms, max 4401ms). It accounts for essentially all of `[STREAM TTFA]`; the
-sentence splitter adds under 10ms. Steps 1-4 contribute 672ms at p50, and that time is a
+The LLM round trip is the bottleneck and is measured directly: `first_token_ms` p50 1842ms
+over n=44 (min 815ms, max 4401ms). It accounts for essentially all of `[STREAM TTFA]`; the
+sentence splitter adds under 10ms. Steps 1-4 contribute 669ms at p50, and that time is a
 second cloud call: intent matching sends the player's words to gpt-4o, which picks one of
 the node's authored actions. Dice, state mutation and the node transition take about 1ms.
 Each generated turn is therefore two LLM calls in sequence. An earlier local-inference
-estimate (roughly 950-1050ms) assumed the 672ms would remain; since that time is itself an
-LLM call it would move local too, and a local figure has not been measured. TTS cold start (5270ms on the
-first synthesis) is not structural; a `warmup()` at session start opens the Azure synthesiser
-WebSocket and eliminates it.
+estimate (roughly 950-1050ms) assumed the steps 1-4 time would remain; since that time is
+itself an LLM call it would move local too, and a local figure has not been measured. TTS
+cold start (5270ms on the first synthesis) is not structural; a `warmup()` at session start
+opens the Azure synthesiser WebSocket and eliminates it.
 
-A note on an earlier error, kept because the correction is the useful part. Previous
-revisions reported input-to-first-audio as ~2040ms with the LLM at 62% (~1264ms). That 1264
-was never measured: it is 1844 minus an assumed 580ms pipeline, on the assumption that
-`[STREAM TTFA]` starts at player input. It does not. `t0` is set inside `narrate_stream()`,
-by which point steps 1-4 have already run, so subtracting the pipeline removed 672ms that
-belongs in the total. The figures above sum the three measured segments instead.
+Two earlier errors, kept because the corrections are the useful part:
+
+- Earlier revisions reported input-to-first-audio as ~2040ms with the LLM at 62% (~1264ms).
+  That 1264 was never measured: it is 1844 minus an assumed 580ms pipeline, on the
+  assumption that `[STREAM TTFA]` starts at player input. It does not. `t0` is set inside
+  `narrate_stream()`, by which point steps 1-4 have already run, so subtracting the pipeline
+  removed time that belongs in the total.
+- The next revision reported 2.7s at p50 over n=46. It added 196ms to every turn, the median
+  of all warm syntheses in the logs, instead of the measured synthesis of each turn's first
+  sentence, which is slower (p50 326ms), and it used a different percentile method. The table
+  above uses the measured first synthesis of every turn.
 
 Full design reasoning in [app/ARCHITECTURE.md](app/ARCHITECTURE.md).
