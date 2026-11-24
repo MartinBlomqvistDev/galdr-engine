@@ -18,7 +18,7 @@
 [Listening � node: crater_investigation]
 2026-05-20 15:32:00,761 [INFO] galdr.services.azure_service: [TTS\u2192speaker] voice=en-GB-SoniaNeural chars=15 latency_ms=2166
 2026-05-20 15:32:06,516 [INFO] galdr.services.azure_service: [STT\u2190mic] chars=42 latency_ms=5755
-2026-05-20 15:32:06,516 [INFO] __main__: [USER INPUT]: I scream at the ground. What is happening?
+2026-05-20 15:32:06,516 [INFO] __main__: [USER INPUT]: <redacted>
 2026-05-20 15:32:07,712 [INFO] httpx: HTTP Request: POST https://swedencentral.api.cognitive.microsoft.com/openai/deployments/gpt-4o/chat/completions?api-version=2025-01-01-preview "HTTP/1.1 200 OK"
 2026-05-20 15:32:07,717 [INFO] galdr.services.azure_service: [LLM CALL] tokens_in=141 tokens_out=4 latency_ms=1200
 2026-05-20 15:32:07,717 [INFO] galdr.core.engine: [STREAM] steps 1-4 done in 1200ms � LLM stream is lazy
@@ -51,16 +51,16 @@
 [AUTO] facility_scan -> the_dark in 2s
 2026-05-20 15:33:22,043 [INFO] galdr.services.azure_service: [TTS\u2192speaker] voice=en-GB-SoniaNeural chars=60 latency_ms=6376
 2026-05-20 15:33:27,418 [INFO] galdr.services.azure_service: [STT\u2190mic] chars=28 latency_ms=5374
-2026-05-20 15:33:27,418 [INFO] galdr.core.calibration: [CALIBRATION] Q: OPERATOR DESIGNATION. State sector. Stat... | A: I don't know, I fixed links.
+2026-05-20 15:33:27,418 [INFO] galdr.core.calibration: [CALIBRATION] Q: OPERATOR DESIGNATION. State sector. Stat... | A: <redacted>
 2026-05-20 15:33:35,320 [INFO] galdr.services.azure_service: [TTS\u2192speaker] voice=en-GB-SoniaNeural chars=70 latency_ms=7902
 2026-05-20 15:33:43,355 [INFO] galdr.services.azure_service: [STT\u2190mic] chars=27 latency_ms=8035
-2026-05-20 15:33:43,356 [INFO] galdr.core.calibration: [CALIBRATION] Q: LOAD CAPACITY. State maximum recorded ou... | A: I can carry **** out a ton.
+2026-05-20 15:33:43,356 [INFO] galdr.core.calibration: [CALIBRATION] Q: LOAD CAPACITY. State maximum recorded ou... | A: <redacted>
 2026-05-20 15:33:49,574 [INFO] galdr.services.azure_service: [TTS\u2192speaker] voice=en-GB-SoniaNeural chars=62 latency_ms=6218
 2026-05-20 15:33:55,132 [INFO] galdr.services.azure_service: [STT\u2190mic] chars=14 latency_ms=5558
-2026-05-20 15:33:55,132 [INFO] galdr.core.calibration: [CALIBRATION] Q: COMMAND INDEX. State number of personnel... | A: Uh, 1,000,002.
+2026-05-20 15:33:55,132 [INFO] galdr.core.calibration: [CALIBRATION] Q: COMMAND INDEX. State number of personnel... | A: <redacted>
 2026-05-20 15:34:04,760 [INFO] galdr.services.azure_service: [TTS\u2192speaker] voice=en-GB-SoniaNeural chars=121 latency_ms=9629
 2026-05-20 15:34:10,518 [INFO] galdr.services.azure_service: [STT\u2190mic] chars=51 latency_ms=5757
-2026-05-20 15:34:10,518 [INFO] galdr.core.calibration: [CALIBRATION] Q: UNAUTHORIZED MEMORY. Declare any knowled... | A: I don't even know what this is, this, uh, facility.
+2026-05-20 15:34:10,518 [INFO] galdr.core.calibration: [CALIBRATION] Q: UNAUTHORIZED MEMORY. Declare any knowled... | A: <redacted>
 2026-05-20 15:34:11,678 [INFO] httpx: HTTP Request: POST https://swedencentral.api.cognitive.microsoft.com/openai/deployments/gpt-4o/chat/completions?api-version=2025-01-01-preview "HTTP/1.1 200 OK"
 2026-05-20 15:34:11,679 [INFO] galdr.services.azure_service: [LLM CALL] tokens_in=335 tokens_out=41 latency_ms=1161
 2026-05-20 15:34:11,679 [INFO] galdr.core.calibration: [CALIBRATION] Final stats: {'strength': 15, 'dexterity': 10, 'constitution': 14, 'intelligence': 8, 'wisdom': 12, 'charisma': 13}
@@ -83,7 +83,7 @@
 [Listening � node: the_dark]
 2026-05-20 15:34:55,501 [INFO] galdr.services.azure_service: [TTS\u2192speaker] voice=en-GB-SoniaNeural chars=15 latency_ms=1854
 2026-05-20 15:35:01,940 [INFO] galdr.services.azure_service: [STT\u2190mic] chars=37 latency_ms=6438
-2026-05-20 15:35:01,940 [INFO] __main__: [USER INPUT]: I listen intently, uh, for the sound.
+2026-05-20 15:35:01,940 [INFO] __main__: [USER INPUT]: <redacted>
 2026-05-20 15:35:02,775 [INFO] httpx: HTTP Request: POST https://swedencentral.api.cognitive.microsoft.com/openai/deployments/gpt-4o/chat/completions?api-version=2025-01-01-preview "HTTP/1.1 200 OK"
 2026-05-20 15:35:02,776 [INFO] galdr.services.azure_service: [LLM CALL] tokens_in=250 tokens_out=4 latency_ms=836
 2026-05-20 15:35:02,776 [INFO] galdr.core.engine: [STREAM] steps 1-4 done in 836ms � LLM stream is lazy
@@ -104,7 +104,7 @@
 [Listening � node: cryo_room]
 2026-05-20 15:35:40,754 [INFO] galdr.services.azure_service: [TTS\u2192speaker] voice=en-GB-SoniaNeural chars=15 latency_ms=1858
 2026-05-20 15:35:47,297 [INFO] galdr.services.azure_service: [STT\u2190mic] chars=35 latency_ms=6543
-2026-05-20 15:35:47,297 [INFO] __main__: [USER INPUT]: I asked Kiki with my enormous heel.
+2026-05-20 15:35:47,297 [INFO] __main__: [USER INPUT]: <redacted>
 2026-05-20 15:35:47,972 [INFO] httpx: HTTP Request: POST https://swedencentral.api.cognitive.microsoft.com/openai/deployments/gpt-4o/chat/completions?api-version=2025-01-01-preview "HTTP/1.1 200 OK"
 2026-05-20 15:35:47,973 [INFO] galdr.services.azure_service: [LLM CALL] tokens_in=228 tokens_out=2 latency_ms=676
 2026-05-20 15:35:47,973 [INFO] galdr.core.engine: [STREAM] steps 1-4 done in 676ms � LLM stream is lazy
@@ -123,7 +123,7 @@
 [Listening � node: pod_close_look]
 2026-05-20 15:36:21,247 [INFO] galdr.services.azure_service: [TTS\u2192speaker] voice=en-GB-SoniaNeural chars=15 latency_ms=1826
 2026-05-20 15:36:28,110 [INFO] galdr.services.azure_service: [STT\u2190mic] chars=63 latency_ms=6863
-2026-05-20 15:36:28,110 [INFO] __main__: [USER INPUT]: I launched my fell myself forward, hitting it with my forehead.
+2026-05-20 15:36:28,110 [INFO] __main__: [USER INPUT]: <redacted>
 2026-05-20 15:36:28,687 [INFO] httpx: HTTP Request: POST https://swedencentral.api.cognitive.microsoft.com/openai/deployments/gpt-4o/chat/completions?api-version=2025-01-01-preview "HTTP/1.1 200 OK"
 2026-05-20 15:36:28,688 [INFO] galdr.services.azure_service: [LLM CALL] tokens_in=117 tokens_out=2 latency_ms=578
 2026-05-20 15:36:28,688 [INFO] galdr.core.engine: [STREAM] steps 1-4 done in 577ms � LLM stream is lazy
@@ -146,7 +146,7 @@
 2026-05-20 15:37:14,233 [INFO] __main__: [LISTEN] no input detected � re-prompting
 2026-05-20 15:37:16,372 [INFO] galdr.services.azure_service: [TTS\u2192speaker] voice=en-GB-SoniaNeural chars=15 latency_ms=2138
 2026-05-20 15:37:24,758 [INFO] galdr.services.azure_service: [STT\u2190mic] chars=46 latency_ms=8387
-2026-05-20 15:37:24,758 [INFO] __main__: [USER INPUT]: I go back and I smash the lit the little ****.
+2026-05-20 15:37:24,758 [INFO] __main__: [USER INPUT]: <redacted>
 2026-05-20 15:37:25,458 [INFO] httpx: HTTP Request: POST https://swedencentral.api.cognitive.microsoft.com/openai/deployments/gpt-4o/chat/completions?api-version=2025-01-01-preview "HTTP/1.1 200 OK"
 2026-05-20 15:37:25,459 [INFO] galdr.services.azure_service: [LLM CALL] tokens_in=211 tokens_out=6 latency_ms=700
 2026-05-20 15:37:25,459 [INFO] galdr.core.engine: [STREAM] steps 1-4 done in 700ms � LLM stream is lazy
@@ -170,7 +170,7 @@
 2026-05-20 15:38:05,904 [INFO] __main__: [LISTEN] no input detected � re-prompting
 2026-05-20 15:38:08,063 [INFO] galdr.services.azure_service: [TTS\u2192speaker] voice=en-GB-SoniaNeural chars=15 latency_ms=2158
 2026-05-20 15:38:18,425 [INFO] galdr.services.azure_service: [STT\u2190mic] chars=71 latency_ms=10362
-2026-05-20 15:38:18,425 [INFO] __main__: [USER INPUT]: I grabbed the card and I stick it into the the place where it might go.
+2026-05-20 15:38:18,425 [INFO] __main__: [USER INPUT]: <redacted>
 2026-05-20 15:38:19,183 [INFO] httpx: HTTP Request: POST https://swedencentral.api.cognitive.microsoft.com/openai/deployments/gpt-4o/chat/completions?api-version=2025-01-01-preview "HTTP/1.1 200 OK"
 2026-05-20 15:38:19,184 [INFO] galdr.services.azure_service: [LLM CALL] tokens_in=90 tokens_out=2 latency_ms=759
 2026-05-20 15:38:19,184 [INFO] galdr.core.engine: [STREAM] steps 1-4 done in 759ms � LLM stream is lazy
@@ -193,7 +193,7 @@
 2026-05-20 15:39:01,534 [INFO] __main__: [LISTEN] no input detected � re-prompting
 2026-05-20 15:39:03,650 [INFO] galdr.services.azure_service: [TTS\u2192speaker] voice=en-GB-SoniaNeural chars=15 latency_ms=2116
 2026-05-20 15:39:07,190 [INFO] galdr.services.azure_service: [STT\u2190mic] chars=24 latency_ms=3539
-2026-05-20 15:39:07,190 [INFO] __main__: [USER INPUT]: I smashed the interface.
+2026-05-20 15:39:07,190 [INFO] __main__: [USER INPUT]: <redacted>
 2026-05-20 15:39:08,096 [INFO] httpx: HTTP Request: POST https://swedencentral.api.cognitive.microsoft.com/openai/deployments/gpt-4o/chat/completions?api-version=2025-01-01-preview "HTTP/1.1 200 OK"
 2026-05-20 15:39:08,097 [INFO] galdr.services.azure_service: [LLM CALL] tokens_in=117 tokens_out=6 latency_ms=907
 2026-05-20 15:39:08,097 [INFO] galdr.core.engine: [STREAM] steps 1-4 done in 907ms � LLM stream is lazy
@@ -219,7 +219,7 @@
 [Listening � node: terminal_resistance]
 2026-05-20 15:40:00,908 [INFO] galdr.services.azure_service: [TTS\u2192speaker] voice=en-GB-SoniaNeural chars=15 latency_ms=1841
 2026-05-20 15:40:08,336 [INFO] galdr.services.azure_service: [STT\u2190mic] chars=66 latency_ms=7428
-2026-05-20 15:40:08,337 [INFO] __main__: [USER INPUT]: I had but the terminal and then I whip up my *** and I poop in it.
+2026-05-20 15:40:08,337 [INFO] __main__: [USER INPUT]: <redacted>
 2026-05-20 15:40:09,024 [INFO] httpx: HTTP Request: POST https://swedencentral.api.cognitive.microsoft.com/openai/deployments/gpt-4o/chat/completions?api-version=2025-01-01-preview "HTTP/1.1 200 OK"
 2026-05-20 15:40:09,025 [INFO] galdr.services.azure_service: [LLM CALL] tokens_in=89 tokens_out=2 latency_ms=688
 2026-05-20 15:40:09,025 [INFO] galdr.core.engine: [STREAM] steps 1-4 done in 687ms � LLM stream is lazy
@@ -244,7 +244,7 @@
 [Listening � node: terminal_resistance]
 2026-05-20 15:40:55,550 [INFO] galdr.services.azure_service: [TTS\u2192speaker] voice=en-GB-SoniaNeural chars=15 latency_ms=1855
 2026-05-20 15:41:07,550 [INFO] galdr.services.azure_service: [STT\u2190mic] chars=67 latency_ms=12000
-2026-05-20 15:41:07,550 [INFO] __main__: [USER INPUT]: I go back towards the cryopods and I look into those ******** eyes.
+2026-05-20 15:41:07,550 [INFO] __main__: [USER INPUT]: <redacted>
 2026-05-20 15:41:08,149 [INFO] httpx: HTTP Request: POST https://swedencentral.api.cognitive.microsoft.com/openai/deployments/gpt-4o/chat/completions?api-version=2025-01-01-preview "HTTP/1.1 200 OK"
 2026-05-20 15:41:08,150 [INFO] galdr.services.azure_service: [LLM CALL] tokens_in=87 tokens_out=2 latency_ms=599
 2026-05-20 15:41:08,150 [INFO] galdr.core.engine: [STREAM] steps 1-4 done in 599ms � LLM stream is lazy
@@ -264,7 +264,7 @@
 [Listening � node: the_ascent]
 2026-05-20 15:41:44,978 [INFO] galdr.services.azure_service: [TTS\u2192speaker] voice=en-GB-SoniaNeural chars=15 latency_ms=2095
 2026-05-20 15:41:48,907 [INFO] galdr.services.azure_service: [STT\u2190mic] chars=34 latency_ms=3929
-2026-05-20 15:41:48,907 [INFO] __main__: [USER INPUT]: Try to wake. I try to wake one up.
+2026-05-20 15:41:48,907 [INFO] __main__: [USER INPUT]: <redacted>
 2026-05-20 15:41:49,565 [INFO] httpx: HTTP Request: POST https://swedencentral.api.cognitive.microsoft.com/openai/deployments/gpt-4o/chat/completions?api-version=2025-01-01-preview "HTTP/1.1 200 OK"
 2026-05-20 15:41:49,566 [INFO] galdr.services.azure_service: [LLM CALL] tokens_in=124 tokens_out=2 latency_ms=659
 2026-05-20 15:41:49,566 [INFO] galdr.core.engine: [STREAM] steps 1-4 done in 659ms � LLM stream is lazy
@@ -283,7 +283,7 @@
 [Listening � node: crater_surface]
 2026-05-20 15:42:20,020 [INFO] galdr.services.azure_service: [TTS\u2192speaker] voice=en-GB-SoniaNeural chars=15 latency_ms=1826
 2026-05-20 15:42:24,410 [INFO] galdr.services.azure_service: [STT\u2190mic] chars=38 latency_ms=4390
-2026-05-20 15:42:24,411 [INFO] __main__: [USER INPUT]: I ask low what the hell are you doing?
+2026-05-20 15:42:24,411 [INFO] __main__: [USER INPUT]: <redacted>
 2026-05-20 15:42:25,232 [INFO] httpx: HTTP Request: POST https://swedencentral.api.cognitive.microsoft.com/openai/deployments/gpt-4o/chat/completions?api-version=2025-01-01-preview "HTTP/1.1 200 OK"
 2026-05-20 15:42:25,233 [INFO] galdr.services.azure_service: [LLM CALL] tokens_in=85 tokens_out=3 latency_ms=822
 2026-05-20 15:42:25,233 [INFO] galdr.core.engine: [STREAM] steps 1-4 done in 822ms � LLM stream is lazy
@@ -303,7 +303,7 @@
 [Listening � node: lo_aftermath]
 2026-05-20 15:43:03,595 [INFO] galdr.services.azure_service: [TTS\u2192speaker] voice=en-GB-SoniaNeural chars=15 latency_ms=1852
 2026-05-20 15:43:09,365 [INFO] galdr.services.azure_service: [STT\u2190mic] chars=62 latency_ms=5769
-2026-05-20 15:43:09,365 [INFO] __main__: [USER INPUT]: I explained everything including my head, **** of the console.
+2026-05-20 15:43:09,365 [INFO] __main__: [USER INPUT]: <redacted>
 2026-05-20 15:43:10,028 [INFO] httpx: HTTP Request: POST https://swedencentral.api.cognitive.microsoft.com/openai/deployments/gpt-4o/chat/completions?api-version=2025-01-01-preview "HTTP/1.1 200 OK"
 2026-05-20 15:43:10,029 [INFO] galdr.services.azure_service: [LLM CALL] tokens_in=174 tokens_out=3 latency_ms=664
 2026-05-20 15:43:10,029 [INFO] galdr.core.engine: [STREAM] steps 1-4 done in 664ms � LLM stream is lazy
@@ -325,7 +325,7 @@
 2026-05-20 15:43:52,610 [INFO] __main__: [LISTEN] no input detected � re-prompting
 2026-05-20 15:43:54,725 [INFO] galdr.services.azure_service: [TTS\u2192speaker] voice=en-GB-SoniaNeural chars=15 latency_ms=2115
 2026-05-20 15:44:01,808 [INFO] galdr.services.azure_service: [STT\u2190mic] chars=56 latency_ms=7083
-2026-05-20 15:44:01,808 [INFO] __main__: [USER INPUT]: I comfort low and I say we'll get to the bottom of this.
+2026-05-20 15:44:01,808 [INFO] __main__: [USER INPUT]: <redacted>
 2026-05-20 15:44:02,829 [INFO] httpx: HTTP Request: POST https://swedencentral.api.cognitive.microsoft.com/openai/deployments/gpt-4o/chat/completions?api-version=2025-01-01-preview "HTTP/1.1 200 OK"
 2026-05-20 15:44:02,829 [INFO] galdr.services.azure_service: [LLM CALL] tokens_in=128 tokens_out=6 latency_ms=1021
 2026-05-20 15:44:02,829 [INFO] galdr.core.engine: [STREAM] steps 1-4 done in 1020ms � LLM stream is lazy

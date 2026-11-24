@@ -185,6 +185,8 @@ pipeline steps 1-4, `first_token_ms` covers the narration LLM round trip, and `[
 starts when `narrate_stream()` begins, which is *after* the pipeline has returned. Because
 the segments do not overlap, the honest end-to-end figure is their sum. The clock starts
 when the transcript is ready; the time from end of speech to transcript is not logged.
+The logs for benchmarks 02-09 are in `app/`. The player's own lines in them are redacted;
+every timing line is unchanged.
 
 | Segment | mean | p50 | p95 |
 |---------|------|-----|-----|
