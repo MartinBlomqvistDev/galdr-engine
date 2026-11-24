@@ -8,7 +8,7 @@ A dramatist authors a directed graph of narrative nodes. Within each node, an AI
 
 ## What it does
 
-- **GPS-triggered narrative**: nodes activate on proximity. Reverb adjusts dynamically as the player approaches. Built for outdoor and site-specific performance.
+- **GPS-triggered narrative (planned)**: nodes can carry a GPS anchor, but proximity does not yet activate nodes or advance the story. Location-triggered play for outdoor and site-specific performance is the next step for this layer.
 - **D&D 5e skill checks**: every player action is mechanically resolved before the LLM generates. Dice result shapes what the AI says; the AI never decides outcomes.
 - **Streaming TTS pipeline**: LLM token stream splits into sentences. Sentence N+1 synthesizes while N plays. Near-zero inter-sentence gap after the first sentence.
 - **Two-layer narrator tonality**: authored `VoiceParams` per node (TTS acoustic delivery, static dramatist intent) + game state injected into system prompt (LLM narrative register, dynamic).
@@ -159,7 +159,7 @@ Without keys the engine runs in mock mode: full game mechanics, scripted node te
 
 The included scenario is CALLOUSED, a voice-only RPG and exam PoC. Player and Lo investigate a stopped geothermal vent on a glass crater floor. The ground cracks. The player falls through into an Ancestor Facility 50,000 years dormant: a ceramic maintenance unit on a fixed circuit, hundreds of sleeping Ancestors, a census frozen at 479 of 480. 19 nodes. D&D 5e mechanics. Diegetic stat emergence. No screen.
 
-GPS-triggered scenarios, multi-character casts, and outdoor performance are engine capabilities not exercised in this PoC.
+GPS-triggered scenarios, multi-character casts and outdoor performance are planned and not exercised in this PoC.
 
 ---
 
@@ -180,29 +180,32 @@ GPS-triggered scenarios, multi-character casts, and outdoor performance are engi
 
 ## Latency profile (n=46 across benchmarks 02-09, Azure gpt-4o + Azure AI Speech)
 
-Three instruments measure three disjoint, sequential segments. `pre_latency` covers the
-deterministic pipeline, `first_token_ms` covers the LLM round trip, and `[STREAM TTFA]`
+Three instruments measure three disjoint, sequential segments. `pre_latency` covers
+pipeline steps 1-4, `first_token_ms` covers the narration LLM round trip, and `[STREAM TTFA]`
 starts when `narrate_stream()` begins, which is *after* the pipeline has returned. Because
-the segments do not overlap, the honest end-to-end figure is their sum.
+the segments do not overlap, the honest end-to-end figure is their sum. The clock starts
+when the transcript is ready; the time from end of speech to transcript is not logged.
 
 | Segment | mean | p50 | p95 |
 |---------|------|-----|-----|
-| Pipeline steps 1-4 (deterministic, pre-LLM) | 712ms | 672ms | 907ms |
+| Pipeline steps 1-4 (intent-matching LLM call, then dice, state, transition) | 712ms | 672ms | 907ms |
 | `[STREAM TTFA]` (LLM call -> first sentence) | 1902ms | 1844ms | 3286ms |
 | Azure OpenAI first token (inside the above) | 1900ms | 1834ms | 3071ms |
 | Azure TTS warm synthesis, sentence 1 | ~250ms | ~196ms | ~450ms |
 | **Input -> first audio (sum, paired n=46)** | **2811ms** | **2726ms** | **4173ms** |
 
 Time to first audio is therefore about **2.7s at p50**, against an original 500ms design
-target that a cloud LLM pipeline does not reach. Per-observation median shares: LLM 67%,
-deterministic pipeline 26%, TTS 7%.
+target that a cloud LLM pipeline does not reach. Per-observation median shares: narration
+LLM 67%, steps 1-4 26%, TTS 7%.
 
 The LLM round trip is the bottleneck and is measured directly: `first_token_ms` p50 1834ms
 over n=46 (min 815ms, max 4401ms). It accounts for essentially all of `[STREAM TTFA]`; the
-sentence splitter adds under 10ms. The deterministic pipeline contributes 672ms and is
-network-independent, so it becomes the binding constraint if inference moves local:
-published Ollama benchmarks on Apple Silicon put local first-token at 50-150ms, which would
-give an estimated input-to-first-audio of roughly 950-1050ms. TTS cold start (5270ms on the
+sentence splitter adds under 10ms. Steps 1-4 contribute 672ms at p50, and that time is a
+second cloud call: intent matching sends the player's words to gpt-4o, which picks one of
+the node's authored actions. Dice, state mutation and the node transition take about 1ms.
+Each generated turn is therefore two LLM calls in sequence. An earlier local-inference
+estimate (roughly 950-1050ms) assumed the 672ms would remain; since that time is itself an
+LLM call it would move local too, and a local figure has not been measured. TTS cold start (5270ms on the
 first synthesis) is not structural; a `warmup()` at session start opens the Azure synthesiser
 WebSocket and eliminates it.
 

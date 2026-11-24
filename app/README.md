@@ -8,7 +8,7 @@ A dramatist authors a directed graph of narrative nodes. Within each node, an AI
 
 ## What it does
 
-- **GPS-triggered narrative**: nodes activate on proximity. Reverb adjusts dynamically as the player approaches. Built for outdoor and site-specific performance.
+- **GPS-triggered narrative (planned)**: nodes can carry a GPS anchor, but proximity does not yet activate nodes or advance the story. Location-triggered play for outdoor and site-specific performance is the next step for this layer.
 - **D&D 5e skill checks**: every player action is mechanically resolved before the LLM generates. Dice result shapes what the AI says; the AI never decides outcomes.
 - **Streaming TTS pipeline**: LLM token stream splits into sentences. Sentence N+1 synthesizes while N plays. Near-zero inter-sentence gap after the first sentence.
 - **Two-layer narrator tonality**: authored `VoiceParams` per node (TTS acoustic delivery, static dramatist intent) + game state injected into system prompt (LLM narrative register, dynamic).
@@ -160,9 +160,9 @@ Without keys the engine runs in mock mode: full game mechanics, scripted node te
 
 ## Demo: CALLOUSED (Prologue)
 
-The included scenario is CALLOUSED, a voice-only RPG and exam PoC. Player and Lo investigate a stopped geothermal vent on a glass crater floor. The ground cracks. The player falls through into an Ancestor Facility 50,000 years dormant: a ceramic maintenance unit on a fixed circuit, hundreds of sleeping Ancestors, a census frozen at 479 of 480. 22 nodes. D&D 5e mechanics. Diegetic stat emergence. No screen.
+The included scenario is CALLOUSED, a voice-only RPG and exam PoC. Player and Lo investigate a stopped geothermal vent on a glass crater floor. The ground cracks. The player falls through into an Ancestor Facility 50,000 years dormant: a ceramic maintenance unit on a fixed circuit, hundreds of sleeping Ancestors, a census frozen at 479 of 480. 19 nodes. D&D 5e mechanics. Diegetic stat emergence. No screen.
 
-GPS-triggered scenarios, multi-character casts, and outdoor performance are engine capabilities not exercised in this PoC.
+GPS-triggered scenarios, multi-character casts and outdoor performance are planned and not exercised in this PoC.
 
 ---
 
@@ -181,13 +181,8 @@ GPS-triggered scenarios, multi-character casts, and outdoor performance are engi
 
 ---
 
-## Latency profile (benchmark 08, Azure gpt-4o, en-GB-RyanNeural)
+## Latency profile
 
-| Metric | mean | p50 | p95 |
-|--------|------|-----|-----|
-| TTFA (input -> first sentence) | 1832ms | ~1800ms | 2368ms |
-| Pre-LLM overhead (steps 1-4) | ~180ms | -- | -- |
-
-`[STREAM TTFA]` measures LLM-to-first-sentence latency. True time-to-first-audio = TTFA + TTS synthesis warm (~200-650ms). Bottleneck is Azure OpenAI first-token latency (~1.6s). The engine pipeline contributes ~10-15% of total TTFA.
+This single-run table is superseded. The current profile is in the root [README](../README.md#latency-profile-n46-across-benchmarks-02-09-azure-gpt-4o--azure-ai-speech): input to first audio is about 2.7s at p50 over n=46, of which 672ms is pipeline steps 1-4, almost all of it the intent-matching LLM call.
 
 Full design reasoning in [ARCHITECTURE.md](ARCHITECTURE.md).
